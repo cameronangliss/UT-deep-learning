@@ -26,7 +26,7 @@ class LinearClassifier(torch.nn.Module):
         """
         Your code here
         """
-        self.layer1 = torch.nn.Linear(12288, 6)
+        self.layer1 = torch.nn.Linear(64, 6)
 
     def forward(self, x):
         """
