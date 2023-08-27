@@ -16,7 +16,7 @@ class ClassificationLoss(torch.nn.Module):
 
         Hint: Don't be too fancy, this is a one-liner
         """
-        return torch.mean(torch.log(torch.softmax(input)))
+        return torch.mean(torch.log(torch.softmax(input)[target]))
 
 
 class LinearClassifier(torch.nn.Module):
