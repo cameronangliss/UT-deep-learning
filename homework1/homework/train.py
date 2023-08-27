@@ -9,7 +9,6 @@ def train(args):
     Your code here
 
     """
-    raise NotImplementedError('train')
 
     save_model(model)
 
