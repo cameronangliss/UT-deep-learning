@@ -16,7 +16,7 @@ class ClassificationLoss(torch.nn.Module):
 
         Hint: Don't be too fancy, this is a one-liner
         """
-        raise NotImplementedError('ClassificationLoss.forward')
+        return torch.mean(torch.log(torch.softmax(input)))
 
 
 class LinearClassifier(torch.nn.Module):
@@ -26,7 +26,7 @@ class LinearClassifier(torch.nn.Module):
         """
         Your code here
         """
-        raise NotImplementedError('LinearClassifier.__init__')
+        self.layer1 = torch.nn.Linear(12288, 6)
 
     def forward(self, x):
         """
@@ -35,7 +35,10 @@ class LinearClassifier(torch.nn.Module):
         @x: torch.Tensor((B,3,64,64))
         @return: torch.Tensor((B,6))
         """
-        raise NotImplementedError('LinearClassifier.forward')
+        output = torch.tensor([])
+        for input_feature in x:
+            output = torch.cat([output, self.layer1(input_feature)])
+        return output
 
 
 class MLPClassifier(torch.nn.Module):
