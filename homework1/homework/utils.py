@@ -1,4 +1,5 @@
 from PIL import Image
+import csv
 
 from torch.utils.data import Dataset, DataLoader
 from torchvision import transforms
@@ -14,13 +15,16 @@ class SuperTuxDataset(Dataset):
 
         WARNING: Do not perform data normalization here. 
         """
-        raise NotImplementedError('SuperTuxDataset.__init__')
+        with open(dataset_path) as f:
+            self.csv_reader = csv.reader(f)
+        for row in self.csv_reader:
+            print(row)
 
     def __len__(self):
         """
         Your code here
         """
-        raise NotImplementedError('SuperTuxDataset.__len__')
+        return len(self.csv_reader)
 
     def __getitem__(self, idx):
         """
