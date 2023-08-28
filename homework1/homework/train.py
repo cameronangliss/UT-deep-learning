@@ -15,10 +15,14 @@ def train(args):
     valid_data = load_data("data/valid")
 
     # Run SGD for several epochs
-    for _ in range(10):
+    while True:
         batch = next(train_data)
-        output = model.forward(batch)
-        error = loss.forward(output, batch)
+        outputs = model.forward(batch)
+        labels = [row["label"] for row in batch]
+        if accuracy(outputs, labels) < 0.9:
+            break
+        error = loss.forward(outputs, batch)
+        optimizer.zero_grad()
         error.backward()
         optimizer.step()
 
