@@ -1,6 +1,7 @@
 import csv
 import os
 
+import torch
 from PIL import Image
 from torch.utils.data import DataLoader, Dataset
 from torchvision import transforms
@@ -12,13 +13,13 @@ class SuperTuxDataset(Dataset):
     def __init__(self, dataset_path):
         self.dataset_path = dataset_path
         with open(os.path.join(dataset_path, "labels.csv")) as f:
-            self.csv_dict = list(csv.DictReader(f))
+            self.data = list(csv.DictReader(f))
 
     def __len__(self):
-        return len(self.csv_dict)
+        return len(self.data)
 
     def __getitem__(self, idx):
-        row = self.csv_dict[idx]
+        row = self.data[idx]
         image_to_tensor = transforms.ToTensor()
         image_path = os.path.join(self.dataset_path, row["file"])
         image_tensor = image_to_tensor(Image.open(image_path))
