@@ -21,8 +21,8 @@ class SuperTuxDataset(Dataset):
             csv_reader = csv.DictReader(f, fieldnames=["image", "label", "stage_name"])
             self.csv_dict = []
             for row in csv_reader:
+                print(row)
                 image_path = os.path.join(dataset_path, row["image"])
-                print(image_path)
                 row["image"] = transforms.ToTensor(Image.open(image_path))
                 self.csv_dict += row
 
