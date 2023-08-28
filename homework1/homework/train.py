@@ -19,7 +19,7 @@ def train(args):
         for batch in train_data:
             inputs = batch[0].to(model.device)
             labels = batch[1]
-            outputs = model.forward(inputs).to(model.device)
+            outputs = model.forward(inputs)
             error = loss.forward(outputs, labels)
             optimizer.zero_grad()
             error.backward()
