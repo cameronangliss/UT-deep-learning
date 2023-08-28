@@ -11,8 +11,8 @@ def train(args):
     optimizer = SGD(model.parameters(), lr=0.01)
 
     # load the data: train and valid
-    train_data = load_data("data/train")
-    valid_data = load_data("data/valid")
+    train_data = iter(load_data("data/train"))
+    valid_data = iter(load_data("data/valid"))
 
     # Run SGD for several epochs
     while True:
