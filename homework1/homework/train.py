@@ -1,4 +1,3 @@
-import torch
 from torch.optim import SGD
 
 from .models import ClassificationLoss, model_factory, save_model
@@ -18,7 +17,7 @@ def train(args):
     # Run SGD for several epochs
     while True:
         for batch in train_data:
-            inputs = batch[0]
+            inputs = batch[0].to(model.device)
             labels = batch[1]
             outputs = model.forward(inputs)
             error = loss.forward(outputs, labels)
