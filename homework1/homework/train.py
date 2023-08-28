@@ -24,12 +24,17 @@ def train(args):
             optimizer.zero_grad()
             error.backward()
             optimizer.step()
+        score = 0
+        n = 0
         for batch in valid_data:
             inputs = batch[0]
             labels = batch[1]
             outputs = model.forward(inputs)
-            score = accuracy(outputs, labels)
-        if score > 0.75:
+            score += accuracy(outputs, labels)
+            n += 1
+        score /= n
+        min_score = 0.75 if args.model == "linear" else 0.80
+        if score > min_score:
             break
 
     # Save your final model, using save_model
