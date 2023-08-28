@@ -8,7 +8,6 @@ def train(args):
     # create a model, loss, optimizer
     model = model_factory[args.model]()
     loss = ClassificationLoss()
-    optimizer = SGD(model.parameters, lr=0.01)
 
     # load the data: train and valid
     train_data = load_data("data/train")
@@ -22,9 +21,9 @@ def train(args):
         if accuracy(outputs, labels) < 0.9:
             break
         error = loss.forward(outputs, batch)
-        optimizer.zero_grad()
+        model.optimizer.zero_grad()
         error.backward()
-        optimizer.step()
+        model.optimizer.step()
 
     # Save your final model, using save_model
     save_model(model)
