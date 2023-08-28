@@ -1,5 +1,7 @@
 import argparse
+
 import matplotlib.pyplot as plt
+
 from .utils import LABEL_NAMES, SuperTuxDataset
 
 
