@@ -31,7 +31,8 @@ class SuperTuxDataset(Dataset):
         Your code here
         return a tuple: img, label
         """
-        raise NotImplementedError('SuperTuxDataset.__getitem__')
+        row = self.csv_reader[idx]
+        return row[0], row[1]
 
 
 def load_data(dataset_path, num_workers=0, batch_size=128):
