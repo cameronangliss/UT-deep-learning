@@ -16,7 +16,7 @@ def train(args):
     valid_data = load_data("data/valid")
 
     # Run SGD for several epochs
-    while True:
+    for _ in range(25):
         for batch in train_data:
             inputs = batch[0]
             labels = batch[1]
@@ -25,8 +25,6 @@ def train(args):
             optimizer.zero_grad()
             error.backward()
             optimizer.step()
-        if accuracy(outputs, labels) > 0.98:
-            break
 
     # Save your final model, using save_model
     save_model(model)
