@@ -8,7 +8,7 @@ def train(args):
     # create a model, loss, optimizer
     model = model_factory[args.model]()
     loss = ClassificationLoss()
-    optimizer = SGD(model.parameters)
+    optimizer = SGD(model.parameters, lr=0.01)
 
     # load the data: train and valid
     train_data = load_data("data/train")
