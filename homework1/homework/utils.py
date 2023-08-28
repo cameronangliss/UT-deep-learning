@@ -35,7 +35,7 @@ class SuperTuxDataset(Dataset):
         image_to_tensor = transforms.ToTensor()
         image_path = os.path.join(self.dataset_path, row["file"])
         image_tensor = image_to_tensor(Image.open(image_path))
-        label_id = ["background", "kart", "pickup", "nitro", "bomb", "projectile"].index(row["label"])
+        label_id = LABEL_NAMES.index(row["label"])
         return image_tensor, label_id
 
 
