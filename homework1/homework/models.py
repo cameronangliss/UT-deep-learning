@@ -11,7 +11,7 @@ class LinearClassifier(torch.nn.Module):
     def __init__(self):
         super().__init__()
         self.layer = torch.nn.Linear(64*64*3, 6)
-        self.device = "cuda" if torch.cuda.is_available() else "cpu"
+        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     def forward(self, x):
         batch_size = x.size()[0]
