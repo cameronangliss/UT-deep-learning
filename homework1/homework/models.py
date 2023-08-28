@@ -11,7 +11,6 @@ class LinearClassifier(torch.nn.Module):
     def __init__(self):
         super().__init__()
         self.layer = torch.nn.Linear(64*64*3, 6)
-        self.optimizer = torch.optim.SGD(self.parameters, lr=0.01)
 
     def forward(self, x):
         batch_size = x.size()[0]
