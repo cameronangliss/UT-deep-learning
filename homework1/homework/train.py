@@ -12,16 +12,16 @@ def train(args):
     optimizer = SGD(model.parameters(), lr=0.01)
 
     # load the data: train and valid
-    train_data = iter(load_data("data/train"))
-    valid_data = iter(load_data("data/valid"))
+    train_data = load_data("data/train").dataset
+    valid_data = load_data("data/valid").dataset
 
     # Run SGD for several epochs
     while True:
         batch = next(train_data)
-        inputs = torch.cat([data[0] for data in batch])
-        outputs = model.forward(batch)
-        labels = [data[1] for data in batch]
-        if accuracy(outputs, labels) < 0.9:
+        inputs = torch.tensor([data[0] for data in batch])
+        outputs = model.forward(inputs)
+        labels = torch.tensor([data[1] for data in batch])
+        if accuracy(outputs, labels) > 0.9:
             break
         error = loss.forward(outputs, batch)
         optimizer.zero_grad()
