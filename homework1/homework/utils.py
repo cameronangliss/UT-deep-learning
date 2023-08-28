@@ -18,7 +18,10 @@ class SuperTuxDataset(Dataset):
         """
         
         with open(os.path.join(dataset_path, "labels.csv")) as f:
-            self.csv_reader = csv.reader(f)
+            self.csv_reader = csv.DictReader(f, fieldnames=["image", "label", "stage_name"])
+        for row in self.csv_reader:
+            image_path = os.path.join(dataset_path, row["image"])
+            row["image"] = transforms.ToTensor(Image.open(image_path))
 
     def __len__(self):
         """
@@ -32,7 +35,7 @@ class SuperTuxDataset(Dataset):
         return a tuple: img, label
         """
         row = self.csv_reader[idx]
-        return row[0], row[1]
+        return row["image"], row["label"]
 
 
 def load_data(dataset_path, num_workers=0, batch_size=128):
