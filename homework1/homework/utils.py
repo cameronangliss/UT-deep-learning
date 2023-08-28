@@ -32,7 +32,7 @@ class SuperTuxDataset(Dataset):
         """
         row = self.csv_dict[idx]
         image_to_tensor = transforms.ToTensor()
-        return image_to_tensor(row["file"]), row["label"]
+        return image_to_tensor(Image.open(row["file"])), row["label"]
 
 
 def load_data(dataset_path, num_workers=0, batch_size=128):
