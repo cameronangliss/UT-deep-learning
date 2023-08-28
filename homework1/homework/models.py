@@ -22,19 +22,9 @@ class ClassificationLoss(torch.nn.Module):
 class LinearClassifier(torch.nn.Module):
     def __init__(self):
         super().__init__()
-
-        """
-        Your code here
-        """
         self.layer = torch.nn.Linear(64*64*3, 6)
 
     def forward(self, x):
-        """
-        Your code here
-
-        @x: torch.Tensor((B,3,64,64))
-        @return: torch.Tensor((B,6))
-        """
         print(x.size())
         batch_size = x.size()[0]
         flattened_x = x.view(batch_size, -1)
