@@ -1,5 +1,6 @@
 from PIL import Image
 import csv
+import os
 
 from torch.utils.data import Dataset, DataLoader
 from torchvision import transforms
@@ -15,7 +16,8 @@ class SuperTuxDataset(Dataset):
 
         WARNING: Do not perform data normalization here. 
         """
-        with open(dataset_path) as f:
+        
+        with open(os.path.join(dataset_path, "labels.csv")) as f:
             self.csv_reader = csv.reader(f)
         for row in self.csv_reader:
             print(row)
