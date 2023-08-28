@@ -37,7 +37,7 @@ class LinearClassifier(torch.nn.Module):
         """
         output = torch.tensor([])
         for input_feature in x:
-            output = torch.cat([output, self.layer1(input_feature)])
+            output = torch.cat([output, self.layer1.forward(input_feature)])
         return output
 
 
