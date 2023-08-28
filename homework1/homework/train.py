@@ -21,7 +21,7 @@ def train(args):
             inputs = batch[0]
             labels = batch[1]
             outputs = model.forward(inputs)
-            error = loss.forward(outputs, batch)
+            error = loss.forward(outputs, labels)
             optimizer.zero_grad()
             error.backward()
             optimizer.step()
