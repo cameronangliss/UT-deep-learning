@@ -17,16 +17,16 @@ def train(args):
     # Run SGD for several epochs
     while True:
         for batch in train_data:
-            inputs = batch[0].to(model.device)
-            labels = batch[1].to(model.device)
+            inputs = batch[0]
+            labels = batch[1]
             outputs = model.forward(inputs)
             error = loss.forward(outputs, labels)
             optimizer.zero_grad()
             error.backward()
             optimizer.step()
         for batch in valid_data:
-            inputs = batch[0].to(model.device)
-            labels = batch[1].to(model.device)
+            inputs = batch[0]
+            labels = batch[1]
             outputs = model.forward(inputs)
             score = accuracy(outputs, labels)
         if score > 0.75:
