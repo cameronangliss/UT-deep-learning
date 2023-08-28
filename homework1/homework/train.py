@@ -1,3 +1,4 @@
+import torch
 from torch.optim import SGD
 
 from .models import ClassificationLoss, model_factory, save_model
@@ -17,8 +18,9 @@ def train(args):
     # Run SGD for several epochs
     while True:
         batch = next(train_data)
+        inputs = torch.cat([data[0] for data in batch])
         outputs = model.forward(batch)
-        labels = [row["label"] for row in batch]
+        labels = [data[1] for data in batch]
         if accuracy(outputs, labels) < 0.9:
             break
         error = loss.forward(outputs, batch)
