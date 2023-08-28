@@ -25,8 +25,8 @@ def train(args):
             error.backward()
             optimizer.step()
         for batch in valid_data:
-            inputs = batch[0]
-            labels = batch[1]
+            inputs = batch[0].to(model.device)
+            labels = batch[1].to(model.device)
             outputs = model.forward(inputs)
             score = accuracy(outputs, labels)
         if score > 0.75:
