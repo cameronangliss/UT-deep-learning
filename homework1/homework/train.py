@@ -18,9 +18,9 @@ def train(args):
     # Run SGD for several epochs
     for _ in range(10):
         for batch in train_data:
-            inputs = torch.tensor([data[0] for data in batch.dataset])
+            inputs = torch.tensor([data[0] for data in batch])
             outputs = model.forward(inputs)
-            labels = torch.tensor([data[1] for data in batch.dataset])
+            labels = torch.tensor([data[1] for data in batch])
             error = loss.forward(outputs, batch)
             optimizer.zero_grad()
             error.backward()
