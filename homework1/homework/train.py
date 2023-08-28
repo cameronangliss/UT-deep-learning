@@ -25,7 +25,7 @@ def train(args):
             optimizer.zero_grad()
             error.backward()
             optimizer.step()
-        if accuracy(outputs, labels) > 0.95:
+        if accuracy(outputs, labels) > 0.98:
             break
 
     # Save your final model, using save_model
