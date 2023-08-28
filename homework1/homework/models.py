@@ -13,7 +13,6 @@ class LinearClassifier(torch.nn.Module):
         self.layer = torch.nn.Linear(64*64*3, 6)
 
     def forward(self, x):
-        print(x.size())
         batch_size = x.size()[0]
         flattened_x = x.view(batch_size, -1)
         return self.layer(flattened_x)
