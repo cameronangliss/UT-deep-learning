@@ -30,7 +30,7 @@ def train(args):
             labels = batch[1]
             outputs = model.forward(inputs)
             score = accuracy(outputs, labels)
-        if score > 0.8:
+        if score > 0.75:
             break
 
     # Save your final model, using save_model
