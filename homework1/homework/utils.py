@@ -16,6 +16,7 @@ class SuperTuxDataset(Dataset):
 
         WARNING: Do not perform data normalization here. 
         """
+        self.dataset_path = dataset_path
         with open(os.path.join(dataset_path, "labels.csv")) as f:
             self.csv_dict = list(csv.DictReader(f))
 
@@ -32,7 +33,8 @@ class SuperTuxDataset(Dataset):
         """
         row = self.csv_dict[idx]
         image_to_tensor = transforms.ToTensor()
-        return image_to_tensor(Image.open(row["file"])), row["label"]
+        image_path = os.path.join(self.dataset_path, row["file"])
+        return image_to_tensor(Image.open(image_path)), row["label"]
 
 
 def load_data(dataset_path, num_workers=0, batch_size=128):
