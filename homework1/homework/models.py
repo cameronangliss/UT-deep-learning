@@ -26,9 +26,7 @@ class LinearClassifier(torch.nn.Module):
         """
         Your code here
         """
-        self.layer1 = torch.nn.Linear(64, 64)
-        self.layer2 = torch.nn.Linear(64, 3)
-        self.layer3 = torch.nn.Linear(3, 6)
+        self.layer = torch.nn.Linear(64*64*3, 6)
 
     def forward(self, x):
         """
@@ -37,7 +35,9 @@ class LinearClassifier(torch.nn.Module):
         @x: torch.Tensor((B,3,64,64))
         @return: torch.Tensor((B,6))
         """
-        return torch.cat([self.layer3(self.layer2(self.layer1(el))) for el in x])
+        batch_size = x.size()[0]
+        flattened_x = x.view(batch_size, -1)
+        return torch.cat([self.layer(el) for el in x])
 
 
 class MLPClassifier(torch.nn.Module):
