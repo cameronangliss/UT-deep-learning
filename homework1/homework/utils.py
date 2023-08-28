@@ -18,23 +18,25 @@ class SuperTuxDataset(Dataset):
         """
         
         with open(os.path.join(dataset_path, "labels.csv")) as f:
-            self.csv_reader = csv.DictReader(f, fieldnames=["image", "label", "stage_name"])
-        for row in self.csv_reader:
-            image_path = os.path.join(dataset_path, row["image"])
-            row["image"] = transforms.ToTensor(Image.open(image_path))
+            csv_reader = csv.DictReader(f, fieldnames=["image", "label", "stage_name"])
+            self.csv_dict = []
+            for row in csv_reader:
+                image_path = os.path.join(dataset_path, row["image"])
+                row["image"] = transforms.ToTensor(Image.open(image_path))
+                self.csv_dict += row
 
     def __len__(self):
         """
         Your code here
         """
-        return len(self.csv_reader)
+        return len(self.csv_dict)
 
     def __getitem__(self, idx):
         """
         Your code here
         return a tuple: img, label
         """
-        row = self.csv_reader[idx]
+        row = self.csv_dict[idx]
         return row["image"], row["label"]
 
 
