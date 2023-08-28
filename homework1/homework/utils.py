@@ -19,8 +19,6 @@ class SuperTuxDataset(Dataset):
         
         with open(os.path.join(dataset_path, "labels.csv")) as f:
             self.csv_reader = csv.reader(f)
-            for row in self.csv_reader:
-                print(row)
 
     def __len__(self):
         """
