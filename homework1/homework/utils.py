@@ -34,7 +34,9 @@ class SuperTuxDataset(Dataset):
         row = self.csv_dict[idx]
         image_to_tensor = transforms.ToTensor()
         image_path = os.path.join(self.dataset_path, row["file"])
-        return image_to_tensor(Image.open(image_path)), row["label"]
+        image_tensor = image_to_tensor(Image.open(image_path))
+        label_id = ["background", "kart", "pickup", "nitro", "bomb", "projectile"].index(row["label"])
+        return image_tensor, label_id
 
 
 def load_data(dataset_path, num_workers=0, batch_size=128):
