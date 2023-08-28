@@ -35,6 +35,7 @@ class LinearClassifier(torch.nn.Module):
         @x: torch.Tensor((B,3,64,64))
         @return: torch.Tensor((B,6))
         """
+        print(x.size())
         batch_size = x.size()[0]
         flattened_x = x.view(batch_size, -1)
         return torch.cat([self.layer(el) for el in x])
