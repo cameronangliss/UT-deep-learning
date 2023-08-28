@@ -14,27 +14,23 @@ class LinearClassifier(torch.nn.Module):
 
     def forward(self, x):
         batch_size = x.size()[0]
-        flattened_x = x.view(batch_size, -1)
-        return self.layer(flattened_x)
+        x = x.view(batch_size, -1)
+        x = self.layer(x)
+        return x
 
 
 class MLPClassifier(torch.nn.Module):
     def __init__(self):
         super().__init__()
-
-        """
-        Your code here
-        """
-        raise NotImplementedError('MLPClassifier.__init__')
+        self.layer1 = torch.nn.Linear(64*64*3, 10)
+        self.layer2 = torch.nn.Linear(10, 6)
 
     def forward(self, x):
-        """
-        Your code here
-
-        @x: torch.Tensor((B,3,64,64))
-        @return: torch.Tensor((B,6))
-        """
-        raise NotImplementedError('MLPClassifier.forward')
+        batch_size = x.size()[0]
+        x = x.view(batch_size, -1)
+        x = self.layer1(x)
+        x = self.layer2(x)
+        return x
 
 
 model_factory = {
