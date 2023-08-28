@@ -4,9 +4,6 @@ import torch.nn.functional as F
 
 class ClassificationLoss(torch.nn.Module):
     def forward(self, input, target):
-        device = torch.device("cuda" if torch.cuda.is_available else "cpu")
-        input.to(device)
-        target.to(device)
         return F.cross_entropy(input, target)
 
 
@@ -14,11 +11,8 @@ class LinearClassifier(torch.nn.Module):
     def __init__(self):
         super().__init__()
         self.layer = torch.nn.Linear(64*64*3, 6)
-        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        self.to(self.device)
 
     def forward(self, x):
-        x.to(self.device)
         batch_size = x.size()[0]
         flattened_x = x.view(batch_size, -1)
         return self.layer(flattened_x)
