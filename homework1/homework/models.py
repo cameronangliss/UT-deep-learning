@@ -38,7 +38,7 @@ class LinearClassifier(torch.nn.Module):
         print(x.size())
         batch_size = x.size()[0]
         flattened_x = x.view(batch_size, -1)
-        return torch.tensor([self.layer(el) for el in flattened_x])
+        return self.layer(flattened_x)
 
 
 class MLPClassifier(torch.nn.Module):
