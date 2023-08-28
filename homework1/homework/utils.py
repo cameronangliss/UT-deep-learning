@@ -1,7 +1,6 @@
 import csv
 import os
 
-import torch
 from PIL import Image
 from torch.utils.data import DataLoader, Dataset
 from torchvision import transforms
