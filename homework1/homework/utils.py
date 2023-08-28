@@ -17,20 +17,20 @@ class SuperTuxDataset(Dataset):
         WARNING: Do not perform data normalization here. 
         """
         with open(os.path.join(dataset_path, "labels.csv")) as f:
-            self.csv_reader = csv.DictReader(f)
+            self.csv_dict = list(csv.DictReader(f))
 
     def __len__(self):
         """
         Your code here
         """
-        return len(list(self.csv_reader))
+        return len(self.csv_dict)
 
     def __getitem__(self, idx):
         """
         Your code here
         return a tuple: img, label
         """
-        row = list(self.csv_reader)[idx]
+        row = self.csv_dict[idx]
         return row["file"], row["label"]
 
 
