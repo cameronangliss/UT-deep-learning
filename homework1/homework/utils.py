@@ -17,10 +17,10 @@ class SuperTuxDataset(Dataset):
         WARNING: Do not perform data normalization here. 
         """
         
-        with open(os.path.join(dataset_path, "labels.csv")) as f:
+        with open(os.path.abspath(dataset_path, "labels.csv")) as f:
             self.csv_reader = csv.reader(f)
-        for row in self.csv_reader:
-            print(row)
+            for row in self.csv_reader:
+                print(row)
 
     def __len__(self):
         """
