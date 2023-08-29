@@ -23,7 +23,7 @@ class LinearClassifier(torch.nn.Module):
 class MLPClassifier(torch.nn.Module):
     def __init__(self):
         super().__init__()
-        self.layer1 = nn.Sequential(
+        self.model = nn.Sequential(
             nn.Linear(64*64*3, 10),
             nn.ReLU(),
             nn.Linear(10, 6),
@@ -33,8 +33,7 @@ class MLPClassifier(torch.nn.Module):
     def forward(self, x):
         batch_size = x.size()[0]
         x = x.view(batch_size, -1)
-        x = self.layer1(x)
-        x = self.layer2(x)
+        x = self.model(x)
         return x
 
 
