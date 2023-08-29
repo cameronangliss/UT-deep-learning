@@ -27,7 +27,6 @@ class MLPClassifier(torch.nn.Module):
             nn.Linear(64*64*3, 8),
             nn.ReLU(),
             nn.Linear(8, 6),
-            nn.ReLU()
         )
 
     def forward(self, x):
