@@ -1,3 +1,4 @@
+import torch
 from torch.optim import SGD
 
 from .models import ClassificationLoss, model_factory, save_model
@@ -6,7 +7,8 @@ from .utils import accuracy, load_data
 
 def train(args):
     # create a model, loss, optimizer
-    model = model_factory[args.model]()
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    model = model_factory[args.model]().to(device)
     loss = ClassificationLoss()
     optimizer = SGD(model.parameters(), lr=0.01)
 
@@ -17,8 +19,8 @@ def train(args):
     # Run SGD for several epochs
     while True:
         for batch in train_data:
-            inputs = batch[0]
-            labels = batch[1]
+            inputs = batch[0].to(device)
+            labels = batch[1].to(device)
             outputs = model.forward(inputs)
             error = loss.forward(outputs, labels)
             optimizer.zero_grad()
@@ -27,8 +29,8 @@ def train(args):
         score = 0
         n = 0
         for batch in valid_data:
-            inputs = batch[0]
-            labels = batch[1]
+            inputs = batch[0].to(device)
+            labels = batch[1].to(device)
             outputs = model.forward(inputs)
             score += accuracy(outputs, labels)
             n += 1
