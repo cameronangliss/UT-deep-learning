@@ -1,4 +1,5 @@
 import torch
+import torch.nn as nn
 import torch.nn.functional as F
 
 
@@ -22,8 +23,12 @@ class LinearClassifier(torch.nn.Module):
 class MLPClassifier(torch.nn.Module):
     def __init__(self):
         super().__init__()
-        self.layer1 = torch.nn.Linear(64*64*3, 10)
-        self.layer2 = torch.nn.Linear(10, 6)
+        self.layer1 = nn.Sequential(
+            nn.Linear(64*64*3, 10),
+            nn.ReLU,
+            nn.Linear(10, 6),
+            nn.ReLU
+        )
 
     def forward(self, x):
         batch_size = x.size()[0]
