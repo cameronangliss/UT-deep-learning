@@ -26,7 +26,7 @@ class MLPClassifier(torch.nn.Module):
         self.model = nn.Sequential(
             nn.Linear(64*64*3, 10),
             nn.ReLU(),
-            nn.Linear(510, 6),
+            nn.Linear(10, 6),
             nn.ReLU()
         )
 
