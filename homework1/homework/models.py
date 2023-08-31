@@ -24,9 +24,9 @@ class MLPClassifier(torch.nn.Module):
     def __init__(self):
         super().__init__()
         self.model = nn.Sequential(
-            nn.Linear(64*64*3, 50),
+            nn.Linear(64*64*3, 100),
             nn.ReLU(),
-            nn.Linear(50, 6),
+            nn.Linear(100, 6),
         )
 
     def forward(self, x):
