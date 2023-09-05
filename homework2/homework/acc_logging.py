@@ -22,12 +22,12 @@ def test_logging(train_logger: tb.SummaryWriter, valid_logger: tb.SummaryWriter)
             dummy_train_accuracy = epoch/10. + torch.randn(10)
             train_logger.add_scalar('loss', dummy_train_loss, global_step=global_step)
             global_step += 1
-        train_logger.add_scalar('accuracy', torch.mean(dummy_train_accuracy), global_step=global_step)
+        train_logger.add_scalars('accuracy', dummy_train_accuracy, global_step=global_step)
         torch.manual_seed(epoch)
         for iteration in range(10):
             dummy_validation_accuracy = epoch / 10. + torch.randn(10)
             global_step += 1
-        valid_logger.add_scalar('accuracy', torch.mean(dummy_validation_accuracy), global_step=global_step)
+        valid_logger.add_scalars('accuracy', dummy_validation_accuracy, global_step=global_step)
 
 
 if __name__ == "__main__":
