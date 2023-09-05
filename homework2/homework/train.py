@@ -41,8 +41,7 @@ def train(args):
             score += accuracy(outputs, labels)
             n += 1
         score /= n
-        min_score = 0.75 if args.model == "linear" else 0.85
-        if score > min_score:
+        if score > 0.5:
             break
 
     # Save your final model, using save_model
