@@ -1,6 +1,7 @@
 from .models import CNNClassifier, save_model
 from .utils import accuracy, load_data
 import torch
+from torch.optim import SGD
 import torch.utils.tensorboard as tb
 
 
@@ -12,11 +13,39 @@ def train(args):
         train_logger = tb.SummaryWriter(path.join(args.log_dir, 'train'))
         valid_logger = tb.SummaryWriter(path.join(args.log_dir, 'valid'))
 
-    """
-    Your code here, modify your HW1 code
-    
-    """
+    # create a model, loss, optimizer
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    loss = ClassificationLoss()
+    optimizer = SGD(model.parameters(), lr=0.01)
 
+    # load the data: train and valid
+    train_data = load_data("data/train")
+    valid_data = load_data("data/valid")
+
+    # Run SGD for several epochs
+    while True:
+        for batch in train_data:
+            inputs = batch[0].to(device)
+            labels = batch[1].to(device)
+            outputs = model.forward(inputs)
+            error = loss.forward(outputs, labels)
+            optimizer.zero_grad()
+            error.backward()
+            optimizer.step()
+        score = 0
+        n = 0
+        for batch in valid_data:
+            inputs = batch[0].to(device)
+            labels = batch[1].to(device)
+            outputs = model.forward(inputs)
+            score += accuracy(outputs, labels)
+            n += 1
+        score /= n
+        min_score = 0.75 if args.model == "linear" else 0.85
+        if score > min_score:
+            break
+
+    # Save your final model, using save_model
     save_model(model)
 
 
