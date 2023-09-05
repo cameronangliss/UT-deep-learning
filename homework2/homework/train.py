@@ -28,7 +28,6 @@ def train(args):
             inputs = batch[0].to(device)
             labels = batch[1].to(device)
             outputs = model.forward(inputs)
-            print(inputs.size(), outputs.size(), labels.size())
             error = loss.forward(outputs, labels)
             optimizer.zero_grad()
             error.backward()

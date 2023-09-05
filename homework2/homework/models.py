@@ -30,9 +30,9 @@ class CNNClassifier(torch.nn.Module):
         self.classifier = torch.nn.Linear(c, 6)
 
     def forward(self, x):
-        z = self.network(x)
-        z = z.mean([2, 3])
-        return self.classifier(z)[:,0]
+        x = self.network(x)
+        x = x.mean([2, 3])
+        return self.classifier(x)[:,0]
 
 
 def save_model(model):
