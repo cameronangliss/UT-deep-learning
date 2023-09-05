@@ -38,6 +38,7 @@ def train(args):
             error.backward()
             optimizer.step()
             global_step += 1
+            n += 1
         score /= n
         train_logger.add_scalar('accuracy', score, global_step=global_step)
         score = 0
