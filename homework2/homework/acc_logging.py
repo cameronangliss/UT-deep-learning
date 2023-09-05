@@ -3,7 +3,7 @@ import torch
 import torch.utils.tensorboard as tb
 
 
-def test_logging(train_logger: tb.SummaryWriter, valid_logger: tb.SummaryWriter):
+def test_logging(train_logger, valid_logger):
     # This is a strongly simplified training loop
     global_step = 0
     for epoch in range(10):

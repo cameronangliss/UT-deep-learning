@@ -23,15 +23,23 @@ def train(args):
     valid_data = load_data("data/valid")
 
     # Run SGD for several epochs
+    global_step = 0
     while True:
+        score = 0
+        n = 0
         for batch in train_data:
             inputs = batch[0].to(device)
             labels = batch[1].to(device)
             outputs = model.forward(inputs)
+            score += accuracy(outputs, labels)
             error = loss.forward(outputs, labels)
+            train_logger.add_scalar('loss', error, global_step=global_step)
             optimizer.zero_grad()
             error.backward()
             optimizer.step()
+            global_step += 1
+        score /= n
+        train_logger.add_scalar('accuracy', score, global_step=global_step)
         score = 0
         n = 0
         for batch in valid_data:
@@ -41,6 +49,7 @@ def train(args):
             score += accuracy(outputs, labels)
             n += 1
         score /= n
+        valid_logger.add_scalar('accuracy', score, global_step=global_step)
         if score > 0.5:
             break
 
