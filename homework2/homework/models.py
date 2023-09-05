@@ -5,11 +5,11 @@ class CNNClassifier(torch.nn.Module):
     def __init__(self):
         super().__init__()
         self.layers = torch.nn.Sequential(
-            torch.nn.Conv2d(3, 10, 7),
+            torch.nn.Conv2d(3, 4, 7),
             torch.nn.ReLU(),
-            torch.nn.Conv2d(10, 12, 3),
+            torch.nn.Conv2d(4, 5, 3),
             torch.nn.ReLU(),
-            torch.nn.Conv2d(12, 15, 3),
+            torch.nn.Conv2d(5, 6, 3),
             torch.nn.MaxPool2d(2),
             torch.nn.Linear(27, 6),
         )
