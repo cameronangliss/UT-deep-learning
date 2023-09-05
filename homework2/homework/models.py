@@ -3,6 +3,7 @@ import torch
 
 class CNNClassifier(torch.nn.Module):
     def __init__(self):
+        super().__init__()
         self.layers = torch.nn.Sequential(
             torch.nn.Conv2d(3, 10, 7),
             torch.nn.ReLU(),
