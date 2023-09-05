@@ -19,12 +19,12 @@ def test_logging(train_logger: tb.SummaryWriter, valid_logger: tb.SummaryWriter)
         for iteration in range(20):
             dummy_train_loss = 0.9**(epoch+iteration/20.)
             dummy_train_accuracy = epoch/10. + torch.randn(10)
-            train_logger.add_scalar('train/loss', dummy_train_loss)
-        train_logger.add_scalar('train/accuracy', torch.mean(dummy_train_accuracy))
+            train_logger.add_scalar('train/loss', dummy_train_loss, epoch * 20 + iteration)
+        train_logger.add_scalar('train/accuracy', torch.mean(dummy_train_accuracy), epoch)
         torch.manual_seed(epoch)
         for iteration in range(10):
             dummy_validation_accuracy = epoch / 10. + torch.randn(10)
-        valid_logger.add_scalar('valid/accuracy', torch.mean(dummy_validation_accuracy))
+        valid_logger.add_scalar('valid/accuracy', torch.mean(dummy_validation_accuracy), epoch)
 
 
 if __name__ == "__main__":
