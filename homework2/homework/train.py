@@ -7,7 +7,6 @@ import torch.utils.tensorboard as tb
 
 def train(args):
     from os import path
-    model = CNNClassifier()
     train_logger, valid_logger = None, None
     if args.log_dir is not None:
         train_logger = tb.SummaryWriter(path.join(args.log_dir, 'train'))
@@ -15,6 +14,7 @@ def train(args):
 
     # create a model, loss, optimizer
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    model = CNNClassifier().to(device)
     loss = torch.nn.CrossEntropyLoss()
     optimizer = SGD(model.parameters(), lr=0.01)
 
