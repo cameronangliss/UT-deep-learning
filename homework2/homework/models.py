@@ -7,9 +7,9 @@ class CNNClassifier(torch.nn.Module):
         self.layers = torch.nn.Sequential(
             torch.nn.Conv2d(3, 10, 7),
             torch.nn.ReLU(),
-            torch.nn.Conv2d(10, 20, 3),
+            torch.nn.Conv2d(10, 12, 3),
             torch.nn.ReLU(),
-            torch.nn.Conv2d(20, 50, 3),
+            torch.nn.Conv2d(12, 15, 3),
             torch.nn.MaxPool2d(3),
             torch.nn.Linear(18, 6),
         )
