@@ -11,7 +11,7 @@ class CNNClassifier(torch.nn.Module):
             torch.nn.ReLU(),
             torch.nn.Conv2d(12, 15, 3),
             torch.nn.MaxPool2d(3),
-            torch.nn.Linear(15, 6),
+            torch.nn.Linear(18, 6),
         )
 
     def forward(self, x):
