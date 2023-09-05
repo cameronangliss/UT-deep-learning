@@ -14,7 +14,7 @@ def train(args):
 
     # create a model, loss, optimizer
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    model = CNNClassifier().to(device)
+    model = torch.load_state_dict(torch.load("cnn.th"))
     loss = torch.nn.CrossEntropyLoss()
     optimizer = SGD(model.parameters(), lr=0.01)
 
@@ -51,7 +51,7 @@ def train(args):
             n += 1
         score /= n
         valid_logger.add_scalar('accuracy', score, global_step=global_step)
-        if score > 0.87:
+        if score > 0.90:
             break
 
     # Save your final model, using save_model
