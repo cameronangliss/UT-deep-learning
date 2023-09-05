@@ -34,7 +34,7 @@ class CNNClassifier(torch.nn.Module):
         z: torch.Tensor = self.network(x)
         print(z.size())
         z = z.mean(dim=[2, 3])
-        print(z.size)
+        print(z.size())
         print(self.classifier(z)[:,0].size())
         return self.classifier(z)[:,0]
 
