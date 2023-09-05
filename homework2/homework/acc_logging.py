@@ -4,15 +4,6 @@ import torch.utils.tensorboard as tb
 
 
 def test_logging(train_logger: tb.SummaryWriter, valid_logger: tb.SummaryWriter):
-
-    """
-    Your code here.
-    Finish logging the dummy loss and accuracy
-    Log the loss every iteration, the accuracy only after each epoch
-    Make sure to set global_step correctly, for epoch=0, iteration=0: global_step=0
-    Call the loss 'loss', and accuracy 'accuracy' (no slash or other namespace)
-    """
-
     # This is a strongly simplified training loop
     global_step = 0
     for epoch in range(10):
