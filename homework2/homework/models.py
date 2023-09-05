@@ -10,8 +10,8 @@ class CNNClassifier(torch.nn.Module):
             torch.nn.Conv2d(10, 12, 3),
             torch.nn.ReLU(),
             torch.nn.Conv2d(12, 15, 3),
-            torch.nn.MaxPool2d(3),
-            torch.nn.Linear(18, 6),
+            torch.nn.MaxPool2d(2),
+            torch.nn.Linear(27, 6),
         )
 
     def forward(self, x):
