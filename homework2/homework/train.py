@@ -25,6 +25,7 @@ def train(args):
     # Run SGD for several epochs
     while True:
         for batch in train_data:
+            print(batch)
             inputs = batch[0].to(device)
             labels = batch[1].to(device)
             outputs = model.forward(inputs)
