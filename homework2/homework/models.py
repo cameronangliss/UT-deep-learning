@@ -27,7 +27,7 @@ class CNNClassifier(torch.nn.Module):
             L.append(self.Block(c, l, stride=2))
             c=l
         self.network = torch.nn.Sequential(*L)
-        self.classifier = torch.nn.Linear(c, 6, dtype=float)
+        self.classifier = torch.nn.Linear(c, 6)
 
     def forward(self, x):
         x = self.network(x)
