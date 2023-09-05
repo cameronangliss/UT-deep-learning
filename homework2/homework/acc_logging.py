@@ -26,7 +26,6 @@ def test_logging(train_logger: tb.SummaryWriter, valid_logger: tb.SummaryWriter)
         torch.manual_seed(epoch)
         for iteration in range(10):
             dummy_validation_accuracy = epoch / 10. + torch.randn(10)
-            global_step += 1
         valid_logger.add_scalar('accuracy', torch.mean(dummy_validation_accuracy), global_step=global_step)
 
 
