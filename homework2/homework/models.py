@@ -2,20 +2,37 @@ import torch
 
 
 class CNNClassifier(torch.nn.Module):
-    def __init__(self):
+    class Block(torch.nn.Module):
+        def __init__(self, n_input, n_output, stride=1):
+            super().__init__()
+            self.layers = torch.nn.Sequential(
+                torch.nn.Conv2d(n_input, n_output, kernel_size=3, padding=1, stride=stride),
+                torch.nn.ReLU(),
+                torch.nn.Conv2d(n_output, n_output, kernel_size=3, padding=1),
+                torch.nn.ReLU()
+            )
+        
+        def forward(self, x):
+            return self.layers(x)
+
+    def __init__(self, layers=[32,64,128], n_input_channels=3):
         super().__init__()
-        self.layers = torch.nn.Sequential(
-            torch.nn.Conv2d(3, 4, 7),
+        L = [
+            torch.nn.Conv2d(n_input_channels, 32, kernel_size=7, padding=3),
             torch.nn.ReLU(),
-            torch.nn.Conv2d(4, 5, 3),
-            torch.nn.ReLU(),
-            torch.nn.Conv2d(5, 6, 3),
-            torch.nn.MaxPool2d(2),
-            torch.nn.Linear(27, 6),
-        )
+            torch.nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
+        ]
+        c = 32
+        for l in layers:
+            L.append(self.Block(c, l, stride=2))
+            c=l
+        self.network = torch.nn.Sequential(*L)
+        self.classifier = torch.nn.Linear(c, 6)
 
     def forward(self, x):
-        return self.layers(x)
+        x = self.network(x)
+        x = x.mean([2, 3])
+        return self.classifier(x)[:,0]
 
 
 def save_model(model):
