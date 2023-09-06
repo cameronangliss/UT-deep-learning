@@ -15,7 +15,7 @@ class CNNClassifier(torch.nn.Module):
         def forward(self, x):
             return self.layers(x)
 
-    def __init__(self, layers=[32,64, 128], n_input_channels=3):
+    def __init__(self, layers=[32, 64, 128], n_input_channels=3):
         super().__init__()
         c = layers[0]
         L = [
