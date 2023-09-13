@@ -17,7 +17,7 @@ def train(args):
     model = CNNClassifier([32, 64, 128, 256]).to(device)
     # model.load_state_dict(torch.load("homework/cnn.th"))
     loss = torch.nn.CrossEntropyLoss()
-    optimizer = SGD(model.parameters(), lr=0.005)
+    optimizer = SGD(model.parameters(), lr=0.01)
 
     # load the data: train and valid
     train_data = load_data("data/train")
