@@ -2,5 +2,5 @@
 **/dense_data
 **/logs
 **/__pycache__
-**/supertux_classification_trainval.zip
-**/supertux_segmentation_trainval.zip
+**/*.th
+**/*.zip
