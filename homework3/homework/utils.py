@@ -1,3 +1,6 @@
+import csv
+import os
+
 import torch
 from PIL import Image
 from torch.utils.data import Dataset, DataLoader
@@ -14,28 +17,20 @@ DENSE_CLASS_DISTRIBUTION = [0.52683655, 0.02929112, 0.4352989, 0.0044619, 0.0041
 
 class SuperTuxDataset(Dataset):
     def __init__(self, dataset_path):
-        """
-        Your code here
-        Hint: Use your solution (or the master solution) to HW1 / HW2
-        Hint: If you're loading (and storing) PIL images here, make sure to call image.load(),
-              to avoid an OS error for too many open files.
-        Hint: Do not store torch.Tensor's as data here, but use PIL images, torchvision.transforms expects PIL images
-              for most transformations.
-        """
-        raise NotImplementedError('SuperTuxDataset.__init__')
+        self.dataset_path = dataset_path
+        with open(os.path.join(dataset_path, "labels.csv")) as f:
+            self.data = list(csv.DictReader(f))
 
     def __len__(self):
-        """
-        Your code here
-        """
-        raise NotImplementedError('SuperTuxDataset.__len__')
+        return len(self.data)
 
     def __getitem__(self, idx):
-        """
-        Your code here
-        """
-        raise NotImplementedError('SuperTuxDataset.__getitem__')
-        return img, label
+        row = self.data[idx]
+        image_to_tensor = transforms.ToTensor()
+        image_path = os.path.join(self.dataset_path, row["file"])
+        image_tensor = image_to_tensor(Image.open(image_path))
+        label_id = LABEL_NAMES.index(row["label"])
+        return image_tensor, label_id
 
 
 class DenseSuperTuxDataset(Dataset):
