@@ -1,10 +1,12 @@
 import csv
 import os
 
+import random
 import torch
 from PIL import Image
 from torch.utils.data import Dataset, DataLoader
 from torchvision import transforms
+from torchvision.utils import save_image
 from torchvision.transforms import functional as F
 
 from . import dense_transforms
@@ -32,6 +34,29 @@ class SuperTuxDataset(Dataset):
         label_id = LABEL_NAMES.index(row["label"])
         return image_tensor, label_id
 
+    def augment(self, factor: int):
+        print("Augmenting train dataset...")
+        new_train_data = []
+        for i in range(len(self)):
+            row = self.data[i]
+            for j in range(factor - 1):
+                transformation = transforms.Compose([
+                    transforms.ColorJitter(
+                        brightness=random.random(),
+                        contrast=random.random(),
+                        saturation=random.random(),
+                        hue=random.random() / 2
+                    ),
+                    transforms.RandomHorizontalFlip()
+                ])
+                img, _ = self[i]
+                new_img = transformation(img)
+                filename = str(len(self) + (factor - 1) * i + j + 1) + ".jpg"
+                save_image(new_img, os.path.join(self.dataset_path, filename))
+                new_train_data += [{"file": filename, "label": row["label"], "track": row["track"]}]
+        self.data += new_train_data
+        print("Finished!")
+
 
 class DenseSuperTuxDataset(Dataset):
     def __init__(self, dataset_path, transform=dense_transforms.ToTensor()):
@@ -56,6 +81,9 @@ class DenseSuperTuxDataset(Dataset):
 
 def load_data(dataset_path, num_workers=0, batch_size=128, **kwargs):
     dataset = SuperTuxDataset(dataset_path, **kwargs)
+    # careful, this if block makes new files in data/train
+    if "train" in dataset_path:
+        dataset.augment(3)
     return DataLoader(dataset, num_workers=num_workers, batch_size=batch_size, shuffle=True, drop_last=True)
 
 
