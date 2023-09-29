@@ -29,9 +29,10 @@ def train(args):
     valid_data = load_data('data/valid')
 
     # augmenting training set
+    print("Augmenting train dataset...")
     new_train_data = []
     for img, label in train_data:
-        for _ in range(10):
+        for _ in range(2):
             transformation = torchvision.transforms.Compose([
                 torchvision.transforms.ColorJitter(
                     brightness=random.random(),
@@ -43,6 +44,7 @@ def train(args):
             ])
             new_train_data += [(transformation(img), label)]
     train_data.dataset += new_train_data
+    print("Finished!")
 
     global_step = 0
     for epoch in range(100):
