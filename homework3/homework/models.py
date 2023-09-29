@@ -3,20 +3,40 @@ import torch.nn.functional as F
 
 
 class CNNClassifier(torch.nn.Module):
-    def __init__(self, layers=[16, 32, 64, 128], n_input_channels=3, n_output_channels=6, kernel_size=5):
-        super().__init__()
+    class Block(torch.nn.Module):
+        def __init__(self, n_input, n_output, stride=1):
+            super().__init__()
+            self.layers = torch.nn.Sequential(
+                torch.nn.Conv2d(n_input, n_output, kernel_size=3, padding=1, stride=stride),
+                torch.nn.BatchNorm2d(n_output),
+                torch.nn.ReLU(),
+            )
+            self.downsample = torch.nn.Sequential(
+                torch.nn.Conv2d(n_input, n_output, kernel_size=1, stride=stride),
+                torch.nn.BatchNorm2d(n_output)
+            )
 
-        L = []
-        c = n_input_channels
+        def forward(self, x):
+            return self.layers(x) + self.downsample(x)
+
+    def __init__(self, layers=[32, 64, 128], n_input_channels=3):
+        super().__init__()
+        c = layers[0]
+        L = [
+            torch.nn.Conv2d(n_input_channels, c, kernel_size=7, padding=3),
+            torch.nn.ReLU(),
+            torch.nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
+        ]
         for l in layers:
-            L.append(torch.nn.Conv2d(c, l, kernel_size, stride=2, padding=kernel_size//2))
-            L.append(torch.nn.ReLU())
-            c = l
+            L.append(self.Block(c, l, stride=2))
+            c=l
         self.network = torch.nn.Sequential(*L)
-        self.classifier = torch.nn.Linear(c, n_output_channels)
+        self.classifier = torch.nn.Linear(c, 6)
 
     def forward(self, x):
-        return self.classifier(self.network(x).mean(dim=[2, 3]))
+        x = self.network(x)
+        x = x.mean(dim=[2, 3])
+        return self.classifier(x)
 
 
 class FCN(torch.nn.Module):

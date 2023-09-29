@@ -8,62 +8,53 @@ import torch.utils.tensorboard as tb
 
 def train(args):
     from os import path
-    model = CNNClassifier()
     train_logger, valid_logger = None, None
     if args.log_dir is not None:
         train_logger = tb.SummaryWriter(path.join(args.log_dir, 'train'))
         valid_logger = tb.SummaryWriter(path.join(args.log_dir, 'valid'))
 
-    import torch
-
-    device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
-
-    model = CNNClassifier().to(device)
-    # model.load_state_dict(torch.load(path.join(path.dirname(path.abspath(__file__)), 'cnn.th')))
-
-    optimizer = torch.optim.SGD(model.parameters(), lr=1e-3, momentum=0.9)
+    # create a model, loss, optimizer
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    model = CNNClassifier([32, 48, 72]).to(device)
+    # model.load_state_dict(torch.load("homework/cnn1.th"))
     loss = torch.nn.CrossEntropyLoss()
+    optimizer = torch.optim.SGD(model.parameters(), lr=1e-3, momentum=0.9)
 
-    train_data = load_data('data/train')
-    valid_data = load_data('data/valid')
+    # load the data: train and valid
+    train_data = load_data("data/train")
+    valid_data = load_data("data/valid")
 
+    # Run SGD for several epochs
     global_step = 0
-    for epoch in range(100):
-        model.train()
-        acc_vals = []
-        for img, label in train_data:
-            img, label = img.to(device), label.to(device)
-
-            logit = model(img)
-            loss_val = loss(logit, label)
-            acc_val = accuracy(logit, label)
-
-            if train_logger is not None:
-                train_logger.add_scalar('loss', loss_val, global_step)
-            acc_vals.append(acc_val.detach().cpu().numpy())
-
+    while True:
+        score = 0
+        n = 0
+        for batch in train_data:
+            inputs = batch[0].to(device)
+            labels = batch[1].to(device)
+            outputs = model.forward(inputs)
+            score += accuracy(outputs, labels)
+            error = loss.forward(outputs, labels)
+            train_logger.add_scalar('loss', error, global_step=global_step)
             optimizer.zero_grad()
-            loss_val.backward()
+            error.backward()
             optimizer.step()
             global_step += 1
-        avg_acc = sum(acc_vals) / len(acc_vals)
-
-        if train_logger:
-            train_logger.add_scalar('accuracy', avg_acc, global_step)
-
-        model.eval()
-        acc_vals = []
-        for img, label in valid_data:
-            img, label = img.to(device), label.to(device)
-            acc_vals.append(accuracy(model(img), label).detach().cpu().numpy())
-        avg_vacc = sum(acc_vals) / len(acc_vals)
-
-        if valid_logger:
-            valid_logger.add_scalar('accuracy', avg_vacc, global_step)
-
-        if valid_logger is None or train_logger is None:
-            print('epoch %-3d \t acc = %0.3f \t val acc = %0.3f' % (epoch, avg_acc, avg_vacc))
-        save_model(model)
+            n += 1
+        score /= n
+        train_logger.add_scalar('accuracy', score, global_step=global_step)
+        score = 0
+        n = 0
+        for batch in valid_data:
+            inputs = batch[0].to(device)
+            labels = batch[1].to(device)
+            outputs = model.forward(inputs)
+            score += accuracy(outputs, labels)
+            n += 1
+        score /= n
+        valid_logger.add_scalar('accuracy', score, global_step=global_step)
+        if score > 0.885:
+            break
 
     # Save your final model, using save_model
     save_model(model)
