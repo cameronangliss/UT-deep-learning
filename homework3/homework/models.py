@@ -83,6 +83,6 @@ def save_model(model):
 def load_model(model):
     from torch import load
     from os import path
-    r = model_factory[model]()
+    r = model_factory[model](layers=[16, 32, 64])
     r.load_state_dict(load(path.join(path.dirname(path.abspath(__file__)), '%s.th' % model), map_location='cpu'))
     return r

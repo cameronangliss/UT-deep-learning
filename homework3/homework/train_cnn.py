@@ -15,7 +15,7 @@ def train(args):
 
     # create a model, loss, optimizer
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    model = CNNClassifier([16, 23, 64, 128, 256]).to(device)
+    model = CNNClassifier([16, 23, 64]).to(device)
     # model.load_state_dict(torch.load("homework/cnn.th"))
     loss = torch.nn.CrossEntropyLoss()
     optimizer = torch.optim.SGD(model.parameters(), lr=1e-3, momentum=0.9, weight_decay=1e-4)

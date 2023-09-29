@@ -83,7 +83,7 @@ def load_data(dataset_path, num_workers=0, batch_size=128, **kwargs):
     dataset = SuperTuxDataset(dataset_path, **kwargs)
     # careful, this if block makes new files in data/train
     # if "train" in dataset_path:
-    #     dataset.augment(3)
+    #     dataset.augment(5)
     return DataLoader(dataset, num_workers=num_workers, batch_size=batch_size, shuffle=True, drop_last=True)
 
 
