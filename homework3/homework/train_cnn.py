@@ -35,7 +35,7 @@ def train(args):
             new_data = torchvision.transforms.Compose(
                 torchvision.transforms.ColorJitter(
                     brightness=random.random(),
-                    constrast=random.random(),
+                    contrast=random.random(),
                     saturation=random.random(),
                     hue=random.random()
                 ),
