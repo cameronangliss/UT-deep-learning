@@ -1,5 +1,6 @@
 from .models import CNNClassifier, save_model
 from .utils import ConfusionMatrix, load_data, accuracy, LABEL_NAMES
+import random
 import torch
 from torch.optim import Adam
 import torchvision
@@ -27,11 +28,26 @@ def train(args):
     train_data = load_data('data/train')
     valid_data = load_data('data/valid')
 
+    # augmenting training set
+    augmented_train_data = train_data
+    for img, label in train_data:
+        for _ in range(10):
+            new_data = torchvision.transforms.Compose(
+                torchvision.transforms.ColorJitter(
+                    brightness=random.random(),
+                    constrast=random.random(),
+                    saturation=random.random(),
+                    hue=random.random()
+                ),
+                torchvision.transforms.RandomHorizontalFlip()
+            )
+            augmented_train_data += [new_data]
+
     global_step = 0
     for epoch in range(100):
         model.train()
         acc_vals = []
-        for img, label in train_data:
+        for img, label in augmented_train_data:
             img, label = img.to(device), label.to(device)
 
             logit = model(img)
