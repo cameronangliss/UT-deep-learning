@@ -19,17 +19,16 @@ def train(args):
     device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
 
     model = CNNClassifier().to(device)
-    if args.continue_training:
-        model.load_state_dict(torch.load(path.join(path.dirname(path.abspath(__file__)), 'cnn.th')))
+    # model.load_state_dict(torch.load(path.join(path.dirname(path.abspath(__file__)), 'cnn.th')))
 
-    optimizer = torch.optim.SGD(model.parameters(), lr=args.learning_rate, momentum=0.9)
+    optimizer = torch.optim.SGD(model.parameters(), lr=1e-3, momentum=0.9)
     loss = torch.nn.CrossEntropyLoss()
 
     train_data = load_data('data/train')
     valid_data = load_data('data/valid')
 
     global_step = 0
-    for epoch in range(args.num_epoch):
+    for epoch in range(100):
         model.train()
         acc_vals = []
         for img, label in train_data:
