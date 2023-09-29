@@ -29,25 +29,26 @@ def train(args):
     valid_data = load_data('data/valid')
 
     # augmenting training set
-    augmented_train_data = train_data
+    new_train_data = []
     for img, label in train_data:
         for _ in range(10):
-            new_data = torchvision.transforms.Compose(
+            transformation = torchvision.transforms.Compose([
                 torchvision.transforms.ColorJitter(
                     brightness=random.random(),
                     contrast=random.random(),
                     saturation=random.random(),
-                    hue=random.random()
+                    hue=random.random() / 2
                 ),
                 torchvision.transforms.RandomHorizontalFlip()
-            )
-            augmented_train_data += [new_data]
+            ])
+            new_train_data += [(transformation(img), label)]
+    train_data.dataset += new_train_data
 
     global_step = 0
     for epoch in range(100):
         model.train()
         acc_vals = []
-        for img, label in augmented_train_data:
+        for img, label in train_data:
             img, label = img.to(device), label.to(device)
 
             logit = model(img)
