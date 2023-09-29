@@ -64,7 +64,6 @@ def train(args):
         if valid_logger is None or train_logger is None:
             print('epoch %-3d \t acc = %0.3f \t val acc = %0.3f' % (epoch, avg_acc, avg_vacc))
         save_model(model)
-    save_model(model)
 
     # Save your final model, using save_model
     save_model(model)
