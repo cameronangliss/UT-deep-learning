@@ -30,8 +30,9 @@ class SuperTuxDataset(Dataset):
         image_to_tensor = transforms.ToTensor()
         image_path = os.path.join(self.dataset_path, row["file"])
         image_tensor = image_to_tensor(Image.open(image_path))
+        transformed_image = image_tensor if self.transform is None else self.transform(image_tensor)
         label_id = LABEL_NAMES.index(row["label"])
-        return self.transform(image_tensor), label_id
+        return transformed_image, label_id
 
 
 class DenseSuperTuxDataset(Dataset):
@@ -55,7 +56,7 @@ class DenseSuperTuxDataset(Dataset):
         return im, lbl
 
 
-def load_data(dataset_path, transform, num_workers=0, batch_size=128, **kwargs):
+def load_data(dataset_path, transform = None, num_workers=0, batch_size=128, **kwargs):
     dataset = SuperTuxDataset(dataset_path, transform, **kwargs)
     # careful, this if block makes new files in data/train
     # if "train" in dataset_path:
