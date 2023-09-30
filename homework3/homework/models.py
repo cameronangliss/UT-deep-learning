@@ -19,7 +19,7 @@ class CNNClassifier(torch.nn.Module):
         def forward(self, x):
             return self.layers(x) + self.downsample(x)
 
-    def __init__(self, layers=[32, 64, 128], n_input_channels=3):
+    def __init__(self, layers=[16, 32, 64], n_input_channels=3):
         super().__init__()
         c = layers[0]
         L = [
@@ -83,6 +83,6 @@ def save_model(model):
 def load_model(model):
     from torch import load
     from os import path
-    r = model_factory[model](layers=[16, 32, 64])
+    r = model_factory[model]()
     r.load_state_dict(load(path.join(path.dirname(path.abspath(__file__)), '%s.th' % model), map_location='cpu'))
     return r

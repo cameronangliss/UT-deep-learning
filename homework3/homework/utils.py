@@ -1,12 +1,10 @@
 import csv
 import os
 
-import random
 import torch
 from PIL import Image
 from torch.utils.data import Dataset, DataLoader
 from torchvision import transforms
-from torchvision.utils import save_image
 from torchvision.transforms import functional as F
 
 from . import dense_transforms
@@ -18,10 +16,11 @@ DENSE_CLASS_DISTRIBUTION = [0.52683655, 0.02929112, 0.4352989, 0.0044619, 0.0041
 
 
 class SuperTuxDataset(Dataset):
-    def __init__(self, dataset_path):
+    def __init__(self, dataset_path, transform):
         self.dataset_path = dataset_path
         with open(os.path.join(dataset_path, "labels.csv")) as f:
             self.data = list(csv.DictReader(f))
+        self.transform = transform
 
     def __len__(self):
         return len(self.data)
@@ -32,30 +31,7 @@ class SuperTuxDataset(Dataset):
         image_path = os.path.join(self.dataset_path, row["file"])
         image_tensor = image_to_tensor(Image.open(image_path))
         label_id = LABEL_NAMES.index(row["label"])
-        return image_tensor, label_id
-
-    def augment(self, factor: int):
-        print("Augmenting train dataset...")
-        new_train_data = []
-        for i in range(len(self)):
-            row = self.data[i]
-            for j in range(factor - 1):
-                transformation = transforms.Compose([
-                    transforms.ColorJitter(
-                        brightness=random.random(),
-                        contrast=random.random(),
-                        saturation=random.random(),
-                        hue=random.random() / 2
-                    ),
-                    transforms.RandomHorizontalFlip()
-                ])
-                img, _ = self[i]
-                new_img = transformation(img)
-                filename = str(len(self) + (factor - 1) * i + j + 1) + ".jpg"
-                save_image(new_img, os.path.join(self.dataset_path, filename))
-                new_train_data += [{"file": filename, "label": row["label"], "track": row["track"]}]
-        self.data += new_train_data
-        print("Finished!")
+        return self.transform(image_tensor), label_id
 
 
 class DenseSuperTuxDataset(Dataset):
@@ -79,8 +55,8 @@ class DenseSuperTuxDataset(Dataset):
         return im, lbl
 
 
-def load_data(dataset_path, num_workers=0, batch_size=128, **kwargs):
-    dataset = SuperTuxDataset(dataset_path, **kwargs)
+def load_data(dataset_path, transform, num_workers=0, batch_size=128, **kwargs):
+    dataset = SuperTuxDataset(dataset_path, transform, **kwargs)
     # careful, this if block makes new files in data/train
     # if "train" in dataset_path:
     #     dataset.augment(5)

@@ -15,13 +15,22 @@ def train(args):
 
     # create a model, loss, optimizer
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    model = CNNClassifier([16, 23, 64]).to(device)
+    model = CNNClassifier().to(device)
     # model.load_state_dict(torch.load("homework/cnn.th"))
     loss = torch.nn.CrossEntropyLoss()
     optimizer = torch.optim.SGD(model.parameters(), lr=1e-3, momentum=0.9, weight_decay=1e-4)
 
     # load the data: train and valid
-    train_data = load_data("data/train")
+    transform = torchvision.transforms.Compose([
+        torchvision.transforms.ColorJitter(
+            brightness=0.5,
+            contrast=0.5,
+            saturation=0.5,
+            hue=0.25
+        ),
+        torchvision.transforms.RandomHorizontalFlip()
+    ])
+    train_data = load_data("data/train", transform)
     valid_data = load_data("data/valid")
 
     # Run SGD for several epochs
