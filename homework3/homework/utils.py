@@ -16,7 +16,7 @@ DENSE_CLASS_DISTRIBUTION = [0.52683655, 0.02929112, 0.4352989, 0.0044619, 0.0041
 
 
 class SuperTuxDataset(Dataset):
-    def __init__(self, dataset_path, transform):
+    def __init__(self, dataset_path, transform = None):
         self.dataset_path = dataset_path
         with open(os.path.join(dataset_path, "labels.csv")) as f:
             self.data = list(csv.DictReader(f))
@@ -57,7 +57,7 @@ class DenseSuperTuxDataset(Dataset):
 
 
 def load_data(dataset_path, transform = None, num_workers=0, batch_size=128, **kwargs):
-    dataset = SuperTuxDataset(dataset_path, transform, **kwargs)
+    dataset = SuperTuxDataset(dataset_path, transform=transform, **kwargs)
     # careful, this if block makes new files in data/train
     # if "train" in dataset_path:
     #     dataset.augment(5)
