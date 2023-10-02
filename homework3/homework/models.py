@@ -40,17 +40,48 @@ class CNNClassifier(torch.nn.Module):
 
 
 class FCN(torch.nn.Module):
-    def __init__(self):
+    """
+    Your code here.
+    Hint: The FCN can be a bit smaller the the CNNClassifier since you need to run it at a higher resolution
+    Hint: Use up-convolutions
+    Hint: Use skip connections
+    Hint: Use residual connections
+    Hint: Always pad by kernel_size / 2, use an odd kernel_size
+    """
+    class Block(torch.nn.Module):
+        def __init__(self, n_input, n_output, stride=1):
+            super().__init__()
+            self.layers = torch.nn.Sequential(
+                torch.nn.Conv2d(n_input, n_output, kernel_size=3, stride=stride, padding=1),
+                torch.nn.BatchNorm2d(n_output),
+                torch.nn.ReLU(),
+                torch.nn.Conv2d(n_output, n_output, kernel_size=3, stride=stride, padding=1),
+                torch.nn.ReLU(),
+            )
+            self.downsample = torch.nn.Sequential(
+                torch.nn.Conv2d(n_input, n_output, kernel_size=1, stride=stride),
+                torch.nn.BatchNorm2d(n_output)
+            )
+
+        def forward(self, x):
+            return self.layers(x) + self.downsample(x)
+
+    def __init__(self, layers=[16, 32, 64], n_input_channels=3):
         super().__init__()
-        """
-        Your code here.
-        Hint: The FCN can be a bit smaller the the CNNClassifier since you need to run it at a higher resolution
-        Hint: Use up-convolutions
-        Hint: Use skip connections
-        Hint: Use residual connections
-        Hint: Always pad by kernel_size / 2, use an odd kernel_size
-        """
-        raise NotImplementedError('FCN.__init__')
+        self.down_blocks = []
+        c = n_input_channels
+        for l in layers:
+            self.down_blocks.append(self.Block(c, l))
+            c = l
+        self.pool = torch.nn.MaxPool2d(kernel_size=2)
+        self.up_convs = []
+        for l in reversed(layers[1:]):
+            self.up_convs.append(torch.nn.ConvTranspose2d(l, l, kernel_size=2, stride=2))
+        self.up_blocks = []
+        rev_layers = list(reversed(layers))
+        for i in range(len(layers) - 1):
+            self.up_blocks.append(self.Block(rev_layers[i] + rev_layers[i + 1], rev_layers[i + 1]))
+        self.final_conv = torch.nn.Conv2d(layers[0], 5, kernel_size=1)
 
     def forward(self, x):
         """
@@ -62,7 +93,19 @@ class FCN(torch.nn.Module):
               if required (use z = z[:, :, :H, :W], where H and W are the height and width of a corresponding strided
               convolution
         """
-        raise NotImplementedError('FCN.forward')
+
+        activations = []
+        for block in self.down_blocks[:-1]:
+            x = block(x)
+            activations.append(x)
+            x = self.pool(x)
+        x = self.down_blocks[-1](x)
+        rev_acts = list(reversed(activations))
+        for i in range(len(self.up_blocks)):
+            x = torch.cat([self.up_convs[i](x), rev_acts[i]], dim=1)
+            x = self.up_blocks[i](x)
+        x = self.final_conv(x)
+        return x
 
 
 model_factory = {
