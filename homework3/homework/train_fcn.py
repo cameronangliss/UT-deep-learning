@@ -55,7 +55,7 @@ def train(args):
             labels = batch[1].to(device)
             outputs = model.forward(inputs)
             score += accuracy(outputs, labels)
-            error = loss.forward(outputs, labels)
+            error = loss.forward(outputs, labels.long())
             train_logger.add_scalar('loss', error, global_step=global_step)
             optimizer.zero_grad()
             error.backward()
