@@ -29,7 +29,7 @@ def train(args):
     model = FCN().to(device)
     # model.load_state_dict(torch.load("homework/cnn.th"))
     loss = torch.nn.CrossEntropyLoss()
-    optimizer = torch.optim.SGD(model.parameters(), lr=1e-3, momentum=0.9, weight_decay=1e-4)
+    optimizer = torch.optim.Adam(model.parameters(), lr=1e-3, momentum=0.9, weight_decay=1e-4)
 
     # load the data: train and valid
     transform = dense_transforms.Compose([
