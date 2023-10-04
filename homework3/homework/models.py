@@ -73,10 +73,10 @@ class FCN(torch.nn.Module):
         for l in layers:
             self.down_blocks.append(self.Block(c, l))
             c = l
-        self.pool = torch.nn.MaxPool2d(kernel_size=2)
+        self.pool = torch.nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
         self.up_convs = []
         for l in reversed(layers[1:]):
-            self.up_convs.append(torch.nn.ConvTranspose2d(l, l, kernel_size=2, stride=2))
+            self.up_convs.append(torch.nn.ConvTranspose2d(l, l, kernel_size=3, stride=2, padding=1, output_padding=1))
         self.up_blocks = []
         rev_layers = list(reversed(layers))
         for i in range(len(layers) - 1):
@@ -95,16 +95,27 @@ class FCN(torch.nn.Module):
         """
 
         activations = []
+        # print("start", x.size())
         for block in self.down_blocks[:-1]:
             x = block(x)
+            # print("side", x.size())
             activations.append(x)
             x = self.pool(x)
+            # print("down", x.size())
         x = self.down_blocks[-1](x)
+        # print("side", x.size())
         rev_acts = list(reversed(activations))
         for i in range(len(self.up_blocks)):
-            x = torch.cat([self.up_convs[i](x), rev_acts[i]], dim=1)
+            x = self.up_convs[i](x)
+            # print("up", x.size())
+            H = rev_acts[i].size()[2]
+            W = rev_acts[i].size()[3]
+            x = torch.cat([x[:, :, :H, :W], rev_acts[i]], dim=1)
+            # print("cat", x.size())
             x = self.up_blocks[i](x)
+            # print("side", x.size())
         x = self.final_conv(x)
+        # print("final", x.size())
         return x
 
 
