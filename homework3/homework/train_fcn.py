@@ -3,7 +3,7 @@ import numpy as np
 import torchvision
 
 from .models import FCN, save_model
-from .utils import load_dense_data, DENSE_CLASS_DISTRIBUTION, ConfusionMatrix, accuracy
+from .utils import load_dense_data, DENSE_CLASS_DISTRIBUTION, ConfusionMatrix
 from . import dense_transforms
 import torch.utils.tensorboard as tb
 
@@ -27,7 +27,7 @@ def train(args):
     # create a model, loss, optimizer
     device = torch.device("cpu")
     model = FCN().to(device)
-    # model.load_state_dict(torch.load("homework/cnn.th"))
+    # model.load_state_dict(torch.load("homework/fcn.th"))
     loss = torch.nn.CrossEntropyLoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=1e-3, weight_decay=1e-4)
 
@@ -46,35 +46,31 @@ def train(args):
     valid_data = load_dense_data("dense_data/valid")
 
     # Run SGD for several epochs
+    conf_matrix = ConfusionMatrix()
     global_step = 0
     while True:
-        score = 0
-        n = 0
         for batch in train_data:
             inputs = batch[0].to(device)
             labels = batch[1].to(device)
             outputs = model.forward(inputs)
-            score += accuracy(outputs, labels)
+            conf_matrix.add(outputs.argmax(1), labels)
             error = loss.forward(outputs, labels.long())
             train_logger.add_scalar('loss', error, global_step=global_step)
             optimizer.zero_grad()
             error.backward()
             optimizer.step()
             global_step += 1
-            n += 1
-        score /= n
+        score = conf_matrix.global_accuracy
         train_logger.add_scalar('accuracy', score, global_step=global_step)
-        score = 0
-        n = 0
+        conf_matrix = ConfusionMatrix()
         for batch in valid_data:
             inputs = batch[0].to(device)
             labels = batch[1].to(device)
             outputs = model.forward(inputs)
-            score += accuracy(outputs, labels)
-            n += 1
-        score /= n
+            conf_matrix.add(outputs.argmax(1), labels)
+        score = conf_matrix.global_accuracy
         valid_logger.add_scalar('accuracy', score, global_step=global_step)
-        if score > 0.8:
+        if score > 0.7:
             break
 
     save_model(model)
