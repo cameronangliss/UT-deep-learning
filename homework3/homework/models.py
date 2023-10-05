@@ -19,7 +19,7 @@ class CNNClassifier(torch.nn.Module):
         def forward(self, x):
             return self.layers(x) + self.downsample(x)
 
-    def __init__(self, layers=[32, 64, 128, 256, 512], n_input_channels=3):
+    def __init__(self, layers=[16, 32, 64], n_input_channels=3):
         super().__init__()
         c = layers[0]
         L = [
@@ -66,7 +66,7 @@ class FCN(torch.nn.Module):
         def forward(self, x):
             return self.layers(x) + self.downsample(x)
 
-    def __init__(self, layers=[16, 32, 64], n_input_channels=3):
+    def __init__(self, layers=[32, 64, 128, 256], n_input_channels=3):
         super().__init__()
         self.down_blocks = []
         c = n_input_channels
