@@ -29,7 +29,8 @@ def train(args):
     model = FCN().to(device)
     # model.load_state_dict(torch.load("homework/fcn.th"))
     loss = torch.nn.CrossEntropyLoss()
-    optimizer = torch.optim.Adam(model.parameters(), lr=1e-3, weight_decay=1e-4)
+    optimizer = torch.optim.Adam(model.parameters(), weight_decay=1e-4)
+    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, 'max', patience=25)
 
     # load the data: train and valid
     transform = dense_transforms.Compose([
@@ -40,7 +41,7 @@ def train(args):
             saturation=0.5,
             hue=0.25
         ),
-        dense_transforms.RandomCrop(size=(128, 96)),
+        # dense_transforms.RandomCrop(size=(128, 96)),
         dense_transforms.RandomHorizontalFlip()
     ])
     train_data = load_dense_data("dense_data/train", transform)
@@ -63,6 +64,7 @@ def train(args):
             global_step += 1
         train_logger.add_scalar('global_accuracy', conf_matrix.global_accuracy, global_step=global_step)
         train_logger.add_scalar('IoU', conf_matrix.iou, global_step=global_step)
+        scheduler.step(conf_matrix.global_accuracy)
         conf_matrix = ConfusionMatrix()
         for batch in valid_data:
             inputs = batch[0].to(device)
