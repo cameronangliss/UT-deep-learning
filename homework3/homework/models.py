@@ -62,11 +62,21 @@ class FCN(torch.nn.Module):
                 torch.nn.Conv2d(n_input, n_output, kernel_size=1, stride=stride),
                 torch.nn.BatchNorm2d(n_output)
             )
+            self.layers_no_batch_norm = torch.nn.Sequential(
+                torch.nn.Conv2d(n_input, n_output, kernel_size=3, stride=stride, padding=1),
+                torch.nn.ReLU(),
+                torch.nn.Conv2d(n_output, n_output, kernel_size=3, stride=stride, padding=1),
+                torch.nn.ReLU(),
+            )
+            self.downsample_no_batch_norm = torch.nn.Conv2d(n_input, n_output, kernel_size=1, stride=stride)
 
         def forward(self, x):
-            return self.layers(x) + self.downsample(x)
+            if x.size()[0] == x.size()[2] == x.size()[3] == 1:
+                return self.layers_no_batch_norm(x) + self.downsample_no_batch_norm(x)
+            else:
+                return self.layers(x) + self.downsample(x)
 
-    def __init__(self, layers=[32, 64, 128, 256], n_input_channels=3):
+    def __init__(self, layers=[8, 16, 32, 64, 128, 256], n_input_channels=3):
         super().__init__()
         self.down_blocks = []
         c = n_input_channels
