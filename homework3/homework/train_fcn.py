@@ -40,6 +40,7 @@ def train(args):
             saturation=0.5,
             hue=0.25
         ),
+        dense_transforms.RandomCrop(size=(128, 96)),
         dense_transforms.RandomHorizontalFlip()
     ])
     train_data = load_dense_data("dense_data/train", transform)
@@ -60,17 +61,17 @@ def train(args):
             error.backward()
             optimizer.step()
             global_step += 1
-        score = conf_matrix.global_accuracy
-        train_logger.add_scalar('accuracy', score, global_step=global_step)
+        train_logger.add_scalar('global_accuracy', conf_matrix.global_accuracy, global_step=global_step)
+        train_logger.add_scalar('IoU', conf_matrix.iou, global_step=global_step)
         conf_matrix = ConfusionMatrix()
         for batch in valid_data:
             inputs = batch[0].to(device)
             labels = batch[1].to(device)
             outputs = model.forward(inputs)
             conf_matrix.add(outputs.argmax(1), labels)
-        score = conf_matrix.global_accuracy
-        valid_logger.add_scalar('accuracy', score, global_step=global_step)
-        if score > 0.7:
+        valid_logger.add_scalar('global_accuracy', conf_matrix.global_accuracy, global_step=global_step)
+        valid_logger.add_scalar('IoU', conf_matrix.iou, global_step=global_step)
+        if conf_matrix.global_accuracy > 0.7 and conf_matrix.iou > 0.3:
             break
 
     save_model(model)
