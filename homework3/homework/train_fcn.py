@@ -48,9 +48,9 @@ def train(args):
     valid_data = load_dense_data("dense_data/valid")
 
     # Run SGD for several epochs
-    conf_matrix = ConfusionMatrix()
     global_step = 0
     while True:
+        conf_matrix = ConfusionMatrix()
         for batch in train_data:
             inputs = batch[0].to(device)
             labels = batch[1].to(device)
