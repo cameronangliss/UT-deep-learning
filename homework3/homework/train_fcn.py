@@ -30,7 +30,7 @@ def train(args):
     # model.load_state_dict(torch.load("homework/fcn.th"))
     loss = torch.nn.CrossEntropyLoss()
     optimizer = torch.optim.Adam(model.parameters(), weight_decay=1e-4)
-    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, 'max', patience=25)
+    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, 'max')
 
     # load the data: train and valid
     transform = dense_transforms.Compose([
