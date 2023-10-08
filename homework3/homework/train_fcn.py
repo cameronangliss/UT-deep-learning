@@ -29,7 +29,7 @@ def train(args):
     model = FCN().to(device)
     # model.load_state_dict(torch.load("homework/fcn.th"))
     loss = torch.nn.CrossEntropyLoss()
-    optimizer = torch.optim.Adam(model.parameters(), weight_decay=1e-4)
+    optimizer = torch.optim.Adam(model.parameters(), lr=1e-3, weight_decay=1e-4)
     scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, 'max')
 
     # load the data: train and valid
@@ -41,7 +41,6 @@ def train(args):
             saturation=0.5,
             hue=0.25
         ),
-        # dense_transforms.RandomCrop(size=(128, 96)),
         dense_transforms.RandomHorizontalFlip()
     ])
     train_data = load_dense_data("dense_data/train", transform)
@@ -52,8 +51,8 @@ def train(args):
     while True:
         conf_matrix = ConfusionMatrix()
         for batch in train_data:
-            inputs = batch[0].to(device)
-            labels = batch[1].to(device)
+            inputs = batch[0]
+            labels = batch[1]
             outputs = model.forward(inputs)
             conf_matrix.add(outputs.argmax(1), labels)
             error = loss.forward(outputs, labels.long())
@@ -67,13 +66,13 @@ def train(args):
         scheduler.step(conf_matrix.global_accuracy)
         conf_matrix = ConfusionMatrix()
         for batch in valid_data:
-            inputs = batch[0].to(device)
-            labels = batch[1].to(device)
+            inputs = batch[0]
+            labels = batch[1]
             outputs = model.forward(inputs)
             conf_matrix.add(outputs.argmax(1), labels)
         valid_logger.add_scalar('global_accuracy', conf_matrix.global_accuracy, global_step=global_step)
         valid_logger.add_scalar('IoU', conf_matrix.iou, global_step=global_step)
-        if conf_matrix.global_accuracy > 0.7 and conf_matrix.iou > 0.3:
+        if conf_matrix.global_accuracy > 0.85 and conf_matrix.iou > 0.55:
             break
 
     save_model(model)
