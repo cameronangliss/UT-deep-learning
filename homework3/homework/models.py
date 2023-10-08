@@ -51,25 +51,27 @@ class FCN(torch.nn.Module):
     class Block(torch.nn.Module):
         def __init__(self, n_input, n_output, stride=1):
             super().__init__()
-            self.conv = torch.nn.Conv2d(n_input, n_output, kernel_size=3, stride=stride, padding=1)
-            self.batch_norm = torch.nn.BatchNorm2d(n_output)
-            self.relu = torch.nn.ReLU()
-            self.downsample_conv = torch.nn.Conv2d(n_input, n_output, kernel_size=1, stride=stride)
-            self.downsample_batch = torch.nn.BatchNorm2d(n_output)
+            self.n_input = n_input
+            self.n_output = n_output
+            self.layers = torch.nn.Sequential(
+                torch.nn.Conv2d(n_input, n_output, kernel_size=3, padding=1, stride=stride),
+                torch.nn.BatchNorm2d(n_output),
+                torch.nn.ReLU(),
+            )
+            self.downsample = torch.nn.Sequential(
+                torch.nn.Conv2d(n_input, n_output, kernel_size=1, stride=stride),
+                torch.nn.BatchNorm2d(n_output)
+            )
 
         def forward(self, x):
             if x.size()[0] == x.size()[2] == x.size()[3] == 1:
-                y = self.conv(x)
-                y = self.relu(y)
-                z = self.downsample_conv(x)
-                return y + z
+                if self.n_output > self.n_input:
+                    zeros = torch.zeros(1, self.n_output - self.n_input, 1, 1)
+                    return torch.cat([zeros, x], dim=1)
+                else:
+                    return x[:, :self.n_output, :, :]
             else:
-                y = self.conv(x)
-                y = self.batch_norm(y)
-                y = self.relu(y)
-                z = self.downsample_conv(x)
-                z = self.downsample_batch(z)
-                return y + z
+                return self.layers(x) + self.downsample(x)
 
     def __init__(self, layers=[32, 64, 128, 256], n_input_channels=3):
         super().__init__()
