@@ -26,7 +26,7 @@ def train(args):
     # create a model, loss, optimizer
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model = FCN().to(device)
-    # model.load_state_dict(torch.load("homework/fcn.th"))
+    model.load_state_dict(torch.load("homework/fcn.th"))
     loss = torch.nn.CrossEntropyLoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=1e-3, weight_decay=1e-4)
     scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, 'max')
@@ -71,7 +71,7 @@ def train(args):
             conf_matrix.add(outputs.argmax(1), labels)
         valid_logger.add_scalar('global_accuracy', conf_matrix.global_accuracy, global_step=global_step)
         valid_logger.add_scalar('IoU', conf_matrix.iou, global_step=global_step)
-        if conf_matrix.global_accuracy > 0.87 and conf_matrix.iou > 0.57:
+        if conf_matrix.global_accuracy > 0.88 and conf_matrix.iou > 0.58:
             break
 
     save_model(model)
