@@ -62,7 +62,7 @@ def train(args):
             n += 1
         score /= n
         valid_logger.add_scalar('accuracy', score, global_step=global_step)
-        if score > 0.93:
+        if score > 0.935:
             break
 
     # Save your final model, using save_model
