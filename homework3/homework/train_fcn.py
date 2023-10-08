@@ -24,7 +24,7 @@ def train(args):
     """
 
     # create a model, loss, optimizer
-    device = torch.device("cpu")
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model = FCN().to(device)
     # model.load_state_dict(torch.load("homework/fcn.th"))
     loss = torch.nn.CrossEntropyLoss()
