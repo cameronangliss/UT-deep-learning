@@ -26,7 +26,7 @@ def train(args):
     # create a model, loss, optimizer
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model = FCN().to(device)
-    model.load_state_dict(torch.load("homework/fcn.th"))
+    # model.load_state_dict(torch.load("homework/fcn.th"))
     loss = torch.nn.CrossEntropyLoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=1e-3, weight_decay=1e-4)
     scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, 'max')
