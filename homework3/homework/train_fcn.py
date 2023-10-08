@@ -10,7 +10,6 @@ import torch.utils.tensorboard as tb
 
 def train(args):
     from os import path
-    model = FCN()
     train_logger, valid_logger = None, None
     if args.log_dir is not None:
         train_logger = tb.SummaryWriter(path.join(args.log_dir, 'train'), flush_secs=1)
@@ -51,8 +50,8 @@ def train(args):
     while True:
         conf_matrix = ConfusionMatrix()
         for batch in train_data:
-            inputs = batch[0]
-            labels = batch[1]
+            inputs = batch[0].to(device)
+            labels = batch[1].to(device)
             outputs = model.forward(inputs)
             conf_matrix.add(outputs.argmax(1), labels)
             error = loss.forward(outputs, labels.long())
@@ -66,13 +65,13 @@ def train(args):
         scheduler.step(conf_matrix.global_accuracy)
         conf_matrix = ConfusionMatrix()
         for batch in valid_data:
-            inputs = batch[0]
-            labels = batch[1]
+            inputs = batch[0].to(device)
+            labels = batch[1].to(device)
             outputs = model.forward(inputs)
             conf_matrix.add(outputs.argmax(1), labels)
         valid_logger.add_scalar('global_accuracy', conf_matrix.global_accuracy, global_step=global_step)
         valid_logger.add_scalar('IoU', conf_matrix.iou, global_step=global_step)
-        if conf_matrix.global_accuracy > 0.85 and conf_matrix.iou > 0.55:
+        if conf_matrix.global_accuracy > 0.87 and conf_matrix.iou > 0.57:
             break
 
     save_model(model)
