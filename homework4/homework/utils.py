@@ -92,9 +92,9 @@ class DetectionSuperTuxDataset(Dataset):
         return data
 
 
-def load_detection_data(dataset_path, transforms=None, num_workers=0, batch_size=32, **kwargs):
+def load_detection_data(dataset_path, num_workers=0, batch_size=32, **kwargs):
     dataset = DetectionSuperTuxDataset(dataset_path, **kwargs)
-    return DataLoader(dataset, transforms, num_workers=num_workers, batch_size=batch_size, shuffle=True, drop_last=True)
+    return DataLoader(dataset, num_workers=num_workers, batch_size=batch_size, shuffle=True, drop_last=True)
 
 
 if __name__ == '__main__':

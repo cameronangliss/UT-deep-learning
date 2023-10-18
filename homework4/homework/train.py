@@ -39,7 +39,7 @@ def train(args):
             dense_transforms.RandomHorizontalFlip(),
         ]
     )
-    train_data = load_detection_data("dense_data/train", transform)
+    train_data = load_detection_data("dense_data/train", transform=transform)
     valid_data = load_detection_data("dense_data/valid")
 
     # Run SGD for several epochs
