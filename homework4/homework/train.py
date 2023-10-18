@@ -2,18 +2,19 @@ import torch
 import numpy as np
 
 from .models import Detector, save_model
-from .utils import load_detection_data
+from .utils import PR, load_detection_data, point_close, box_iou
 from . import dense_transforms
 import torch.utils.tensorboard as tb
 
 
 def train(args):
     from os import path
+
     model = Detector()
     train_logger, valid_logger = None, None
     if args.log_dir is not None:
-        train_logger = tb.SummaryWriter(path.join(args.log_dir, 'train'), flush_secs=1)
-        valid_logger = tb.SummaryWriter(path.join(args.log_dir, 'valid'), flush_secs=1)
+        train_logger = tb.SummaryWriter(path.join(args.log_dir, "train"), flush_secs=1)
+        valid_logger = tb.SummaryWriter(path.join(args.log_dir, "valid"), flush_secs=1)
 
     """
     Your code here, modify your HW3 code
@@ -24,52 +25,74 @@ def train(args):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model = Detector().to(device)
     # model.load_state_dict(torch.load("homework/det.th"))
-    loss = torch.nn.CrossEntropyLoss()
+    loss = torch.nn.BCEWithLogitsLoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=1e-3, weight_decay=1e-4)
-    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, 'max')
 
     # load the data: train and valid
-    transform = dense_transforms.Compose([
-        dense_transforms.ToTensor(),
-        dense_transforms.ToHeatmap(),
-        dense_transforms.ColorJitter(
-            brightness=0.5,
-            contrast=0.5,
-            saturation=0.5,
-            hue=0.25
-        ),
-        dense_transforms.RandomHorizontalFlip()
-    ])
+    transform = dense_transforms.Compose(
+        [
+            dense_transforms.ToTensor(),
+            dense_transforms.ToHeatmap(),
+            dense_transforms.ColorJitter(
+                brightness=0.5, contrast=0.5, saturation=0.5, hue=0.25
+            ),
+            dense_transforms.RandomHorizontalFlip(),
+        ]
+    )
     train_data = load_detection_data("dense_data/train", transform)
     valid_data = load_detection_data("dense_data/valid")
 
     # Run SGD for several epochs
-    global_step = 0
+    gs = 0
     while True:
-        conf_matrix = ConfusionMatrix()
-        for batch in train_data:
-            inputs = batch[0].to(device)
-            labels = batch[1].to(device)
-            outputs = model.forward(inputs)
-            conf_matrix.add(outputs.argmax(1), labels)
-            error = loss.forward(outputs, labels.long())
-            train_logger.add_scalar('loss', error, global_step=global_step)
+        pr_box = [PR() for _ in range(3)]
+        pr_dist = [PR(is_close=point_close) for _ in range(3)]
+        pr_iou = [PR(is_close=box_iou) for _ in range(3)]
+        for image, *heatmaps in train_data:
+            detections = model.detect(image)
+            for i in range(3):
+                pr_box.add(detections[i], heatmaps[i])
+                pr_dist.add(detections[i], heatmaps[i])
+                pr_iou.add(detections[i], heatmaps[i])
+            error = (
+                loss.forward(detections[0], heatmaps[0])
+                + loss.forward(detections[1], heatmaps[1])
+                + loss.forward(detections[2], heatmaps[2])
+            ) / 3
+            train_logger.add_scalar("loss", error, global_step=gs)
             optimizer.zero_grad()
             error.backward()
             optimizer.step()
             global_step += 1
-        train_logger.add_scalar('global_accuracy', conf_matrix.global_accuracy, global_step=global_step)
-        train_logger.add_scalar('IoU', conf_matrix.iou, global_step=global_step)
-        scheduler.step(conf_matrix.global_accuracy)
-        conf_matrix = ConfusionMatrix()
-        for batch in valid_data:
-            inputs = batch[0].to(device)
-            labels = batch[1].to(device)
-            outputs = model.forward(inputs)
-            conf_matrix.add(outputs.argmax(1), labels)
-        valid_logger.add_scalar('global_accuracy', conf_matrix.global_accuracy, global_step=global_step)
-        valid_logger.add_scalar('IoU', conf_matrix.iou, global_step=global_step)
-        if conf_matrix.global_accuracy > 0.9 and conf_matrix.iou > 0.6:
+        train_logger.add_scalar("PiB kart", pr_box[0].average_prec, global_step=gs)
+        train_logger.add_scalar("PC kart", pr_dist[0].average_prec, global_step=gs)
+        train_logger.add_scalar("PiB bomb", pr_box[1].average_prec, global_step=gs)
+        train_logger.add_scalar("PC bomb", pr_dist[1].average_prec, global_step=gs)
+        train_logger.add_scalar("PiB pickup", pr_box[2].average_prec, global_step=gs)
+        train_logger.add_scalar("PC pickup", pr_dist[2].average_prec, global_step=gs)
+        pr_box = [PR() for _ in range(3)]
+        pr_dist = [PR(is_close=point_close) for _ in range(3)]
+        pr_iou = [PR(is_close=box_iou) for _ in range(3)]
+        for image, *heatmaps in valid_data:
+            detections = model.detect(image)
+            for i in range(3):
+                pr_box.add(detections[i], heatmaps[i])
+                pr_dist.add(detections[i], heatmaps[i])
+                pr_iou.add(detections[i], heatmaps[i])
+        valid_logger.add_scalar("PiB kart", pr_box[0].average_prec, global_step=gs)
+        valid_logger.add_scalar("PC kart", pr_dist[0].average_prec, global_step=gs)
+        valid_logger.add_scalar("PiB bomb", pr_box[1].average_prec, global_step=gs)
+        valid_logger.add_scalar("PC bomb", pr_dist[1].average_prec, global_step=gs)
+        valid_logger.add_scalar("PiB pickup", pr_box[2].average_prec, global_step=gs)
+        valid_logger.add_scalar("PC pickup", pr_dist[2].average_prec, global_step=gs)
+        if (
+            pr_box[0].average_prec > 0.75
+            and pr_box[1].average_prec > 0.45
+            and pr_box[2].average_prec > 0.85
+            and pr_dist[0].average_prec > 0.72
+            and pr_dist[1].average_prec > 0.45
+            and pr_dist[2].average_prec > 0.85
+        ):
             break
 
     save_model(model)
@@ -83,16 +106,17 @@ def log(logger, imgs, gt_det, det, global_step):
     det: predicted object-center heatmaps
     global_step: iteration
     """
-    logger.add_images('image', imgs[:16], global_step)
-    logger.add_images('label', gt_det[:16], global_step)
-    logger.add_images('pred', torch.sigmoid(det[:16]), global_step)
+    logger.add_images("image", imgs[:16], global_step)
+    logger.add_images("label", gt_det[:16], global_step)
+    logger.add_images("pred", torch.sigmoid(det[:16]), global_step)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     import argparse
 
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('--log_dir')
+    parser.add_argument("--log_dir")
     # Put custom arguments here
 
     args = parser.parse_args()
