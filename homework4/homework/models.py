@@ -119,7 +119,12 @@ class Detector(torch.nn.Module):
                  scalar. Otherwise pytorch might keep a computation graph in the background and your program will run
                  out of memory.
         """
-        raise NotImplementedError('Detector.detect')
+
+        heatmaps = self.forward(image[None])[0]
+        kart_peaks = [(score, cx, cy, 0, 0) for score, cx, cy in extract_peak(heatmaps[0], max_det=30)]
+        bomb_peaks = [(score, cx, cy, 0, 0) for score, cx, cy in extract_peak(heatmaps[1], max_det=30)]
+        pickup_peaks = [(score, cx, cy, 0, 0) for score, cx, cy in extract_peak(heatmaps[2], max_det=30)]
+        return kart_peaks, bomb_peaks, pickup_peaks
 
 
 def save_model(model):
