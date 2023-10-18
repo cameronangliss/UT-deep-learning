@@ -19,7 +19,59 @@ def train(args):
     Your code here, modify your HW3 code
     Hint: Use the log function below to debug and visualize your model
     """
-    raise NotImplementedError('train')
+
+    # create a model, loss, optimizer
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    model = Detector().to(device)
+    # model.load_state_dict(torch.load("homework/det.th"))
+    loss = torch.nn.CrossEntropyLoss()
+    optimizer = torch.optim.Adam(model.parameters(), lr=1e-3, weight_decay=1e-4)
+    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, 'max')
+
+    # load the data: train and valid
+    transform = dense_transforms.Compose([
+        dense_transforms.ToTensor(),
+        dense_transforms.ToHeatmap(),
+        dense_transforms.ColorJitter(
+            brightness=0.5,
+            contrast=0.5,
+            saturation=0.5,
+            hue=0.25
+        ),
+        dense_transforms.RandomHorizontalFlip()
+    ])
+    train_data = load_detection_data("dense_data/train", transform)
+    valid_data = load_detection_data("dense_data/valid")
+
+    # Run SGD for several epochs
+    global_step = 0
+    while True:
+        conf_matrix = ConfusionMatrix()
+        for batch in train_data:
+            inputs = batch[0].to(device)
+            labels = batch[1].to(device)
+            outputs = model.forward(inputs)
+            conf_matrix.add(outputs.argmax(1), labels)
+            error = loss.forward(outputs, labels.long())
+            train_logger.add_scalar('loss', error, global_step=global_step)
+            optimizer.zero_grad()
+            error.backward()
+            optimizer.step()
+            global_step += 1
+        train_logger.add_scalar('global_accuracy', conf_matrix.global_accuracy, global_step=global_step)
+        train_logger.add_scalar('IoU', conf_matrix.iou, global_step=global_step)
+        scheduler.step(conf_matrix.global_accuracy)
+        conf_matrix = ConfusionMatrix()
+        for batch in valid_data:
+            inputs = batch[0].to(device)
+            labels = batch[1].to(device)
+            outputs = model.forward(inputs)
+            conf_matrix.add(outputs.argmax(1), labels)
+        valid_logger.add_scalar('global_accuracy', conf_matrix.global_accuracy, global_step=global_step)
+        valid_logger.add_scalar('IoU', conf_matrix.iou, global_step=global_step)
+        if conf_matrix.global_accuracy > 0.9 and conf_matrix.iou > 0.6:
+            break
+
     save_model(model)
 
 
