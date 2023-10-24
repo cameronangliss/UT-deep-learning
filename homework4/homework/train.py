@@ -90,6 +90,16 @@ def train(args):
             and pr_dist[2].average_prec > 0.85
         ):
             break
+        else:
+            print(
+                f"{pr_box[0].average_prec}/0.75",
+                f"{pr_box[1].average_prec}/0.45",
+                f"{pr_box[2].average_prec}/0.85",
+                f"{pr_dist[0].average_prec}/0.72",
+                f"{pr_dist[0].average_prec}/0.45",
+                f"{pr_dist[0].average_prec}/0.85",
+                end="\r"
+            )
 
     save_model(model)
 
