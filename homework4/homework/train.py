@@ -48,11 +48,11 @@ def train(args):
         pr_dist = [PR(is_close=point_close) for _ in range(3)]
         for batch in train_data:
             image = batch[0].to(device)
-            heatmaps = batch[1:]
+            heatmaps = [h.to(device) for h in batch[1:]]
             detections = model.detect(image)
             for i, heatmap in enumerate(heatmaps):
-                pr_box[i].add(detections[i], np.array(heatmap))
-                pr_dist[i].add(detections[i], np.array(heatmap))
+                pr_box[i].add(detections[i], np.array(heatmap.detach().cpu().numpy()))
+                pr_dist[i].add(detections[i], np.array(heatmap.detach().cpu().numpy()))
             model_output = model.forward(image)
             error = loss.forward(model_output, heatmaps[0])
             train_logger.add_scalar("loss", error, global_step=gs)
@@ -70,11 +70,11 @@ def train(args):
         pr_dist = [PR(is_close=point_close) for _ in range(3)]
         for batch in valid_data:
             image = batch[0].to(device)
-            heatmaps = batch[1]
+            heatmaps = [h.to(device) for h in batch[1:]]
             detections = model.detect(image)
-            for i in range(3):
-                pr_box.add(detections[i], heatmaps[i])
-                pr_dist.add(detections[i], heatmaps[i])
+            for i, heatmap in enumerate(heatmaps):
+                pr_box.add(detections[i], np.array(heatmap.detach().cpu().numpy()))
+                pr_dist.add(detections[i], np.array(heatmap.detach().cpu().numpy()))
         valid_logger.add_scalar("PiB kart", pr_box[0].average_prec, global_step=gs)
         valid_logger.add_scalar("PC kart", pr_dist[0].average_prec, global_step=gs)
         valid_logger.add_scalar("PiB bomb", pr_box[1].average_prec, global_step=gs)
