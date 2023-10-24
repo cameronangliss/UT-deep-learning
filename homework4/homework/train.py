@@ -46,10 +46,9 @@ def train(args):
     while True:
         pr_box = [PR() for _ in range(3)]
         pr_dist = [PR(is_close=point_close) for _ in range(3)]
-        for image, *heatmaps in train_data:
-            image = image.to(device)
-            for h in heatmaps:
-                h = h.to(device)
+        for batch in train_data:
+            image = batch[0].to(device)
+            heatmaps = batch[1:]
             detections = model.detect(image)
             for i, heatmap in enumerate(heatmaps):
                 pr_box[i].add(detections[i], np.array(heatmap))
@@ -69,10 +68,9 @@ def train(args):
         train_logger.add_scalar("PC pickup", pr_dist[2].average_prec, global_step=gs)
         pr_box = [PR() for _ in range(3)]
         pr_dist = [PR(is_close=point_close) for _ in range(3)]
-        for image, *heatmaps in valid_data:
-            image = image.to(device)
-            for h in heatmaps:
-                h = h.to(device)
+        for batch in valid_data:
+            image = batch[0].to(device)
+            heatmaps = batch[1]
             detections = model.detect(image)
             for i in range(3):
                 pr_box.add(detections[i], heatmaps[i])
