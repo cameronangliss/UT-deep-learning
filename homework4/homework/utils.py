@@ -16,15 +16,6 @@ def point_close(pred, lbl, d=5):
     return ((x0 + x1 - 1) / 2 - px) ** 2 + ((y0 + y1 - 1) / 2 - py) ** 2 < d ** 2
 
 
-def box_iou(pred, lbl, t=0.5):
-    px, py, pw2, ph2 = pred[:, None, 0], pred[:, None, 1], pred[:, None, 2], pred[:, None, 3]
-    px0, px1, py0, py1 = px - pw2, px + pw2, py - ph2, py + ph2
-    x0, y0, x1, y1 = lbl[None, :, 0], lbl[None, :, 1], lbl[None, :, 2], lbl[None, :, 3]
-    iou = (abs(torch.min(px1, x1) - torch.max(px0, x0)) * abs(torch.min(py1, y1) - torch.max(py0, y0))) / \
-          (abs(torch.max(px1, x1) - torch.min(px0, x0)) * abs(torch.max(py1, y1) - torch.min(py0, y0)))
-    return iou > t
-
-
 class PR:
     def __init__(self, min_size=20, is_close=point_in_box):
         self.min_size = min_size

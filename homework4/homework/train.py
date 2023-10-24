@@ -2,7 +2,7 @@ import torch
 import numpy as np
 
 from .models import Detector, save_model
-from .utils import PR, load_detection_data, point_close, box_iou
+from .utils import PR, load_detection_data, point_close
 from . import dense_transforms
 import torch.utils.tensorboard as tb
 
@@ -10,7 +10,6 @@ import torch.utils.tensorboard as tb
 def train(args):
     from os import path
 
-    model = Detector()
     train_logger, valid_logger = None, None
     if args.log_dir is not None:
         train_logger = tb.SummaryWriter(path.join(args.log_dir, "train"), flush_secs=1)
@@ -33,10 +32,10 @@ def train(args):
         [
             dense_transforms.ToTensor(),
             dense_transforms.ToHeatmap(),
-            dense_transforms.ColorJitter(
-                brightness=0.5, contrast=0.5, saturation=0.5, hue=0.25
-            ),
-            dense_transforms.RandomHorizontalFlip(),
+            # dense_transforms.ColorJitter(
+            #     brightness=0.5, contrast=0.5, saturation=0.5, hue=0.25
+            # ),
+            # dense_transforms.RandomHorizontalFlip(),
         ]
     )
     train_data = load_detection_data("dense_data/train", transform=transform)
@@ -47,23 +46,21 @@ def train(args):
     while True:
         pr_box = [PR() for _ in range(3)]
         pr_dist = [PR(is_close=point_close) for _ in range(3)]
-        pr_iou = [PR(is_close=box_iou) for _ in range(3)]
         for image, *heatmaps in train_data:
+            image = image.to(device)
+            for h in heatmaps:
+                h = h.to(device)
             detections = model.detect(image)
-            for i in range(3):
-                pr_box.add(detections[i], heatmaps[i])
-                pr_dist.add(detections[i], heatmaps[i])
-                pr_iou.add(detections[i], heatmaps[i])
-            error = (
-                loss.forward(detections[0], heatmaps[0])
-                + loss.forward(detections[1], heatmaps[1])
-                + loss.forward(detections[2], heatmaps[2])
-            ) / 3
+            for i, heatmap in enumerate(heatmaps):
+                pr_box[i].add(detections[i], np.array(heatmap))
+                pr_dist[i].add(detections[i], np.array(heatmap))
+            model_output = model.forward(image)
+            error = loss.forward(model_output, heatmaps[0])
             train_logger.add_scalar("loss", error, global_step=gs)
             optimizer.zero_grad()
             error.backward()
             optimizer.step()
-            global_step += 1
+            gs += 1
         train_logger.add_scalar("PiB kart", pr_box[0].average_prec, global_step=gs)
         train_logger.add_scalar("PC kart", pr_dist[0].average_prec, global_step=gs)
         train_logger.add_scalar("PiB bomb", pr_box[1].average_prec, global_step=gs)
@@ -72,13 +69,14 @@ def train(args):
         train_logger.add_scalar("PC pickup", pr_dist[2].average_prec, global_step=gs)
         pr_box = [PR() for _ in range(3)]
         pr_dist = [PR(is_close=point_close) for _ in range(3)]
-        pr_iou = [PR(is_close=box_iou) for _ in range(3)]
         for image, *heatmaps in valid_data:
+            image = image.to(device)
+            for h in heatmaps:
+                h = h.to(device)
             detections = model.detect(image)
             for i in range(3):
                 pr_box.add(detections[i], heatmaps[i])
                 pr_dist.add(detections[i], heatmaps[i])
-                pr_iou.add(detections[i], heatmaps[i])
         valid_logger.add_scalar("PiB kart", pr_box[0].average_prec, global_step=gs)
         valid_logger.add_scalar("PC kart", pr_dist[0].average_prec, global_step=gs)
         valid_logger.add_scalar("PiB bomb", pr_box[1].average_prec, global_step=gs)

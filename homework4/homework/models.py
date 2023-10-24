@@ -2,7 +2,7 @@ import torch
 import torch.nn.functional as F
 
 
-def extract_peak(heatmap, max_pool_ks=7, min_score=-5, max_det=100):
+def extract_peak(heatmap, max_pool_ks=7, min_score=-5, max_det=100) -> list[tuple[float, int, int]]:
     """
        Your code here.
        Extract local maxima (peaks) in a 2d heatmap.
@@ -72,7 +72,7 @@ class Detector(torch.nn.Module):
         rev_layers = list(reversed(layers))
         for i in range(len(layers) - 1):
             self.up_blocks.append(self.Block(rev_layers[i] + rev_layers[i + 1], rev_layers[i + 1]))
-        self.final_conv = torch.nn.Conv2d(layers[0], 5, kernel_size=1)
+        self.final_conv = torch.nn.Conv2d(layers[0], 3, kernel_size=1)
         self.network_chain = torch.nn.Sequential(*self.down_blocks, *self.up_convs, *self.up_blocks)
 
     def forward(self, x):
@@ -120,11 +120,11 @@ class Detector(torch.nn.Module):
                  out of memory.
         """
 
-        heatmaps = self.forward(image[None])[0]
+        heatmaps = self.forward(image)[0]
         kart_peaks = [(score, cx, cy, 0, 0) for score, cx, cy in extract_peak(heatmaps[0], max_det=30)]
         bomb_peaks = [(score, cx, cy, 0, 0) for score, cx, cy in extract_peak(heatmaps[1], max_det=30)]
         pickup_peaks = [(score, cx, cy, 0, 0) for score, cx, cy in extract_peak(heatmaps[2], max_det=30)]
-        return kart_peaks, bomb_peaks, pickup_peaks
+        return [kart_peaks, bomb_peaks, pickup_peaks]
 
 
 def save_model(model):
