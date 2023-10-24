@@ -30,12 +30,12 @@ def train(args):
     # load the data: train and valid
     transform = dense_transforms.Compose(
         [
+            dense_transforms.ColorJitter(
+                brightness=0.5, contrast=0.5, saturation=0.5, hue=0.25
+            ),
+            dense_transforms.RandomHorizontalFlip(),
             dense_transforms.ToTensor(),
             dense_transforms.ToHeatmap(),
-            # dense_transforms.ColorJitter(
-            #     brightness=0.5, contrast=0.5, saturation=0.5, hue=0.25
-            # ),
-            # dense_transforms.RandomHorizontalFlip(),
         ]
     )
     train_data = load_detection_data("dense_data/train", transform=transform)
@@ -48,13 +48,13 @@ def train(args):
         pr_dist = [PR(is_close=point_close) for _ in range(3)]
         for batch in train_data:
             image = batch[0].to(device)
-            heatmaps = [h.to(device) for h in batch[1:]]
+            heatmaps = batch[1].to(device)
             detections = model.detect(image)
-            for i, heatmap in enumerate(heatmaps):
-                pr_box[i].add(detections[i], np.array(heatmap.detach().cpu().numpy()))
-                pr_dist[i].add(detections[i], np.array(heatmap.detach().cpu().numpy()))
+            for i in range(3):
+                pr_box[i].add(detections[i], heatmaps[i].detach().cpu().numpy())
+                pr_dist[i].add(detections[i], heatmaps[i].detach().cpu().numpy())
             model_output = model.forward(image)
-            error = loss.forward(model_output, heatmaps[0])
+            error = loss.forward(model_output, heatmaps)
             train_logger.add_scalar("loss", error, global_step=gs)
             optimizer.zero_grad()
             error.backward()
