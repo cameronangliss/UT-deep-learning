@@ -120,6 +120,8 @@ class Detector(torch.nn.Module):
                  out of memory.
         """
 
+        if len(image.size()) == 3:
+            image = image[None]
         heatmaps = self.forward(image)[0]
         kart_peaks = [(score, cx, cy, 0, 0) for score, cx, cy in extract_peak(heatmaps[0], max_det=30)]
         bomb_peaks = [(score, cx, cy, 0, 0) for score, cx, cy in extract_peak(heatmaps[1], max_det=30)]
