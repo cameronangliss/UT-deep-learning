@@ -47,13 +47,14 @@ def train(args):
         pr_box = [PR() for _ in range(3)]
         pr_dist = [PR(is_close=point_close) for _ in range(3)]
         for batch in train_data:
-            image = batch[0].to(device)
+            images = batch[0].to(device)
             heatmaps = batch[1].to(device)
-            detections = model.detect(image)
+            detections = [model.detect(img) for img in images]
             for i in range(3):
-                pr_box[i].add(detections[i], heatmaps[:, i, :, :].detach().cpu().numpy())
-                pr_dist[i].add(detections[i], heatmaps[:, i, :, :].detach().cpu().numpy())
-            model_output = model.forward(image)
+                for det, heatmap in zip(detections, heatmaps):
+                    pr_box[i].add(det[i], heatmap[i].detach().cpu().numpy())
+                    pr_dist[i].add(det[i], heatmap[i].detach().cpu().numpy())
+            model_output = model.forward(images)
             error = loss.forward(model_output, heatmaps)
             train_logger.add_scalar("loss", error, global_step=gs)
             optimizer.zero_grad()
@@ -69,12 +70,13 @@ def train(args):
         pr_box = [PR() for _ in range(3)]
         pr_dist = [PR(is_close=point_close) for _ in range(3)]
         for batch in valid_data:
-            image = batch[0].to(device)
+            images = batch[0].to(device)
             heatmaps = batch[1].to(device)
-            detections = model.detect(image)
+            detections = [model.detect(img) for img in images]
             for i in range(3):
-                pr_box.add(detections[i], heatmaps[:, i, :, :].detach().cpu().numpy())
-                pr_dist.add(detections[i], heatmaps[:, i, :, :].detach().cpu().numpy())
+                for det, heatmap in zip(detections, heatmaps):
+                    pr_box[i].add(det[i], heatmap[i].detach().cpu().numpy())
+                    pr_dist[i].add(det[i], heatmap[i].detach().cpu().numpy())
         valid_logger.add_scalar("PiB kart", pr_box[0].average_prec, global_step=gs)
         valid_logger.add_scalar("PC kart", pr_dist[0].average_prec, global_step=gs)
         valid_logger.add_scalar("PiB bomb", pr_box[1].average_prec, global_step=gs)
