@@ -15,14 +15,13 @@ def extract_peak(heatmap, max_pool_ks=7, min_score=-5, max_det=100) -> list[tupl
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     max_pool = torch.nn.MaxPool2d(max_pool_ks, stride=1, padding=max_pool_ks//2).to(device)
-    max_vals = max_pool(heatmap[None, None])
-    dets = []
-    for y in range(heatmap.size()[0]):
-        for x in range(heatmap.size()[1]):
-            if len(dets) == max_det:
-                return dets
-            if heatmap[y, x] == max_vals[0, 0, y, x] and heatmap[y, x] > min_score:
-                dets += [(heatmap[y, x], x, y)]
+    pooled_map = max_pool(heatmap[None, None])[0][0].view(-1)
+    peaked_ids = torch.nonzero(pooled_map != heatmap.view(-1))
+    pooled_map[peaked_ids] = float("-inf")
+    values, indices = torch.topk(pooled_map, k=min(max_det, pooled_map.size()[0]))
+    xs = indices % heatmap.size()[1]
+    ys = indices // heatmap.size()[1]
+    dets = [(float(score.item()), int(cx.item()), int(cy.item())) for score, cx, cy in zip(values, xs, ys) if score > min_score]
     return dets
 
 
