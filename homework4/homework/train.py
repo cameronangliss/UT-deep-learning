@@ -56,6 +56,7 @@ def train(args):
             model_output = model.forward(images)
             log(train_logger, images, heatmaps, model_output, gs)
             error = loss.forward(model_output, heatmaps)
+            print(error.item(), end="\r")
             train_logger.add_scalar("loss", error, global_step=gs)
             optimizer.zero_grad()
             error.backward()
