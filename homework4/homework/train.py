@@ -23,7 +23,7 @@ def train(args):
     # create a model, loss, optimizer
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model = Detector().to(device)
-    model.load_state_dict(torch.load("homework/det.th"))
+    # model.load_state_dict(torch.load("homework/det.th"))
     loss = torch.nn.BCEWithLogitsLoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=1e-3, weight_decay=1e-4)
 
