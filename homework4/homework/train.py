@@ -67,6 +67,7 @@ def train(args):
             images = batch[0].to(device)
             heatmaps = batch[1].to(device)
             error = loss.forward(model_output, heatmaps)
+            i += 1
             avg_error += (1 / i) * (error - avg_error)
         if avg_error < 0.05:
             break
