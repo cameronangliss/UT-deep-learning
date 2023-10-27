@@ -23,7 +23,7 @@ def train(args):
     # create a model, loss, optimizer
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model = Detector().to(device)
-    model.load_state_dict(torch.load("homework/det.th"))
+    # model.load_state_dict(torch.load("homework/det.th"))
     loss = torch.nn.BCEWithLogitsLoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=1e-3, weight_decay=1e-4)
 
@@ -48,28 +48,28 @@ def train(args):
     valid_data = load_detection_data("dense_data/valid", transform=valid_transform)
 
     # Run SGD for several epochs
-    gs = 0
+    global_step = 0
     while True:
         for batch in train_data:
             images = batch[0].to(device)
             heatmaps = batch[1].to(device)
             model_output = model.forward(images)
-            log(train_logger, images, heatmaps, model_output, gs)
-            error = loss.forward(model_output, heatmaps)
-            train_logger.add_scalar("loss", error, global_step=gs)
+            log(train_logger, images, heatmaps, model_output, global_step)
+            train_error = loss.forward(model_output, heatmaps)
+            train_logger.add_scalar("loss", train_error, global_step=global_step)
             optimizer.zero_grad()
-            error.backward()
+            train_error.backward()
             optimizer.step()
-            gs += 1
-        print("training error:", error.item())
+            global_step += 1
+        print("training error:", train_error.item())
         avg_error = 0
         i = 0
         for batch in valid_data:
             images = batch[0].to(device)
             heatmaps = batch[1].to(device)
-            error = loss.forward(model_output, heatmaps)
+            valid_error = loss.forward(model_output, heatmaps)
             i += 1
-            avg_error += (1 / i) * (error - avg_error)
+            avg_error += (1 / i) * (valid_error - avg_error)
         print("validation error:", avg_error.item())
         if avg_error < 0.007:
             break
