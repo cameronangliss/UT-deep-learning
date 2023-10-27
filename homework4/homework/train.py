@@ -69,7 +69,7 @@ def train(args):
             error = loss.forward(model_output, heatmaps)
             i += 1
             avg_error += (1 / i) * (error - avg_error)
-        if avg_error < 0.05:
+        if avg_error < 0.005:
             break
 
     save_model(model)
