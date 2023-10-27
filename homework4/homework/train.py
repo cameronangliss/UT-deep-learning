@@ -49,7 +49,7 @@ def train(args):
 
     # Run SGD for several epochs
     global_step = 0
-    while True:
+    for _ in range(100):
         for batch in train_data:
             images = batch[0].to(device)
             heatmaps = batch[1].to(device)
@@ -71,8 +71,6 @@ def train(args):
             i += 1
             avg_error += (1 / i) * (valid_error - avg_error)
         print("validation error:", avg_error.item())
-        if avg_error < 0.007:
-            break
 
     save_model(model)
 
