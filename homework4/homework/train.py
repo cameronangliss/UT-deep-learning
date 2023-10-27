@@ -25,7 +25,7 @@ def train(args):
     model = Detector().to(device)
     # model.load_state_dict(torch.load("homework/det.th"))
     loss = torch.nn.BCEWithLogitsLoss()
-    optimizer = torch.optim.Adam(model.parameters(), lr=1e-3, weight_decay=1e-4)
+    optimizer = torch.optim.Adam(model.parameters(), lr=1e-4, weight_decay=1e-4)
 
     # load the data: train and valid
     train_transform = dense_transforms.Compose(
@@ -49,7 +49,7 @@ def train(args):
 
     # Run SGD for several epochs
     global_step = 0
-    for _ in range(100):
+    for _ in range(50):
         for batch in train_data:
             images = batch[0].to(device)
             heatmaps = batch[1].to(device)
