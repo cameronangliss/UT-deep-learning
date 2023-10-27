@@ -28,7 +28,7 @@ def train(args):
     optimizer = torch.optim.Adam(model.parameters(), lr=1e-3, weight_decay=1e-4)
 
     # load the data: train and valid
-    transform = dense_transforms.Compose(
+    train_transform = dense_transforms.Compose(
         [
             dense_transforms.ColorJitter(
                 brightness=0.5, contrast=0.5, saturation=0.5, hue=0.25
@@ -38,8 +38,14 @@ def train(args):
             dense_transforms.ToHeatmap(),
         ]
     )
-    train_data = load_detection_data("dense_data/train", transform=transform)
-    valid_data = load_detection_data("dense_data/valid")
+    valid_transform = dense_transforms.Compose(
+        [
+            dense_transforms.ToTensor(),
+            dense_transforms.ToHeatmap(),
+        ]
+    )
+    train_data = load_detection_data("dense_data/train", transform=train_transform)
+    valid_data = load_detection_data("dense_data/valid", transform=valid_transform)
 
     # Run SGD for several epochs
     gs = 0
