@@ -61,7 +61,7 @@ def train(args):
             error.backward()
             optimizer.step()
             gs += 1
-        print(error.item())
+        print("training error:", error.item())
         avg_error = 0
         i = 0
         for batch in valid_data:
@@ -70,7 +70,7 @@ def train(args):
             error = loss.forward(model_output, heatmaps)
             i += 1
             avg_error += (1 / i) * (error - avg_error)
-        print(avg_error)
+        print("validation error:", avg_error)
         if avg_error < 0.005:
             break
 
