@@ -2,7 +2,7 @@ import torch
 import numpy as np
 
 from .models import Detector, save_model
-from .utils import PR, load_detection_data, point_close
+from .utils import load_detection_data
 from . import dense_transforms
 import torch.utils.tensorboard as tb
 
@@ -23,7 +23,7 @@ def train(args):
     # create a model, loss, optimizer
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model = Detector().to(device)
-    # model.load_state_dict(torch.load("homework/det.th"))
+    model.load_state_dict(torch.load("homework/det.th"))
     loss = torch.nn.BCEWithLogitsLoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=1e-3, weight_decay=1e-4)
 
@@ -44,16 +44,9 @@ def train(args):
     # Run SGD for several epochs
     gs = 0
     while True:
-        pr_box = [PR() for _ in range(3)]
-        pr_dist = [PR(is_close=point_close) for _ in range(3)]
         for batch in train_data:
             images = batch[0].to(device)
             heatmaps = batch[1].to(device)
-            detections = [model.detect(img) for img in images]
-            for i in range(3):
-                for det, heatmap in zip(detections, heatmaps):
-                    pr_box[i].add(det[i], heatmap[i].detach().cpu().numpy())
-                    pr_dist[i].add(det[i], heatmap[i].detach().cpu().numpy())
             model_output = model.forward(images)
             log(train_logger, images, heatmaps, model_output, gs)
             error = loss.forward(model_output, heatmaps)
@@ -62,36 +55,14 @@ def train(args):
             error.backward()
             optimizer.step()
             gs += 1
-        train_logger.add_scalar("PiB kart", pr_box[0].average_prec, global_step=gs)
-        train_logger.add_scalar("PC kart", pr_dist[0].average_prec, global_step=gs)
-        train_logger.add_scalar("PiB bomb", pr_box[1].average_prec, global_step=gs)
-        train_logger.add_scalar("PC bomb", pr_dist[1].average_prec, global_step=gs)
-        train_logger.add_scalar("PiB pickup", pr_box[2].average_prec, global_step=gs)
-        train_logger.add_scalar("PC pickup", pr_dist[2].average_prec, global_step=gs)
-        pr_box = [PR() for _ in range(3)]
-        pr_dist = [PR(is_close=point_close) for _ in range(3)]
+        avg_error = 0
+        i = 0
         for batch in valid_data:
             images = batch[0].to(device)
             heatmaps = batch[1].to(device)
-            detections = [model.detect(img) for img in images]
-            for i in range(3):
-                for det, heatmap in zip(detections, heatmaps):
-                    pr_box[i].add(det[i], heatmap[i].detach().cpu().numpy())
-                    pr_dist[i].add(det[i], heatmap[i].detach().cpu().numpy())
-        valid_logger.add_scalar("PiB kart", pr_box[0].average_prec, global_step=gs)
-        valid_logger.add_scalar("PC kart", pr_dist[0].average_prec, global_step=gs)
-        valid_logger.add_scalar("PiB bomb", pr_box[1].average_prec, global_step=gs)
-        valid_logger.add_scalar("PC bomb", pr_dist[1].average_prec, global_step=gs)
-        valid_logger.add_scalar("PiB pickup", pr_box[2].average_prec, global_step=gs)
-        valid_logger.add_scalar("PC pickup", pr_dist[2].average_prec, global_step=gs)
-        if (
-            pr_box[0].average_prec > 0.75
-            and pr_box[1].average_prec > 0.45
-            and pr_box[2].average_prec > 0.85
-            and pr_dist[0].average_prec > 0.72
-            and pr_dist[1].average_prec > 0.45
-            and pr_dist[2].average_prec > 0.85
-        ):
+            error = loss.forward(model_output, heatmaps)
+            avg_error += (1 / i) * (error - avg_error)
+        if avg_error < 0.05:
             break
 
     save_model(model)
