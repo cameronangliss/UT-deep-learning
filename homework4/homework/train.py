@@ -23,7 +23,7 @@ def train(args):
     # create a model, loss, optimizer
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model = Detector().to(device)
-    # model.load_state_dict(torch.load("homework/det.th"))
+    model.load_state_dict(torch.load("homework/det.th"))
     loss = torch.nn.BCEWithLogitsLoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=1e-3, weight_decay=1e-4)
 
@@ -71,7 +71,7 @@ def train(args):
             i += 1
             avg_error += (1 / i) * (error - avg_error)
         print("validation error:", avg_error.item())
-        if avg_error < 0.005:
+        if avg_error < 0.01:
             break
 
     save_model(model)
