@@ -56,12 +56,12 @@ def train(args):
             model_output = model.forward(images)
             log(train_logger, images, heatmaps, model_output, gs)
             error = loss.forward(model_output, heatmaps)
-            print(error.item(), end="\r")
             train_logger.add_scalar("loss", error, global_step=gs)
             optimizer.zero_grad()
             error.backward()
             optimizer.step()
             gs += 1
+        print(error.item())
         avg_error = 0
         i = 0
         for batch in valid_data:
@@ -70,6 +70,7 @@ def train(args):
             error = loss.forward(model_output, heatmaps)
             i += 1
             avg_error += (1 / i) * (error - avg_error)
+        print(avg_error)
         if avg_error < 0.005:
             break
 
