@@ -71,7 +71,7 @@ def train(args):
             i += 1
             avg_error += (1 / i) * (error - avg_error)
         print("validation error:", avg_error.item())
-        if avg_error < 0.01:
+        if avg_error < 0.009:
             break
 
     save_model(model)
