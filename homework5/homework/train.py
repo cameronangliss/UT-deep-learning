@@ -46,15 +46,15 @@ def train(args):
             optimizer.step()
             global_step += 1
         print("training error:", train_error.item())
-        avg_error = 0
-        i = 0
-        for batch in valid_data:
-            images = batch[0].to(device)
-            heatmaps = batch[1].to(device)
-            valid_error = loss.forward(model_output, heatmaps)
-            i += 1
-            avg_error += (1 / i) * (valid_error - avg_error)
-        print("validation error:", avg_error.item())
+        # avg_error = 0
+        # i = 0
+        # for batch in valid_data:
+        #     images = batch[0].to(device)
+        #     heatmaps = batch[1].to(device)
+        #     valid_error = loss.forward(model_output, heatmaps)
+        #     i += 1
+        #     avg_error += (1 / i) * (valid_error - avg_error)
+        # print("validation error:", avg_error.item())
 
     save_model(model)
 
