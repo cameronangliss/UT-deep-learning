@@ -15,7 +15,7 @@ def train(args):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model = Planner().to(device)
     # model.load_state_dict(torch.load("homework/det.th"))
-    loss = torch.nn.BCEWithLogitsLoss()
+    loss = torch.nn.MSELoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=1e-4, weight_decay=1e-4)
 
     # load the data: train and valid
