@@ -157,26 +157,14 @@ class PyTux:
         pystk.clean()
 
 
-def main():
+def main(args):
     from .controller import control
-    from argparse import ArgumentParser
     from os import makedirs
 
 
     def noisy_control(aim_pt, vel):
         return control(aim_pt + np.random.randn(*aim_pt.shape) * aim_noise,
                        vel + np.random.randn() * vel_noise)
-
-
-    parser = ArgumentParser("Collects a dataset for the high-level planner")
-    parser.add_argument('track', nargs='+')
-    parser.add_argument('-o', '--output', default=DATASET_PATH)
-    parser.add_argument('-n', '--n_images', default=10000, type=int)
-    parser.add_argument('-m', '--steps_per_track', default=20000, type=int)
-    parser.add_argument('--aim_noise', default=0.1, type=float)
-    parser.add_argument('--vel_noise', default=5, type=float)
-    parser.add_argument('-v', '--verbose', action='store_true')
-    args = parser.parse_args()
     try:
         makedirs(args.output)
     except OSError:
@@ -206,7 +194,3 @@ def main():
             # Add noise after the first round
             aim_noise, vel_noise = args.aim_noise, args.vel_noise
     pytux.close()
-
-
-if __name__ == '__main__':
-    main()
