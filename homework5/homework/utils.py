@@ -160,7 +160,7 @@ class PyTux:
 def main(pytux, track, n_images, steps_per_track, aim_noise, vel_noise, output, verbose):
     from .controller import control
     from os import makedirs
-    global n
+
 
     def noisy_control(aim_pt, vel):
         return control(aim_pt + np.random.randn(*aim_pt.shape) * aim_noise,
@@ -177,7 +177,7 @@ def main(pytux, track, n_images, steps_per_track, aim_noise, vel_noise, output, 
         def collect(_, im, pt):
             from PIL import Image
             from os import path
-
+            global n
             id = n if n < images_per_track else np.random.randint(0, n + 1)
             if id < images_per_track:
                 fn = path.join(output, track + '_%05d' % id)
