@@ -30,9 +30,8 @@ def control(aim_point, current_vel):
 
 def test_controller(pytux, track, verbose):
     import numpy as np
-    for t in track:
-        steps, how_far = pytux.rollout(t, control, max_frames=1000, verbose=verbose)
-        print(steps, how_far)
+    steps, how_far = pytux.rollout(track, control, max_frames=1000, verbose=verbose)
+    print(steps, how_far)
     pytux.close()
 
 
