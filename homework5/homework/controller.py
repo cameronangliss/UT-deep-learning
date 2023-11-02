@@ -1,7 +1,5 @@
 import pystk
 
-from .utils import PyTux
-
 
 def control(aim_point, current_vel):
     """
@@ -28,10 +26,11 @@ def control(aim_point, current_vel):
     return action
 
 
-def test_controller(pytux, track, verbose):
+def test_controller(pytux, tracks, verbose):
     import numpy as np
-    steps, how_far = pytux.rollout(track, control, max_frames=1000, verbose=verbose)
-    print(steps, how_far)
+    for t in tracks:
+        steps, how_far = pytux.rollout(t, control, max_frames=1000, verbose=verbose)
+        print(steps, how_far)
     pytux.close()
 
 
