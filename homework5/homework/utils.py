@@ -157,20 +157,33 @@ class PyTux:
         pystk.clean()
 
 
-def main(pytux, track, n_images, steps_per_track, aim_noise, vel_noise, output, verbose):
+if __name__ == '__main__':
     from .controller import control
+    from argparse import ArgumentParser
     from os import makedirs
 
 
     def noisy_control(aim_pt, vel):
         return control(aim_pt + np.random.randn(*aim_pt.shape) * aim_noise,
                        vel + np.random.randn() * vel_noise)
+
+
+    parser = ArgumentParser("Collects a dataset for the high-level planner")
+    parser.add_argument('track', nargs='+')
+    parser.add_argument('-o', '--output', default=DATASET_PATH)
+    parser.add_argument('-n', '--n_images', default=10000, type=int)
+    parser.add_argument('-m', '--steps_per_track', default=20000, type=int)
+    parser.add_argument('--aim_noise', default=0.1, type=float)
+    parser.add_argument('--vel_noise', default=5, type=float)
+    parser.add_argument('-v', '--verbose', action='store_true')
+    args = parser.parse_args()
     try:
-        makedirs(output)
+        makedirs(args.output)
     except OSError:
         pass
-    for track in track:
-        n, images_per_track = 0, n_images // len(track)
+    pytux = PyTux()
+    for track in args.track:
+        n, images_per_track = 0, args.n_images // len(args.track)
         aim_noise, vel_noise = 0, 0
 
 
@@ -180,16 +193,16 @@ def main(pytux, track, n_images, steps_per_track, aim_noise, vel_noise, output, 
             global n
             id = n if n < images_per_track else np.random.randint(0, n + 1)
             if id < images_per_track:
-                fn = path.join(output, track + '_%05d' % id)
+                fn = path.join(args.output, track + '_%05d' % id)
                 Image.fromarray(im).save(fn + '.png')
                 with open(fn + '.csv', 'w') as f:
                     f.write('%0.1f,%0.1f' % tuple(pt))
             n += 1
 
 
-        while n < steps_per_track:
-            steps, how_far = pytux.rollout(track, noisy_control, max_frames=1000, verbose=verbose, data_callback=collect)
+        while n < args.steps_per_track:
+            steps, how_far = pytux.rollout(track, noisy_control, max_frames=1000, verbose=args.verbose, data_callback=collect)
             print(steps, how_far)
             # Add noise after the first round
-            aim_noise, vel_noise = aim_noise, vel_noise
+            aim_noise, vel_noise = args.aim_noise, args.vel_noise
     pytux.close()
