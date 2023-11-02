@@ -169,7 +169,6 @@ def main(pytux, track, n_images, steps_per_track, aim_noise, vel_noise, output, 
         makedirs(output)
     except OSError:
         pass
-    pytux = PyTux()
     for track in track:
         n, images_per_track = 0, n_images // len(track)
         aim_noise, vel_noise = 0, 0
