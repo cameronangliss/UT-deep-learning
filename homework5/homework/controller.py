@@ -22,7 +22,7 @@ def control(aim_point, current_vel):
     action.brake = current_vel > 30
     action.steer = max(-1, min(1, aim_point[0] / 0.4))
     action.drift = abs(aim_point[0]) >= 0.4
-    action.nitro = current_vel < 10 or abs(aim_point[0]) <= 0.05
+    action.nitro = current_vel < 20 and abs(aim_point[0]) <= 0.05
 
     return action
 
