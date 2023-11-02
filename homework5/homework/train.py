@@ -1,3 +1,4 @@
+import os
 from .planner import Planner, save_model 
 import torch
 import torch.utils.tensorboard as tb
@@ -14,7 +15,8 @@ def train(args):
     # create a model, loss, optimizer
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model = Planner().to(device)
-    # model.load_state_dict(torch.load("homework/det.th"))
+    if os.path.exists("homework/planner.th"):
+        model.load_state_dict(torch.load("homework/planner.th"))
     loss = torch.nn.MSELoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=1e-4, weight_decay=1e-4)
 
@@ -33,7 +35,7 @@ def train(args):
 
     # Run SGD for several epochs
     global_step = 0
-    for _ in range(10):
+    for _ in range(50):
         for batch in train_data:
             images = batch[0].to(device)
             heatmaps = batch[1].to(device)
