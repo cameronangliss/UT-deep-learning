@@ -26,17 +26,10 @@ def train(args):
             ),
             dense_transforms.RandomHorizontalFlip(),
             dense_transforms.ToTensor(),
-            dense_transforms.ToHeatmap(),
-        ]
-    )
-    valid_transform = dense_transforms.Compose(
-        [
-            dense_transforms.ToTensor(),
-            dense_transforms.ToHeatmap(),
         ]
     )
     train_data = load_data("drive_data", transform=train_transform)
-    valid_data = load_data("drive_data", transform=valid_transform)
+    valid_data = load_data("drive_data")
 
     # Run SGD for several epochs
     global_step = 0
