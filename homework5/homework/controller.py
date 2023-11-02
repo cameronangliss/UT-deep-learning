@@ -20,8 +20,8 @@ def control(aim_point, current_vel):
 
     action.acceleration = float(current_vel < 25)
     action.brake = current_vel > 30
-    action.steer = aim_point[0] / 0.75
-    action.drift = abs(aim_point[0]) >= 0.75
+    action.steer = aim_point[0] / 0.5
+    action.drift = abs(aim_point[0]) >= 0.5
 
     return action
 
