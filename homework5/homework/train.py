@@ -35,8 +35,8 @@ def train(args):
             dense_transforms.ToHeatmap(),
         ]
     )
-    train_data = load_data("dense_data/train", transform=train_transform)
-    valid_data = load_data("dense_data/valid", transform=valid_transform)
+    train_data = load_data("drive_data", transform=train_transform)
+    valid_data = load_data("drive_data", transform=valid_transform)
 
     # Run SGD for several epochs
     global_step = 0
