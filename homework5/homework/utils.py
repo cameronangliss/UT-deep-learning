@@ -157,7 +157,7 @@ class PyTux:
         pystk.clean()
 
 
-if __name__ == '__main__':
+def main():
     from .controller import control
     from argparse import ArgumentParser
     from os import makedirs
@@ -206,3 +206,7 @@ if __name__ == '__main__':
             # Add noise after the first round
             aim_noise, vel_noise = args.aim_noise, args.vel_noise
     pytux.close()
+
+
+if __name__ == '__main__':
+    main()
