@@ -14,6 +14,7 @@ def train(args):
     # create a model, loss, optimizer
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model = Planner().to(device)
+    save_model(model)
     # model.load_state_dict(torch.load("homework/det.th"))
     loss = torch.nn.BCEWithLogitsLoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=1e-4, weight_decay=1e-4)
@@ -36,25 +37,15 @@ def train(args):
     for _ in range(50):
         for batch in train_data:
             images = batch[0].to(device)
-            heatmaps = batch[1].to(device)
             model_output = model.forward(images)
-            log(train_logger, images, heatmaps, model_output, global_step)
-            train_error = loss.forward(model_output, heatmaps)
+            # log(train_logger, images, heatmaps, model_output, global_step)
             train_logger.add_scalar("loss", train_error, global_step=global_step)
             optimizer.zero_grad()
             train_error.backward()
             optimizer.step()
             global_step += 1
-        print("training error:", train_error.item())
-        avg_error = 0
-        i = 0
         for batch in valid_data:
             images = batch[0].to(device)
-            heatmaps = batch[1].to(device)
-            valid_error = loss.forward(model_output, heatmaps)
-            i += 1
-            avg_error += (1 / i) * (valid_error - avg_error)
-        print("validation error:", avg_error.item())
 
     save_model(model)
 
