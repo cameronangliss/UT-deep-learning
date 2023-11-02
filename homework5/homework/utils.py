@@ -157,7 +157,7 @@ class PyTux:
         pystk.clean()
 
 
-def main(args):
+def main(pytux, track, n_images, steps_per_track, aim_noise, vel_noise, output, verbose):
     from .controller import control
     from os import makedirs
 
@@ -166,12 +166,12 @@ def main(args):
         return control(aim_pt + np.random.randn(*aim_pt.shape) * aim_noise,
                        vel + np.random.randn() * vel_noise)
     try:
-        makedirs(args.output)
+        makedirs(output)
     except OSError:
         pass
     pytux = PyTux()
-    for track in args.track:
-        n, images_per_track = 0, args.n_images // len(args.track)
+    for track in track:
+        n, images_per_track = 0, n_images // len(track)
         aim_noise, vel_noise = 0, 0
 
 
@@ -181,16 +181,16 @@ def main(args):
             global n
             id = n if n < images_per_track else np.random.randint(0, n + 1)
             if id < images_per_track:
-                fn = path.join(args.output, track + '_%05d' % id)
+                fn = path.join(output, track + '_%05d' % id)
                 Image.fromarray(im).save(fn + '.png')
                 with open(fn + '.csv', 'w') as f:
                     f.write('%0.1f,%0.1f' % tuple(pt))
             n += 1
 
 
-        while n < args.steps_per_track:
-            steps, how_far = pytux.rollout(track, noisy_control, max_frames=1000, verbose=args.verbose, data_callback=collect)
+        while n < steps_per_track:
+            steps, how_far = pytux.rollout(track, noisy_control, max_frames=1000, verbose=verbose, data_callback=collect)
             print(steps, how_far)
             # Add noise after the first round
-            aim_noise, vel_noise = args.aim_noise, args.vel_noise
+            aim_noise, vel_noise = aim_noise, vel_noise
     pytux.close()
