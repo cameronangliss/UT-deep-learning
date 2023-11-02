@@ -33,7 +33,7 @@ def train(args):
 
     # Run SGD for several epochs
     global_step = 0
-    for _ in range(50):
+    for _ in range(10):
         for batch in train_data:
             images = batch[0].to(device)
             heatmaps = batch[1].to(device)
