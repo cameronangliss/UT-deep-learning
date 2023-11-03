@@ -35,8 +35,9 @@ def train(args):
 
     # Run SGD for several epochs
     global_step = 0
-    for i in range(args.n_epochs):
+    for _ in range(args.n_epochs):
         avg_error = 0
+        i = 0
         for batch in train_data:
             images = batch[0].to(device)
             heatmaps = batch[1].to(device)
@@ -47,7 +48,8 @@ def train(args):
             train_error.backward()
             optimizer.step()
             global_step += 1
-            avg_error += (1 / (i + 1)) * (train_error.item() - avg_error)
+            i += 1
+            avg_error += (1 / i) * (train_error.item() - avg_error)
         print("training error:", avg_error)
         # avg_error = 0
         # i = 0
