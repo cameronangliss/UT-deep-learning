@@ -18,11 +18,11 @@ def control(aim_point, current_vel):
     Hint: You may want to use action.drift=True for wide turns (it will turn faster)
     """
 
-    action.acceleration = 1 if current_vel < 20 else 0.5 if 20 < current_vel < 25 else 0
-    action.brake = current_vel > 30
+    action.acceleration = 1 if current_vel < 15 else 0.5 if 15 < current_vel < 20 else 0
+    action.brake = current_vel > 25
     action.steer = max(-1, min(1, aim_point[0] / 0.4))
     action.drift = abs(aim_point[0]) >= 0.5
-    action.nitro = current_vel < 20 and abs(aim_point[0]) <= 0.1
+    action.nitro = current_vel < 10 and abs(aim_point[0]) <= 0.1
 
     return action
 
