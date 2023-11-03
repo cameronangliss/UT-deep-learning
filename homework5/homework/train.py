@@ -84,7 +84,7 @@ if __name__ == '__main__':
 
     parser.add_argument('--log_dir')
     # Put custom arguments here
-    parser.add_argument('-n', '--n_epochs', default=10)
+    parser.add_argument('-n', '--n_epochs', default=10, type=int)
 
     args = parser.parse_args()
     train(args)
