@@ -35,7 +35,7 @@ def train(args):
 
     # Run SGD for several epochs
     global_step = 0
-    for _ in range(50):
+    for _ in range(args.n_epochs):
         for batch in train_data:
             images = batch[0].to(device)
             heatmaps = batch[1].to(device)
@@ -84,6 +84,7 @@ if __name__ == '__main__':
 
     parser.add_argument('--log_dir')
     # Put custom arguments here
+    parser.add_argument('-n', '--n_epochs', default=10)
 
     args = parser.parse_args()
     train(args)
