@@ -72,16 +72,14 @@ class Team:
         for _ in self.num_players:
             kart_peaks, bomb_peaks, pickup_peaks, puck_peaks = self.model.detect(player_image)
             # making default action for now
-            action = [
-                dict(
-                    acceleration=1,
-                    brake=False,
-                    drift=False,
-                    fire=False,
-                    nitro=False,
-                    rescue=False,
-                    steer=0
-                )
-            ]
+            action = dict(
+                acceleration=1,
+                brake=False,
+                drift=False,
+                fire=False,
+                nitro=False,
+                rescue=False,
+                steer=0
+            )
             action_dicts += [action]
         return action_dicts
