@@ -1,3 +1,7 @@
+import torch
+
+from detector import Detector
+
 
 class Team:
     agent_type = 'image'
@@ -7,6 +11,8 @@ class Team:
           TODO: Load your agent here. Load network parameters, and other parts of our model
           We will call this function with default arguments only
         """
+        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        self.model = Detector().to(device)
         self.team = None
         self.num_players = None
 
@@ -61,5 +67,21 @@ class Team:
                  rescue:       bool (optional. no clue where you will end up though.)
                  steer:        float -1..1 steering angle
         """
-        # TODO: Change me. I'm just cruising straight
-        return [dict(acceleration=1, steer=0)] * self.num_players
+        
+        action_dicts = []
+        for _ in self.num_players:
+            kart_peaks, bomb_peaks, pickup_peaks, puck_peaks = self.model.detect(player_image)
+            # making default action for now
+            action = [
+                dict(
+                    acceleration=1,
+                    brake=False,
+                    drift=False,
+                    fire=False,
+                    nitro=False,
+                    rescue=False,
+                    steer=0
+                )
+            ]
+            action_dicts += [action]
+        return action_dicts
