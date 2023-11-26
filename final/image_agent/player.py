@@ -71,10 +71,9 @@ class Team:
         """
         
         action_dicts = []
-        for _ in range(self.num_players):
-            print(len(player_image))
-            screen_width = player_image.size()[0]
-            kart_peaks, bomb_peaks, pickup_peaks, puck_peaks = self.model.detect(player_image)
+        for i in range(self.num_players):
+            screen_width = player_image[i].size()[0]
+            kart_peaks, bomb_peaks, pickup_peaks, puck_peaks = self.model.detect(player_image[i])
             print(puck_peaks)
             if len(puck_peaks) > 0:
                 # CHASE THE PUCK!!!
