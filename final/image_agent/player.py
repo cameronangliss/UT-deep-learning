@@ -76,7 +76,6 @@ class Team:
             img = torch.tensor(np.transpose(player_image[i], [2, 1, 0]), dtype=torch.float).to(self.device)
             screen_width = img.size()[0]
             kart_peaks, bomb_peaks, pickup_peaks, puck_peaks = self.model.detect(img)
-            print(puck_peaks)
             if len(puck_peaks) > 0:
                 # CHASE THE PUCK!!!
                 puck_x = puck_peaks[0][1]
