@@ -104,7 +104,7 @@ class Detector(torch.nn.Module):
         # print("final", x.size())
         return x
 
-    def detect(self, image) -> tuple[list[tuple[float, int, int]]]:
+    def detect(self, image):
         """
            Your code here.
            Implement object detection here.
@@ -122,7 +122,7 @@ class Detector(torch.nn.Module):
         kart_peaks = [(score, cx, cy) for score, cx, cy in extract_peak(heatmaps[0], max_det=30)]
         bomb_peaks = [(score, cx, cy) for score, cx, cy in extract_peak(heatmaps[1], max_det=30)]
         pickup_peaks = [(score, cx, cy) for score, cx, cy in extract_peak(heatmaps[2], max_det=30)]
-        puck_peaks = [(score, cx, cy) for score, cx, cy in extract_peak(heatmaps[3], max_det=30)]
+        puck_peaks = [(score, cx, cy) for score, cx, cy in extract_peak(heatmaps[3], max_det=1)]
         return kart_peaks, bomb_peaks, pickup_peaks, puck_peaks
 
 
