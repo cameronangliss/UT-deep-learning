@@ -1,3 +1,5 @@
+import os
+
 import torch
 
 from detector import Detector
@@ -13,6 +15,8 @@ class Team:
         """
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.model = Detector().to(device)
+        if os.path.exists("homework/planner.th"):
+            self.model.load_state_dict(torch.load("homework/planner.th"))
         self.team = None
         self.num_players = None
 
