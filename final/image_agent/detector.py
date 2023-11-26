@@ -123,6 +123,7 @@ class Detector(torch.nn.Module):
         bomb_peaks = [(score, cx, cy) for score, cx, cy in extract_peak(heatmaps[1], max_det=30)]
         pickup_peaks = [(score, cx, cy) for score, cx, cy in extract_peak(heatmaps[2], max_det=30)]
         puck_peaks = [(score, cx, cy) for score, cx, cy in extract_peak(heatmaps[3], max_det=1)]
+        print(puck_peaks)
         return kart_peaks, bomb_peaks, pickup_peaks, puck_peaks
 
 
