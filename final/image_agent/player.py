@@ -72,8 +72,8 @@ class Team:
         
         action_dicts = []
         for i in range(self.num_players):
-            screen_width = player_image[i].size()[0]
-            print(screen_width)
+            img = torch.tensor(player_image[i])
+            screen_width = img.size()[0]
             kart_peaks, bomb_peaks, pickup_peaks, puck_peaks = self.model.detect(player_image[i])
             print(puck_peaks)
             if len(puck_peaks) > 0:
