@@ -118,6 +118,7 @@ class Detector(torch.nn.Module):
                  out of memory.
         """
 
+        print("hello?")
         heatmaps = self.forward(image[None])[0]
         print("hi")
         kart_peaks = [(score, cx, cy) for score, cx, cy in extract_peak(heatmaps[0], max_det=30)]
