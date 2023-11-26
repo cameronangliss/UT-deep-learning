@@ -12,8 +12,8 @@ class Team:
           TODO: Load your agent here. Load network parameters, and other parts of our model
           We will call this function with default arguments only
         """
-        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        self.model = Detector().to(device)
+        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        self.model = Detector().to(self.device)
         if os.path.exists("homework/planner.th"):
             self.model.load_state_dict(torch.load("homework/planner.th"))
         self.team = None
@@ -73,8 +73,7 @@ class Team:
         
         action_dicts = []
         for i in range(self.num_players):
-            img = torch.tensor(np.transpose(player_image[i], [2, 1, 0]), dtype=torch.float)
-            print(img.size())
+            img = torch.tensor(np.transpose(player_image[i], [2, 1, 0]), dtype=torch.float).to(self.device)
             screen_width = img.size()[0]
             kart_peaks, bomb_peaks, pickup_peaks, puck_peaks = self.model.detect(img)
             print(puck_peaks)
