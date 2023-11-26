@@ -72,7 +72,7 @@ class Team:
         
         action_dicts = []
         for _ in range(self.num_players):
-            print(player_image)
+            print(len(player_image))
             screen_width = player_image.size()[0]
             kart_peaks, bomb_peaks, pickup_peaks, puck_peaks = self.model.detect(player_image)
             print(puck_peaks)
