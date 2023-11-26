@@ -75,9 +75,9 @@ class Team:
         for _ in self.num_players:
             screen_width = player_image.size()[0]
             kart_peaks, bomb_peaks, pickup_peaks, puck_peaks = self.model.detect(player_image)
+            print(puck_peaks)
             if len(puck_peaks) > 0:
                 # CHASE THE PUCK!!!
-                print(puck_peaks)
                 puck_x = puck_peaks[0][1]
                 steer = 2 * puck_x / screen_width - screen_width
             else:
