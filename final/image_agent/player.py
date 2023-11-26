@@ -74,7 +74,7 @@ class Team:
         for i in range(self.num_players):
             img = torch.tensor(player_image[i])
             screen_width = img.size()[0]
-            kart_peaks, bomb_peaks, pickup_peaks, puck_peaks = self.model.detect(player_image[i])
+            kart_peaks, bomb_peaks, pickup_peaks, puck_peaks = self.model.detect(img)
             print(puck_peaks)
             if len(puck_peaks) > 0:
                 # CHASE THE PUCK!!!
