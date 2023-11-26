@@ -1,8 +1,6 @@
 import os
-
 import torch
-
-from detector import Detector
+from .detector import Detector
 
 
 class Team:
