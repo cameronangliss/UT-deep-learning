@@ -69,8 +69,16 @@ class Team:
         """
         
         action_dicts = []
+        print(player_state)
         for _ in self.num_players:
+            screen_width = player_image.size()[0]
             kart_peaks, bomb_peaks, pickup_peaks, puck_peaks = self.model.detect(player_image)
+            if len(puck_peaks) > 0:
+                # CHASE THE PUCK!!!
+                puck_x = puck_peaks[0][1]
+                steer = 2 * puck_x / screen_width - screen_width
+            else:
+                steer = 0
             # making default action for now
             action = dict(
                 acceleration=1,
@@ -79,7 +87,7 @@ class Team:
                 fire=False,
                 nitro=False,
                 rescue=False,
-                steer=0
+                steer=steer
             )
             action_dicts += [action]
         return action_dicts
