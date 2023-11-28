@@ -215,6 +215,41 @@ class Match:
             team2_state = [to_native(p) for p in state.players[1::2]]
             soccer_state = to_native(state.soccer)
             team1_images = team2_images = None
+
+            kart0 = state.players[0].kart
+            kart1 = state.players[1].kart
+            kart2 = state.players[2].kart
+            kart3 = state.players[3].kart
+
+            projTeam1Player0 = np.array(state.players[0].camera.projection).T
+            viewTeam1Player0 = np.array(state.players[0].camera.view).T
+            
+            projTeam2Player1 = np.array(state.players[1].camera.projection).T
+            viewTeam2Player1= np.array(state.players[1].camera.view).T
+
+            projTeam1Player2 = np.array(state.players[2].camera.projection).T
+            viewTeam1Player2 = np.array(state.players[2].camera.view).T
+
+            projTeam2Player3 = np.array(state.players[3].camera.projection).T
+            viewTeam2Player3 = np.array(state.players[3].camera.view).T
+
+            puckWorldLocation = state.soccer.ball.location
+
+            #aim_point_world = self._point_on_track(kart.distance_down_track+TRACK_OFFSET, track)
+            
+            puckScreenLocationPlayer0 = self._to_image(puckWorldLocation, projTeam1Player0, viewTeam1Player0)
+            puckScreenLocationPlayer1 = self._to_image(puckWorldLocation, projTeam2Player1, viewTeam2Player1)
+            puckScreenLocationPlayer2 = self._to_image(puckWorldLocation, projTeam1Player2, viewTeam1Player2)
+            puckScreenLocationPlayer3 = self._to_image(puckWorldLocation, projTeam2Player3, viewTeam2Player3)
+            
+            
+            print("puck world = ", puckWorldLocation)
+            print("puck screen 0 = ", puckScreenLocationPlayer0)
+            print("puck screen 1 = ", puckScreenLocationPlayer1)
+            print("puck screen 2 = ", puckScreenLocationPlayer2)
+            print("puck screen 3 = ", puckScreenLocationPlayer3)
+
+
             if self._use_graphics:
                 team1_images = [np.array(race.render_data[i].image) for i in range(0, len(race.render_data), 2)]
                 team2_images = [np.array(race.render_data[i].image) for i in range(1, len(race.render_data), 2)]
