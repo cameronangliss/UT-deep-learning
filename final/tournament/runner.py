@@ -167,6 +167,11 @@ class Match:
         logging.debug('timeout {} <? {} {}'.format(timeout, t1, t2))
         return t1 < timeout, t2 < timeout
 
+    @staticmethod
+    def _to_image(x, proj, view):
+        p = proj @ view @ np.array(list(x) + [1])
+        return np.clip(np.array([p[0] / p[-1], -p[1] / p[-1]]), -1, 1)
+    
     def run(self, team1, team2, num_player=1, max_frames=MAX_FRAMES, max_score=3, record_fn=None, timeout=1e10,
             initial_ball_location=[0, 0], initial_ball_velocity=[0, 0], verbose=False):
         RaceConfig = self._pystk.RaceConfig
