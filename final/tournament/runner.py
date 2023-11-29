@@ -1,6 +1,8 @@
 import logging
 import numpy as np
+import os
 from collections import namedtuple
+
 
 TRACK_NAME = 'icy_soccer_field'
 MAX_FRAMES = 1000
@@ -269,10 +271,12 @@ class Match:
             print("shape = ", player_0_image.shape)
             # Save off images/labels
             if collect_data:
-                Image.fromarray(player_0_image).save("tournament/train_data/KartTraining_0_" + str(it) + '.png')
-                Image.fromarray(player_1_image).save("tournament/train_data/KartTraining_1_" + str(it) + '.png')
-                Image.fromarray(player_2_image).save("tournament/train_data/KartTraining_2_" + str(it) + '.png')
-                Image.fromarray(player_3_image).save("tournament/train_data/KartTraining_3_" + str(it) + '.png')
+                if not os.path.exists("drive_data"):
+                    os.mkdir("drive_data")
+                Image.fromarray(player_0_image).save("drive_data/KartTraining_0_" + str(it) + '.png')
+                Image.fromarray(player_1_image).save("drive_data/KartTraining_1_" + str(it) + '.png')
+                Image.fromarray(player_2_image).save("drive_data/KartTraining_2_" + str(it) + '.png')
+                Image.fromarray(player_3_image).save("drive_data/KartTraining_3_" + str(it) + '.png')
                 with open("drive_data/KartTraining_0_" + str(it) + '.csv', 'w') as f:
                     f.write('%0.1f,%0.1f' % tuple(puckScreenLocationPlayer0))
                 with open("drive_data/KartTraining_1_" + str(it) + '.csv', 'w') as f:
