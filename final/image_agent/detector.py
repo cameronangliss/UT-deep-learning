@@ -1,27 +1,16 @@
 import torch
+import torch.nn.functional as F
 
 
-def extract_peak(heatmap, max_pool_ks=7, min_score=-5, max_det=100) -> list[tuple[float, int, int]]:
+def spatial_argmax(logit):
     """
-       Your code here.
-       Extract local maxima (peaks) in a 2d heatmap.
-       @heatmap: H x W heatmap containing peaks (similar to your training heatmap)
-       @max_pool_ks: Only return points that are larger than a max_pool_ks x max_pool_ks window around the point
-       @min_score: Only return peaks greater than min_score
-       @return: List of peaks [(score, cx, cy), ...], where cx, cy are the position of a peak and score is the
-                heatmap value at the peak. Return no more than max_det peaks per image
+    Compute the soft-argmax of a heatmap
+    :param logit: A tensor of size BS x H x W
+    :return: A tensor of size BS x 2 the soft-argmax in normalized coordinates (-1 .. 1)
     """
-
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    max_pool = torch.nn.MaxPool2d(max_pool_ks, stride=1, padding=max_pool_ks//2).to(device)
-    pooled_map = max_pool(heatmap[None, None])[0][0].view(-1)
-    peaked_ids = torch.nonzero(pooled_map != heatmap.view(-1))
-    pooled_map[peaked_ids] = float("-inf")
-    values, indices = torch.topk(pooled_map, k=min(max_det, pooled_map.size()[0]))
-    xs = indices % heatmap.size()[1]
-    ys = indices // heatmap.size()[1]
-    dets = [(float(score.item()), int(cx.item()), int(cy.item())) for score, cx, cy in zip(values, xs, ys) if score > min_score]
-    return dets
+    weights = F.softmax(logit.view(logit.size(0), -1), dim=-1).view_as(logit)
+    return torch.stack(((weights.sum(1) * torch.linspace(-1, 1, logit.size(2)).to(logit.device)[None]).sum(1),
+                        (weights.sum(2) * torch.linspace(-1, 1, logit.size(1)).to(logit.device)[None]).sum(1)), 1)
 
 
 class Detector(torch.nn.Module):
@@ -52,8 +41,7 @@ class Detector(torch.nn.Module):
 
     def __init__(self, layers=[32, 64, 128, 256], n_input_channels=3):
         """
-           Your code here.
-           Setup your detection network
+        Your code here
         """
 
         super().__init__()
@@ -70,14 +58,15 @@ class Detector(torch.nn.Module):
         rev_layers = list(reversed(layers))
         for i in range(len(layers) - 1):
             self.up_blocks.append(self.Block(rev_layers[i] + rev_layers[i + 1], rev_layers[i + 1]))
-        self.final_conv = torch.nn.Conv2d(layers[0], 4, kernel_size=1)
+        self.final_conv = torch.nn.Conv2d(layers[0], 1, kernel_size=1)
         self.network_chain = torch.nn.Sequential(*self.down_blocks, *self.up_convs, *self.up_blocks)
 
     def forward(self, x):
         """
-           Your code here.
-           Implement a forward pass through the network, use forward for training,
-           and detect for detection
+        Your code here
+        Predict the aim point in image coordinate, given the supertuxkart image
+        @img: (B,3,96,128)
+        return (B,2)
         """
 
         activations = []
@@ -100,41 +89,46 @@ class Detector(torch.nn.Module):
             # print("cat", x.size())
             x = self.up_blocks[i](x)
             # print("side", x.size())
-        x = self.final_conv(x)
+        x = self.final_conv(x)[:, 0, :, :]
         # print("final", x.size())
+        x = spatial_argmax(x)
         return x
-
-    def detect(self, image):
-        """
-           Your code here.
-           Implement object detection here.
-           @image: 3 x H x W image
-           @return: Three list of detections [(score, cx, cy, w/2, h/2), ...], one per class,
-                    return no more than 30 detections per image per class. You only need to predict width and height
-                    for extra credit. If you do not predict an object size, return w=0, h=0.
-           Hint: Use extract_peak here
-           Hint: Make sure to return three python lists of tuples of (float, int, int, float, float) and not a pytorch
-                 scalar. Otherwise pytorch might keep a computation graph in the background and your program will run
-                 out of memory.
-        """
-
-        heatmaps = self.forward(image[None])[0]
-        kart_peaks = [(score, cx, cy) for score, cx, cy in extract_peak(heatmaps[0], max_det=30)]
-        bomb_peaks = [(score, cx, cy) for score, cx, cy in extract_peak(heatmaps[1], max_det=30)]
-        pickup_peaks = [(score, cx, cy) for score, cx, cy in extract_peak(heatmaps[2], max_det=30)]
-        puck_peaks = [(score, cx, cy) for score, cx, cy in extract_peak(heatmaps[3], max_det=1)]
-        return kart_peaks, bomb_peaks, pickup_peaks, puck_peaks
 
 
 def save_model(model):
     from torch import save
     from os import path
-    return save(model.state_dict(), path.join(path.dirname(path.abspath(__file__)), 'det.th'))
+    if isinstance(model, Detector):
+        return save(model.state_dict(), path.join(path.dirname(path.abspath(__file__)), 'det.th'))
+    raise ValueError("model type '%s' not supported!" % str(type(model)))
 
 
 def load_model():
     from torch import load
     from os import path
     r = Detector()
-    r.load_state_dict(load(path.join(path.dirname(path.abspath(__file__)), 'det.th'), map_location='cpu'))
+    r.load_state_dict(load(path.join(path.dirname(path.abspath(__file__)), 'planner.th'), map_location='cpu'))
     return r
+
+
+# if __name__ == '__main__':
+#     from .controller import control
+#     from .utils import PyTux
+#     from argparse import ArgumentParser
+
+
+#     def test_planner(args):
+#         # Load model
+#         planner = load_model().eval()
+#         pytux = PyTux()
+#         for t in args.track:
+#             steps, how_far = pytux.rollout(t, control, planner=planner, max_frames=1000, verbose=args.verbose)
+#             print(steps, how_far)
+#         pytux.close()
+
+
+#     parser = ArgumentParser("Test the planner")
+#     parser.add_argument('track', nargs='+')
+#     parser.add_argument('-v', '--verbose', action='store_true')
+#     args = parser.parse_args()
+#     test_planner(args)
