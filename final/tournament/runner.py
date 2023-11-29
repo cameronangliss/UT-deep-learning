@@ -173,7 +173,7 @@ class Match:
         return np.clip(np.array([p[0] / p[-1], -p[1] / p[-1]]), -1, 1)
     
     def run(self, team1, team2, num_player=1, max_frames=MAX_FRAMES, max_score=3, record_fn=None, timeout=1e10,
-            initial_ball_location=[0, 0], initial_ball_velocity=[0, 0], verbose=False):
+            initial_ball_location=[0, 0], initial_ball_velocity=[0, 0], collect_data=False, verbose=False):
         RaceConfig = self._pystk.RaceConfig
 
         logging.info('Creating teams')
@@ -268,8 +268,7 @@ class Match:
             
             print("shape = ", player_0_image.shape)
             # Save off images/labels
-            saveData = False
-            if saveData:
+            if collect_data:
                 Image.fromarray(player_0_image).save("tournament/train_data/KartTraining_0_" + str(it) + '.png')
                 Image.fromarray(player_1_image).save("tournament/train_data/KartTraining_1_" + str(it) + '.png')
                 Image.fromarray(player_2_image).save("tournament/train_data/KartTraining_2_" + str(it) + '.png')
@@ -343,6 +342,7 @@ if __name__ == '__main__':
     parser = ArgumentParser(description="Play some Ice Hockey. List any number of players, odd players are in team 1, even players team 2.")
     parser.add_argument('-r', '--record_video', help="Do you want to record a video?")
     parser.add_argument('-s', '--record_state', help="Do you want to pickle the state?")
+    parser.add_argument('--collect_data', help="Do you want to collect image data?")
     parser.add_argument('-f', '--num_frames', default=1200, type=int, help="How many steps should we play for?")
     parser.add_argument('-p', '--num_players', default=2, type=int, help="Number of players per team")
     parser.add_argument('-m', '--max_score', default=3, type=int, help="How many goal should we play to?")
@@ -373,7 +373,7 @@ if __name__ == '__main__':
         try:
             result = match.run(team1, team2, args.num_players, args.num_frames, max_score=args.max_score,
                                initial_ball_location=args.ball_location, initial_ball_velocity=args.ball_velocity,
-                               record_fn=recorder)
+                               record_fn=recorder, collect_data=args.collect_data)
         except MatchException as e:
             print('Match failed', e.score)
             print(' T1:', e.msg1)
