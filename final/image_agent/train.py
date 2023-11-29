@@ -35,6 +35,7 @@ def train(args):
 
     # Run SGD for several epochs
     global_step = 0
+    print("hi")
     for _ in range(args.n_epochs):
         avg_error = 0
         i = 0
