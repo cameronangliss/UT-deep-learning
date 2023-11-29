@@ -70,27 +70,27 @@ class Detector(torch.nn.Module):
         """
 
         activations = []
-        print("start", x.size())
+        #print("start", x.size())
         for block in self.down_blocks[:-1]:
             x = block(x)
-            print("side", x.size())
+            #print("side", x.size())
             activations.append(x)
             x = self.pool(x)
-            print("down", x.size())
+            #print("down", x.size())
         x = self.down_blocks[-1](x)
-        print("side", x.size())
+        #print("side", x.size())
         rev_acts = list(reversed(activations))
         for i in range(len(self.up_blocks)):
             x = self.up_convs[i](x)
-            print("up", x.size())
+            #print("up", x.size())
             H = rev_acts[i].size()[2]
             W = rev_acts[i].size()[3]
             x = torch.cat([x[:, :, :H, :W], rev_acts[i]], dim=1)
-            print("cat", x.size())
+            #print("cat", x.size())
             x = self.up_blocks[i](x)
-            print("side", x.size())
+            #print("side", x.size())
         x = self.final_conv(x)[:, 0, :, :]
-        print("final", x.size())
+        #print("final", x.size())
         x = spatial_argmax(x)
         return x
 
