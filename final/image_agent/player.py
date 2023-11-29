@@ -74,14 +74,8 @@ class Team:
         action_dicts = []
         for i in range(self.num_players):
             img = torch.tensor(np.transpose(player_image[i], [2, 1, 0]), dtype=torch.float).to(self.device)
-            screen_width = img.size()[0]
-            kart_peaks, bomb_peaks, pickup_peaks, puck_peaks = self.model.detect(img)
-            if len(puck_peaks) > 0:
-                # CHASE THE PUCK!!!
-                puck_x = puck_peaks[0][1]
-                steer = 2 * puck_x / screen_width - screen_width
-            else:
-                steer = 0
+            puck_locations = self.model.forward(img[None])
+            puck_x = float(puck_locations[0][0].item())
             # making default action for now
             action = dict(
                 acceleration=1,
@@ -90,7 +84,7 @@ class Team:
                 fire=False,
                 nitro=False,
                 rescue=False,
-                steer=steer
+                steer=puck_x
             )
             action_dicts += [action]
         return action_dicts
