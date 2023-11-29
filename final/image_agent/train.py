@@ -42,6 +42,8 @@ def train(args):
         for batch in train_data:
             images = batch[0].to(device)
             heatmaps = batch[1].to(device)
+            print(images.size())
+            print(heatmaps.size())
             model_output = model.forward(images)
             print(model_output.size())
             print(heatmaps.size())
