@@ -35,15 +35,19 @@ def train(args):
 
     # Run SGD for several epochs
     global_step = 0
+
     for _ in range(args.n_epochs):
+        print("Epoch: ", _ ," of ", args.n_epochs)
         avg_error = 0
         i = 0
         for batch in train_data:
             images = batch[0].to(device)
             heatmaps = batch[1].to(device)
+            #print(images.size())
+            #print(heatmaps.size())
             model_output = model.forward(images)
-            print(model_output.size())
-            print(heatmaps.size())
+            #print(model_output.size())
+            #print(heatmaps.size())
             train_error = loss.forward(model_output, heatmaps)
             train_logger.add_scalar("loss", train_error, global_step=global_step)
             optimizer.zero_grad()

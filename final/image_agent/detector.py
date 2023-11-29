@@ -15,97 +15,52 @@ def spatial_argmax(logit):
 
 
 class Detector(torch.nn.Module):
+    class Block(torch.nn.Module):
+        def __init__(self, n_input, n_output, stride=1):
+            super().__init__()
+            self.n_input = n_input
+            self.n_output = n_output
+            self.layers = torch.nn.Sequential(
+                torch.nn.Conv2d(n_input, n_output, kernel_size=3, padding=1, stride=stride),
+                torch.nn.BatchNorm2d(n_output),
+                torch.nn.ReLU(inplace=True),
+            )
+            self.downsample = torch.nn.Sequential(
+                torch.nn.Conv2d(n_input, n_output, kernel_size=1, stride=stride),
+                torch.nn.BatchNorm2d(n_output)
+            )
+
+        def forward(self, x):
+            if x.size()[0] == x.size()[2] == x.size()[3] == 1:
+                if self.n_output > self.n_input:
+                    zeros = torch.zeros(1, self.n_output - self.n_input, 1, 1)
+                    return torch.cat([zeros, x], dim=1)
+                else:
+                    return x[:, :self.n_output, :, :]
+            else:
+                return self.layers(x) + self.downsample(x)
+
     def __init__(self, layers=[32, 64, 128, 256], n_input_channels=3):
         """
         Your code here
         """
 
         super().__init__()
-        n_input_channels=3
-        n_output_channels=3
-        self.down1 = nn.Sequential(
-            nn.Conv2d(3, 32, kernel_size=3, padding=1),
-            nn.BatchNorm2d(32),
-            nn.ReLU(inplace=True),
-            nn.Conv2d(32, 32, kernel_size=3, padding=1),
-            nn.BatchNorm2d(32),
-            nn.ReLU(inplace=True)
-        )
-        self.down2 = nn.Sequential(
-            #nn.MaxPool2d(2),
-            nn.Conv2d(32, 64, kernel_size=3, padding=1),
-            nn.BatchNorm2d(64),
-            nn.ReLU(inplace=True),
-            nn.Conv2d(64, 64, kernel_size=3, padding=1),
-            nn.BatchNorm2d(64),
-            nn.ReLU(inplace=True)
-        )
-        self.down3 = nn.Sequential(
-            #nn.MaxPool2d(2),
-            nn.Conv2d(64, 128, kernel_size=3, padding=1),
-            nn.BatchNorm2d(128),
-            nn.ReLU(inplace=True),
-            nn.Conv2d(128, 128, kernel_size=3, padding=1),
-            nn.BatchNorm2d(128),
-            nn.ReLU(inplace=True)
-        )
-        self.down4 = nn.Sequential(
-            #nn.MaxPool2d(2),
-            nn.Conv2d(128, 256, kernel_size=3, padding=1),
-            nn.BatchNorm2d(256),
-            nn.ReLU(inplace=True),
-            nn.Conv2d(256, 256, kernel_size=3, padding=1),
-            nn.BatchNorm2d(256),
-            nn.ReLU(inplace=True)
-        )
-        self.up1 = nn.Sequential(
-            #nn.ConvTranspose2d(128,128//2,2,2)
-            nn.Conv2d(256,128, kernel_size=3, padding=1),
-            nn.BatchNorm2d(128),
-            nn.ReLU(inplace=True),
-            nn.Conv2d(128, 128, kernel_size=3, padding=1),
-            nn.BatchNorm2d(128),
-            nn.ReLU(inplace=True)
-        )
-        self.up2 = nn.Sequential(
-            #nn.ConvTranspose2d(128,128//2,2,2)
-            nn.Conv2d(256, 128, kernel_size=3, padding=1),
-            nn.BatchNorm2d(128),
-            nn.ReLU(inplace=True),
-            nn.Conv2d(128, 64, kernel_size=3, padding=1),
-            nn.BatchNorm2d(64),
-            nn.ReLU(inplace=True)
-        )
-        self.up3 = nn.Sequential(
-            #nn.ConvTranspose2d(128,128//2,2,2)
-            nn.Conv2d(128, 64, kernel_size=3, padding=1),
-            nn.BatchNorm2d(64),
-            nn.ReLU(inplace=True),
-            nn.Conv2d(64, 32, kernel_size=3, padding=1),
-            nn.BatchNorm2d(32),
-            nn.ReLU(inplace=True)
-        )
-        self.maxpool = nn.Sequential(
-            nn.MaxPool2d(2)
-        )
-        self.up = nn.Upsample(scale_factor=2, mode='bilinear', align_corners=True)
-        
-        self.u1 = nn.Sequential(
-            nn.ConvTranspose2d(256, 256, 2, stride=2)
-        )
-        self.u2 = nn.Sequential(
-            nn.ConvTranspose2d(128, 128, 2, stride=2)
-        )
-        self.u3 = nn.Sequential(
-            nn.ConvTranspose2d(64, 64, 2, stride=2)
-        )
-        self.u4 = nn.Sequential(
-            nn.ConvTranspose2d(32,32,2,stride=2)
-        )
-        self.up4 = nn.Sequential(
-            nn.Conv2d(64, 1, kernel_size=1),
-        )
-        
+        self.down_blocks = []
+        c = n_input_channels
+        for l in layers:
+            self.down_blocks.append(self.Block(c, l))
+            c = l
+        self.pool = torch.nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
+        self.up_convs = []
+        for l in reversed(layers[1:]):
+            self.up_convs.append(torch.nn.ConvTranspose2d(l, l, kernel_size=3, stride=2, padding=1, output_padding=1))
+        self.up_blocks = []
+        rev_layers = list(reversed(layers))
+        for i in range(len(layers) - 1):
+            self.up_blocks.append(self.Block(rev_layers[i] + rev_layers[i + 1], rev_layers[i + 1]))
+        self.final_conv = torch.nn.Conv2d(layers[0], 1, kernel_size=1)
+        self.network_chain = torch.nn.Sequential(*self.down_blocks, *self.up_convs, *self.up_blocks)
         
     def forward(self, x):
         """
@@ -115,42 +70,30 @@ class Detector(torch.nn.Module):
         return (B,2)
         """
 
-        x = img
-        b,a,h,w = x.shape
-        xd1 = self.down1(x)
-        xd2 = xd1
-        b,a,h1,w1 = xd1.shape
-        if (h1 > 1 and w1) > 1:
-            xd2 = self.maxpool(xd2)
-        xd2 = self.down2(xd2)
-        xd3 = xd2
-        b,a,h2,w2 = xd2.shape
-        if (h2 > 1 and w2 > 1):
-            xd3 = self.maxpool(xd3)
-        xd3 = self.down3(xd3)
-        xd4 = xd3
-        b,a,h3,w3 = xd3.shape
-        if (h3 > 1 and w3 > 1):
-            xd4 = self.maxpool(xd4)
-        xd4 = self.down4(xd4)
-        b,a,h4,w4 = xd4.shape
-        x = xd4
-        x = self.up1(x)
-        if (h3 > 1 and w3 > 1):
-            x = self.u2(x)
-        x = torch.cat([x,xd3], dim=1)  
-        x = self.up2(x)
-        if (h2 > 1 and w2 > 1):
-            x = self.u3(x)
-        x = torch.cat([x,xd2], dim=1)        
-        x = self.up3(x)
-        if (h1 > 1 and w1) > 1:
-            x = self.u4(x)
-        x = torch.cat([x,xd1], dim=1)
-        x = self.up4(x)
-        hm = x[:, 0, :, :]
-        ret = spatial_argmax(hm)
-        return ret
+        activations = []
+        #print("start", x.size())
+        for block in self.down_blocks[:-1]:
+            x = block(x)
+            #print("side", x.size())
+            activations.append(x)
+            x = self.pool(x)
+            #print("down", x.size())
+        x = self.down_blocks[-1](x)
+        #print("side", x.size())
+        rev_acts = list(reversed(activations))
+        for i in range(len(self.up_blocks)):
+            x = self.up_convs[i](x)
+            #print("up", x.size())
+            H = rev_acts[i].size()[2]
+            W = rev_acts[i].size()[3]
+            x = torch.cat([x[:, :, :H, :W], rev_acts[i]], dim=1)
+            #print("cat", x.size())
+            x = self.up_blocks[i](x)
+            #print("side", x.size())
+        x = self.final_conv(x)[:, 0, :, :]
+        #print("final", x.size())
+        x = spatial_argmax(x)
+        return x
 
 
 def save_model(model):

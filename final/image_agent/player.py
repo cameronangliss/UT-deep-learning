@@ -76,6 +76,7 @@ class Team:
             img = torch.tensor(np.transpose(player_image[i], [2, 1, 0]), dtype=torch.float).to(self.device)
             puck_locations = self.model.forward(img[None])
             puck_x = float(puck_locations[0][0].item())
+            action = pystk.action
             # making default action for now
             action = dict(
                 acceleration=1,
@@ -86,5 +87,9 @@ class Team:
                 rescue=False,
                 steer=puck_x
             )
+            if (puck_x <0) :
+                action.steer = -1
+            if (puck_x >0):
+                action.steer = 1
             action_dicts += [action]
         return action_dicts
