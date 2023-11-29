@@ -73,7 +73,6 @@ class Team:
         
         action_dicts = []
         for i in range(self.num_players):
-            print(f"Player {i} location:", player_state[i]["kart"]["location"])
             img = torch.tensor(np.transpose(player_image[i], [2, 1, 0]), dtype=torch.float).to(self.device)
             screen_width = img.size()[0]
             kart_peaks, bomb_peaks, pickup_peaks, puck_peaks = self.model.detect(img)
