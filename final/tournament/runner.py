@@ -112,7 +112,7 @@ class Match:
     """
         Do not create more than one match per process (use ray to create more)
     """
-    def __init__(self, use_graphics=False, logging_level=None):
+    def __init__(self, use_graphics=True, logging_level=None):
         # DO this here so things work out with ray
         import pystk
         self._pystk = pystk
@@ -211,7 +211,9 @@ class Match:
         state.set_ball_location((initial_ball_location[0], 1, initial_ball_location[1]),
                                 (initial_ball_velocity[0], 0, initial_ball_velocity[1]))
 
-        for it in range(max_frames):
+        from PIL import Image
+        index = 0
+        for it in range(MAX_FRAMES):
             logging.debug('iteration {} / {}'.format(it, MAX_FRAMES))
             state.update()
 
@@ -256,9 +258,62 @@ class Match:
 
 
             if self._use_graphics:
+                player_0_image = np.array(race.render_data[0].image)
+                player_1_image = np.array(race.render_data[1].image)
+                player_2_image = np.array(race.render_data[2].image)
+                player_3_image = np.array(race.render_data[3].image)
                 team1_images = [np.array(race.render_data[i].image) for i in range(0, len(race.render_data), 2)]
                 team2_images = [np.array(race.render_data[i].image) for i in range(1, len(race.render_data), 2)]
 
+            
+            print("shape = ", player_0_image.shape)
+            # Save off images/labels
+            saveData = False
+            if saveData:
+                Image.fromarray(player_0_image).save("tournament/train_data/KartTraining_0_" + str(it) + '.png')
+                Image.fromarray(player_1_image).save("tournament/train_data/KartTraining_1_" + str(it) + '.png')
+                Image.fromarray(player_2_image).save("tournament/train_data/KartTraining_2_" + str(it) + '.png')
+                Image.fromarray(player_3_image).save("tournament/train_data/KartTraining_3_" + str(it) + '.png')
+                with open("tournament/train_data/KartTraining_0_" + str(it) + '.csv', 'w') as f:
+                    f.write('%0.1f,%0.1f' % tuple(puckScreenLocationPlayer0))
+                with open("tournament/train_data/KartTraining_1_" + str(it) + '.csv', 'w') as f:
+                    f.write('%0.1f,%0.1f' % tuple(puckScreenLocationPlayer1))
+                with open("tournament/train_data/KartTraining_2_" + str(it) + '.csv', 'w') as f:
+                    f.write('%0.1f,%0.1f' % tuple(puckScreenLocationPlayer2))
+                with open("tournament/train_data/KartTraining_3_" + str(it) + '.csv', 'w') as f:
+                    f.write('%0.1f,%0.1f' % tuple(puckScreenLocationPlayer3))
+                    
+
+            
+            
+            '''for image in player_0_images:
+                if index > 15:
+                    Image.fromarray(image).save("tournament/train_data/KartTraining" + str(index) + '_0.png')
+                    with open("tournament/train_data/KartTraining" + str(index) + '_0.csv', 'w') as f:
+                        f.write('%0.1f,%0.1f' % tuple(puckScreenLocationPlayer0))
+                index = index + 1
+            for image in player_1_images:
+                if index > 15:
+                    Image.fromarray(image).save("tournament/train_data/KartTraining" + str(index) + '_1.png')
+                    with open("tournament/train_data/KartTraining" + str(index) + '_1.csv', 'w') as f:
+                        f.write('%0.1f,%0.1f' % tuple(puckScreenLocationPlayer1))
+                index = index + 1
+            for image in player_2_images:
+                if index > 15:
+                    Image.fromarray(image).save("tournament/train_data/KartTraining" + str(index) + '_2.png')
+                    with open("tournament/train_data/KartTraining" + str(index) + '_2.csv', 'w') as f:
+                        f.write('%0.1f,%0.1f' % tuple(puckScreenLocationPlayer1))
+                index = index + 1
+            for image in player_3_images:
+                if index > 15:
+                    Image.fromarray(image).save("tournament/train_data/KartTraining" + str(index) + '_3.png')
+                    with open("tournament/train_data/KartTraining" + str(index) + '_3.csv', 'w') as f:
+                        f.write('%0.1f,%0.1f' % tuple(puckScreenLocationPlayer3))
+                index = index + 1
+            '''
+            
+            
+            
             # Have each team produce actions (in parallel)
             if t1_can_act:
                 if t1_type == 'image':
@@ -344,7 +399,7 @@ if __name__ == '__main__':
             recorder = recorder & utils.StateRecorder(args.record_state)
 
         # Start the match
-        match = Match(use_graphics=team1.agent_type == 'image' or team2.agent_type == 'image')
+        match = Match(use_graphics=True)
         try:
             result = match.run(team1, team2, args.num_players, args.num_frames, max_score=args.max_score,
                                initial_ball_location=args.ball_location, initial_ball_velocity=args.ball_velocity,
@@ -354,7 +409,7 @@ if __name__ == '__main__':
             print(' T1:', e.msg1)
             print(' T2:', e.msg2)
 
-        print('Match results', result)
+        #print('Match results', result)
 
     else:
         # Fire up ray
