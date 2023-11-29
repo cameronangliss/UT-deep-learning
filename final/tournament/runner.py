@@ -250,14 +250,6 @@ class Match:
             puckScreenLocationPlayer1 = self._to_image(puckWorldLocation, projTeam2Player1, viewTeam2Player1)
             puckScreenLocationPlayer2 = self._to_image(puckWorldLocation, projTeam1Player2, viewTeam1Player2)
             puckScreenLocationPlayer3 = self._to_image(puckWorldLocation, projTeam2Player3, viewTeam2Player3)
-            
-            
-            print("puck world = ", puckWorldLocation)
-            print("puck screen 0 = ", puckScreenLocationPlayer0)
-            print("puck screen 1 = ", puckScreenLocationPlayer1)
-            print("puck screen 2 = ", puckScreenLocationPlayer2)
-            print("puck screen 3 = ", puckScreenLocationPlayer3)
-
 
             if self._use_graphics:
                 player_0_image = np.array(race.render_data[0].image)
@@ -267,8 +259,6 @@ class Match:
                 team1_images = [np.array(race.render_data[i].image) for i in range(0, len(race.render_data), 2)]
                 team2_images = [np.array(race.render_data[i].image) for i in range(1, len(race.render_data), 2)]
 
-            
-            print("shape = ", player_0_image.shape)
             # Save off images/labels
             if collect_data:
                 if not os.path.exists("drive_data"):
@@ -285,8 +275,7 @@ class Match:
                     f.write('%0.1f,%0.1f' % tuple(puckScreenLocationPlayer2))
                 with open("drive_data/KartTraining_3_" + str(it) + '.csv', 'w') as f:
                     f.write('%0.1f,%0.1f' % tuple(puckScreenLocationPlayer3))
-                    
-            
+
             # Have each team produce actions (in parallel)
             if t1_can_act:
                 if t1_type == 'image':
