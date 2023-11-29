@@ -283,36 +283,6 @@ class Match:
                 with open("tournament/train_data/KartTraining_3_" + str(it) + '.csv', 'w') as f:
                     f.write('%0.1f,%0.1f' % tuple(puckScreenLocationPlayer3))
                     
-
-            
-            
-            '''for image in player_0_images:
-                if index > 15:
-                    Image.fromarray(image).save("tournament/train_data/KartTraining" + str(index) + '_0.png')
-                    with open("tournament/train_data/KartTraining" + str(index) + '_0.csv', 'w') as f:
-                        f.write('%0.1f,%0.1f' % tuple(puckScreenLocationPlayer0))
-                index = index + 1
-            for image in player_1_images:
-                if index > 15:
-                    Image.fromarray(image).save("tournament/train_data/KartTraining" + str(index) + '_1.png')
-                    with open("tournament/train_data/KartTraining" + str(index) + '_1.csv', 'w') as f:
-                        f.write('%0.1f,%0.1f' % tuple(puckScreenLocationPlayer1))
-                index = index + 1
-            for image in player_2_images:
-                if index > 15:
-                    Image.fromarray(image).save("tournament/train_data/KartTraining" + str(index) + '_2.png')
-                    with open("tournament/train_data/KartTraining" + str(index) + '_2.csv', 'w') as f:
-                        f.write('%0.1f,%0.1f' % tuple(puckScreenLocationPlayer1))
-                index = index + 1
-            for image in player_3_images:
-                if index > 15:
-                    Image.fromarray(image).save("tournament/train_data/KartTraining" + str(index) + '_3.png')
-                    with open("tournament/train_data/KartTraining" + str(index) + '_3.csv', 'w') as f:
-                        f.write('%0.1f,%0.1f' % tuple(puckScreenLocationPlayer3))
-                index = index + 1
-            '''
-            
-            
             
             # Have each team produce actions (in parallel)
             if t1_can_act:
