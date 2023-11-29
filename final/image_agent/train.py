@@ -15,7 +15,7 @@ def train(args):
     # create a model, loss, optimizer
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model = Detector().to(device)
-    if os.path.exists("homework/planner.th"):
+    if os.path.exists("homework/det.th"):
         model.load_state_dict(torch.load("homework/det.th"))
     loss = torch.nn.MSELoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=1e-4, weight_decay=1e-4)
