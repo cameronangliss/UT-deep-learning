@@ -22,7 +22,7 @@ class Detector(torch.nn.Module):
             self.layers = torch.nn.Sequential(
                 torch.nn.Conv2d(n_input, n_output, kernel_size=3, padding=1, stride=stride),
                 torch.nn.BatchNorm2d(n_output),
-                torch.nn.ReLU(),
+                torch.nn.ReLU(inplace=True),
             )
             self.downsample = torch.nn.Sequential(
                 torch.nn.Conv2d(n_input, n_output, kernel_size=1, stride=stride),
