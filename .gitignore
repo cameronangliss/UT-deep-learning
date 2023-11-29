@@ -1,5 +1,6 @@
 **/data
 **/dense_data
+**/drive_data
 **/logs
 **/__pycache__
 **/*.th

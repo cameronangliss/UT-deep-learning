@@ -31,7 +31,7 @@ def train(args):
         ]
     )
     train_data = load_data("drive_data", transform=train_transform)
-    valid_data = load_data("drive_data")
+    # valid_data = load_data("drive_data")
 
     # Run SGD for several epochs
     global_step = 0
