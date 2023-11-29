@@ -13,7 +13,7 @@ def train(args):
         train_logger = tb.SummaryWriter(path.join(args.log_dir, 'train'))
 
     # create a model, loss, optimizer
-    device = torch.device("cpu")
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model = Detector().to(device)
     if os.path.exists("homework/det.th"):
         model.load_state_dict(torch.load("homework/det.th"))
