@@ -86,5 +86,9 @@ class Team:
                 rescue=False,
                 steer=puck_x
             )
+            if (puck_x <0) :
+                action.steer = -1
+            if (puck_x >0):
+                action.steer = 1
             action_dicts += [action]
         return action_dicts
