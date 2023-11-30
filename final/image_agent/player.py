@@ -20,7 +20,6 @@ class Team:
             print("Done!")
         self.team = None
         self.num_players = None
-        self.escaping_goal = [False, False]
         self.backup_frames = [0, 0]
         self.turn_frames = [0, 0]
 
@@ -78,12 +77,15 @@ class Team:
         
         action_dicts = []
         for i in range(self.num_players):
+            # calculating puck's x-coordinate on screen
             img = torch.tensor(np.transpose(player_image[i], [2, 1, 0]), dtype=torch.float).to(self.device)
             puck_coords = self.model.forward(img[None])[0]
             puck_x = float(puck_coords[0].item())
-            if self.escaping_goal[i]:
+
+            # escape from a goalpost
+            if abs(player_state[i]["kart"]["location"][2]) > 64 or self.backup_frames[i] > 0:
                 print(f"Player {i} escaping goal")
-                if abs(player_state[i]["kart"]["location"][2]) > 63 and self.backup_frames[i] < 50:
+                if self.backup_frames[i] < 50:
                     acceleration = 0
                     brake = True
                     steer = 0
@@ -97,14 +99,10 @@ class Team:
                     acceleration = 1
                     brake = False
                     steer = puck_x
-                    self.escaping_goal[i] = False
                     self.backup_frames[i] = 0
                     self.turn_frames[i] = 0
-            elif abs(player_state[i]["kart"]["location"][2]) > 63:
-                self.escaping_goal[i] = True
-                acceleration = 0
-                brake = True
-                steer = 0
+
+            # normal behavior
             else:
                 acceleration = 1
                 brake = False
