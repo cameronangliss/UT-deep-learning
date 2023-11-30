@@ -80,6 +80,7 @@ class Team:
             drifting = False
             vel = np.linalg.norm(player_state[i].get('kart').get('velocity'))
             print(player_state[i].get('kart').get('location'))
+            print(player_state[i].get('kart').get('front')
             acc = 1
             if (puck_x <0) :
                 steering = -1
