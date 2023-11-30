@@ -86,7 +86,7 @@ class Team:
                     acceleration = 0
                     brake = True
                     steer = 0
-                elif self.frame_count[i] < 20:
+                elif self.frame_count[i] < 50:
                     acceleration = 1
                     brake = False
                     steer = 1
