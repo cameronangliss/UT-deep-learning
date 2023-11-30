@@ -107,14 +107,9 @@ class Team:
                     steer = 0
                     self.backup_frames[i] += 1
                 elif self.turn_frames[i] < 40:
-                    acceleration = 1
-                    brake = False
                     steer = 1
                     self.turn_frames[i] += 1
                 else:
-                    acceleration = 1
-                    brake = False
-                    steer = puck_x
                     self.backup_frames[i] = 0
                     self.turn_frames[i] = 0
 
