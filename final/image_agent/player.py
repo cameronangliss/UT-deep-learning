@@ -81,12 +81,14 @@ class Team:
             puck_coords = self.model.forward(img[None])[0]
             puck_x = float(puck_coords[0].item())
             if self.escaping_goal[i]:
+                print(f"Player {i} escaping goal")
                 acceleration = 0
                 brake = True
                 steer = 0
                 if abs(player_state[i]["kart"]["location"][2]) < 70:
                     self.escaping_goal[i] = False
             elif self.searching_for_puck[i]:
+                print(f"Player {i} searching for puck")
                 acceleration = 1
                 brake = False
                 steer = 1
