@@ -85,13 +85,14 @@ class Team:
                 steering = 1
             if (abs(puck_x) > 0.3):
               drifting = True
-            if (player_state['velocity'] > 5):
-              acc = 0
+            #if (player_state['velocity'] > 5):
+            print(player_state)
+            #  acc = 0
             # making default action for now
             action = dict(
-                acceleration=1,
+                acceleration=acc,
                 brake=False,
-                drift=True,
+                drift=drifting,
                 fire=False,
                 nitro=False,
                 rescue=False,
