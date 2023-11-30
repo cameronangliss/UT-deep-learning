@@ -89,7 +89,7 @@ class Team:
             print(f"Player {i}", player_state[i]["kart"]["location"])
 
             # setting values for normal behavior (may be changed by later code for edge cases)
-            if np.linalg.norm(player_state[i]["kart"]["velocity"]) < 20:
+            if np.linalg.norm(player_state[i]["kart"]["velocity"]) < 15:
                 acceleration = 1
             else:
                 acceleration = 0
