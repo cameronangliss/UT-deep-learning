@@ -98,7 +98,7 @@ class Team:
             # get out of the goalpost if you're stuck in it
             if (
                 abs(player_state[i]["kart"]["location"][2]) > 64
-                or self.stuck_in_goalpost
+                or self.stuck_in_goalpost[i]
             ):
                 print(f"Player {i} escaping goalpost")
                 print("position:", player_state[i]["kart"]["location"])
@@ -122,8 +122,8 @@ class Team:
             # get off the wall if you're stuck against it
             elif (
                 abs(player_state[i]["kart"]["location"][0]) > 38
-                or player_state[i]["kart"]["location"][2] > 63.5
-                or self.stuck_against_wall
+                or player_state[i]["kart"]["location"][2] > 63
+                or self.stuck_against_wall[i]
             ):
                 print(f"Player {i} getting off wall")
                 print("position:", player_state[i]["kart"]["location"])
