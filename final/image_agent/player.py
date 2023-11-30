@@ -111,6 +111,7 @@ class Team:
                 and dir_vec[2] > dir_vec[0]
                 and np.sign(player_state[i]["kart"]["location"][2]) == np.sign(dir_vec[2])
             )
+            print(f"Player {i}:", in_goalpost, stuck_against_x_dir_wall, stuck_against_y_dir_wall)
 
             # get out of goalpost if stuck in it
             if in_goalpost or self.getting_out_of_goalpost[i]:
