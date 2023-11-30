@@ -83,6 +83,9 @@ class Team:
             puck_x = float(puck_coords[0].item())
             puck_y = float(puck_coords[1].item())
 
+            print(puck_coords)
+            print(f"Player {i}", player_state[i]["kart"]["location"])
+
             # setting values for normal behavior (may be changed by later code for edge cases)
             if player_state["kart"]["velocity"] < 20:
                 acceleration = 1
