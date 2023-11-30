@@ -3,9 +3,6 @@ import numpy as np
 import torch
 from .detector import Detector
 
-escaping_goal = False
-searching_for_puck = False
-
 
 class Team:
     agent_type = 'image'
@@ -23,6 +20,8 @@ class Team:
             print("Done!")
         self.team = None
         self.num_players = None
+        self.escaping_goal = [False, False]
+        self.searching_for_puck = [False, False]
 
     def new_match(self, team: int, num_players: int) -> list:
         """
@@ -81,19 +80,19 @@ class Team:
             img = torch.tensor(np.transpose(player_image[i], [2, 1, 0]), dtype=torch.float).to(self.device)
             puck_coords = self.model.forward(img[None])[0]
             puck_x = float(puck_coords[0].item())
-            if escaping_goal:
+            if self.escaping_goal[i]:
                 acceleration = 0
                 brake = True
                 steer = 0
                 if player_state[i]["kart"]["location"][2] < 70:
-                    escaping_goal = False
-            elif searching_for_puck:
+                    self.escaping_goal[i] = False
+            elif self.searching_for_puck[i]:
                 acceleration = 1
                 brake = False
                 steer = 1
             elif player_state[i]["kart"]["location"][2] > 78:
-                escaping_goal = True
-                searching_for_puck = True
+                self.escaping_goal[i] = True
+                self.searching_for_puck[i] = True
                 acceleration = 0
                 brake = True
                 steer = 0
