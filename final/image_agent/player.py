@@ -21,7 +21,10 @@ class Team:
         self.team = None
         self.num_players = None
 
-        # counters to help with getting unstuck
+        # bools to track unstucking behavior
+        self.getting_out_of_goalpost = [False, False]
+        self.getting_off_of_wall = [False, False]
+        # counter to help with getting unstuck
         self.unstucking_frames = [0, 0]
 
     def new_match(self, team: int, num_players: int) -> list:
@@ -96,30 +99,46 @@ class Team:
             print("position:", player_state[i]["kart"]["location"])
             print("direction:", dir_vec)
 
-            # get out of the goalpost or off the wall if you're stuck in/on it
-            if (
-                abs(player_state[i]["kart"]["location"][0]) > 38
-                or player_state[i]["kart"]["location"][2] > 63
-                or self.unstucking_frames[i] > 0
-            ):
-                if (
-                    player_state[i]["kart"]["location"][2] > 64
-                ):
-                    print(f"Player {i} escaping goalpost")
-                else:
-                    print(f"Player {i} getting off wall")
+            # detecting if we need to get unstuck
+            in_goalpost = player_state[i]["kart"]["location"][2] > 64
+            stuck_against_x_dir_wall = abs(player_state[i]["kart"]["location"][0]) > 38 and dir_vec[0] > dir_vec[2]
+            stuck_against_y_dir_wall = player_state[i]["kart"]["location"][2] > 63 and dir_vec[2] > dir_vec[0]
+
+            # get out of goalpost if stuck in it
+            if in_goalpost and self.getting_out_of_goalpost[i]:
+                print(f"Player {i} escaping goalpost")
+                self.getting_out_of_goalpost[i] = True
                 # back up in straight line
-                if self.unstucking_frames[i] < 10:
+                if self.unstucking_frames[i] < 20:
                     acceleration = 0
                     brake = True
                     steer = 0
                     self.unstucking_frames[i] += 1
                 # accelerate and turn as hard as you can
-                elif self.unstucking_frames[i] < 30:
+                elif self.unstucking_frames[i] < 40:
                     acceleration = 1
                     steer = 1
                     self.unstucking_frames[i] += 1
                 else:
+                    self.getting_out_of_goalpost[i] = False
+                    self.unstucking_frames[i] = 0
+
+            if stuck_against_x_dir_wall or stuck_against_y_dir_wall or self.getting_off_of_wall[i]:
+                print(f"Player {i} getting off wall")
+                self.getting_off_of_wall[i] = True
+                # back up in straight line
+                if self.unstucking_frames[i] < 20:
+                    acceleration = 0
+                    brake = True
+                    steer = 0
+                    self.unstucking_frames[i] += 1
+                # accelerate and turn as hard as you can
+                elif self.unstucking_frames[i] < 40:
+                    acceleration = 1
+                    steer = 1
+                    self.unstucking_frames[i] += 1
+                else:
+                    self.getting_off_of_wall[i] = False
                     self.unstucking_frames[i] = 0
 
             action = dict(
