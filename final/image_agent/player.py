@@ -101,8 +101,16 @@ class Team:
 
             # detecting if we need to get unstuck
             in_goalpost = abs(player_state[i]["kart"]["location"][2]) > 64
-            stuck_against_x_dir_wall = abs(player_state[i]["kart"]["location"][0]) > 38 and dir_vec[0] > dir_vec[2]
-            stuck_against_y_dir_wall = abs(player_state[i]["kart"]["location"][2]) > 63 and dir_vec[2] > dir_vec[0]
+            stuck_against_x_dir_wall = (
+                abs(player_state[i]["kart"]["location"][0]) > 40
+                and dir_vec[0] > dir_vec[2]
+                and np.sign(player_state[i]["kart"]["location"][0]) == np.sign(dir_vec[0])
+            )
+            stuck_against_y_dir_wall = (
+                abs(player_state[i]["kart"]["location"][2]) > 63
+                and dir_vec[2] > dir_vec[0]
+                and np.sign(player_state[i]["kart"]["location"][2]) == np.sign(dir_vec[2])
+            )
 
             # get out of goalpost if stuck in it
             if in_goalpost or self.getting_out_of_goalpost[i]:
