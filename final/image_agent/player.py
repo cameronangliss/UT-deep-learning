@@ -116,7 +116,7 @@ class Team:
             action = dict(
                 acceleration=acceleration,
                 brake=brake,
-                drift=False,
+                drift=drift,
                 fire=False,
                 nitro=False,
                 rescue=False,
