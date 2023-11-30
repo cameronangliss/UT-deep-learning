@@ -84,13 +84,13 @@ class Team:
                 acceleration = 0
                 brake = True
                 steer = 0
-                if player_state[i]["kart"]["location"][2] < 70:
+                if abs(player_state[i]["kart"]["location"][2]) < 70:
                     self.escaping_goal[i] = False
             elif self.searching_for_puck[i]:
                 acceleration = 1
                 brake = False
                 steer = 1
-            elif player_state[i]["kart"]["location"][2] > 78:
+            elif abs(player_state[i]["kart"]["location"][2]) > 78:
                 self.escaping_goal[i] = True
                 self.searching_for_puck[i] = True
                 acceleration = 0
