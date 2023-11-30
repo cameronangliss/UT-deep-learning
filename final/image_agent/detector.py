@@ -90,7 +90,7 @@ class Detector(torch.nn.Module):
             x = self.up_blocks[i](x)
             #print("side", x.size())
         x = self.final_conv(x)[:, 0, :, :]
-        print("final", x.size())
+        print("final", x)
         x = spatial_argmax(x)
         return x
 
