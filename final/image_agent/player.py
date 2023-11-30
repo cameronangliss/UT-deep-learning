@@ -81,7 +81,7 @@ class Team:
                 acceleration = 0
                 brake = True
                 steer = 0
-            elif player_state[i]["kart"]["location"][2] > 78:
+            elif player_state[i]["kart"]["location"][2] > 77:
                 escaping_goal = True
                 acceleration = 0
                 brake = True
