@@ -99,7 +99,12 @@ class Team:
                 or player_state[i]["kart"]["location"][2] > 63
                 or self.unstucking_frames[i] > 0
             ):
-                print(f"Player {i} escaping goalpost")
+                if (
+                    player_state[i]["kart"]["location"][2] > 64
+                ):
+                    print(f"Player {i} escaping goalpost")
+                else:
+                    print(f"Player {i} getting off wall")
                 print("position:", player_state[i]["kart"]["location"])
                 print("direction:", dir_vec)
                 # back up in straight line
