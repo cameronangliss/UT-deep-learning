@@ -78,6 +78,7 @@ class Team:
             puck_x = float(puck_locations[0][0].item())
             steering = 0
             drifting = False
+            braking = False
             vel = np.linalg.norm(player_state[i].get('kart').get('velocity'))
             #print(player_state[i].get('kart').get('location'))
             #print(player_state[i].get('kart').get('front'))
