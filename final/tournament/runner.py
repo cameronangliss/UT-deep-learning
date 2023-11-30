@@ -125,8 +125,8 @@ class Match:
         self._use_graphics = use_graphics
         if use_graphics:
             graphics_config = self._pystk.GraphicsConfig.hd()
-            graphics_config.screen_width = 200
-            graphics_config.screen_height = 150
+            graphics_config.screen_width = 256
+            graphics_config.screen_height = 192
         else:
             graphics_config = self._pystk.GraphicsConfig.none()
 
