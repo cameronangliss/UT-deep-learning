@@ -85,7 +85,7 @@ class Team:
             puck_coords = self.model.forward(img[None])[0]
             puck_x = float(puck_coords[0].item())
 
-            # normal behavior
+            # setting values for normal behavior (may be changed by later code for edge cases)
             if player_state["kart"]["velocity"] < 20:
                 acceleration = 1
             else:
