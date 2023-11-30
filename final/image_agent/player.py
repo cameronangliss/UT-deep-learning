@@ -87,7 +87,7 @@ class Team:
             print(f"Player {i}", player_state[i]["kart"]["location"])
 
             # setting values for normal behavior (may be changed by later code for edge cases)
-            if player_state["kart"]["velocity"] < 20:
+            if player_state[i]["kart"]["velocity"] < 20:
                 acceleration = 1
             else:
                 acceleration = 0
