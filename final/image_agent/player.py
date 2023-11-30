@@ -75,7 +75,7 @@ class Team:
         escaping_goal = False
         for i in range(self.num_players):
             img = torch.tensor(np.transpose(player_image[i], [2, 1, 0]), dtype=torch.float).to(self.device)
-            puck_locations = self.model.forward(img)
+            puck_locations = self.model.forward(img[None])
             puck_x = float(puck_locations[0][0].item())
             if escaping_goal:
                 acceleration = 0
