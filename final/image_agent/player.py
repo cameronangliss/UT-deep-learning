@@ -82,7 +82,7 @@ class Team:
             puck_x = float(puck_coords[0].item())
             if self.escaping_goal[i]:
                 print(f"Player {i} escaping goal")
-                if abs(player_state[i]["kart"]["location"][2]) > 70 and self.frame_count[i] == 0:
+                if abs(player_state[i]["kart"]["location"][2]) > 63 and self.frame_count[i] == 0:
                     acceleration = 0
                     brake = True
                     steer = 0
@@ -97,7 +97,7 @@ class Team:
                     steer = puck_x
                     self.escaping_goal[i] = False
                     self.frame_count[i] = 0
-            elif abs(player_state[i]["kart"]["location"][2]) > 78:
+            elif abs(player_state[i]["kart"]["location"][2]) > 63:
                 self.escaping_goal[i] = True
                 acceleration = 0
                 brake = True
