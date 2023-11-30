@@ -21,7 +21,8 @@ class Team:
         self.team = None
         self.num_players = None
         self.escaping_goal = [False, False]
-        self.frame_count = [0, 0]
+        self.backup_frames = [0, 0]
+        self.turn_frames = [0, 0]
 
     def new_match(self, team: int, num_players: int) -> list:
         """
@@ -82,21 +83,23 @@ class Team:
             puck_x = float(puck_coords[0].item())
             if self.escaping_goal[i]:
                 print(f"Player {i} escaping goal")
-                if abs(player_state[i]["kart"]["location"][2]) > 63 and self.frame_count[i] == 0:
+                if abs(player_state[i]["kart"]["location"][2]) > 63 and self.backup_frames[i] < 50:
                     acceleration = 0
                     brake = True
                     steer = 0
-                elif self.frame_count[i] < 50:
+                    self.backup_frames[i] += 1
+                elif self.turn_frames[i] < 50:
                     acceleration = 1
                     brake = False
                     steer = 1
-                    self.frame_count[i] += 1
+                    self.turn_frames[i] += 1
                 else:
                     acceleration = 1
                     brake = False
                     steer = puck_x
                     self.escaping_goal[i] = False
-                    self.frame_count[i] = 0
+                    self.backup_frames[i] = 0
+                    self.turn_frames[i] = 0
             elif abs(player_state[i]["kart"]["location"][2]) > 63:
                 self.escaping_goal[i] = True
                 acceleration = 0
