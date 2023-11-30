@@ -108,13 +108,13 @@ class Team:
                 print("position:", player_state[i]["kart"]["location"])
                 print("direction:", dir_vec)
                 # back up in straight line
-                if self.unstucking_frames[i] < 25:
+                if self.unstucking_frames[i] < 10:
                     acceleration = 0
                     brake = True
                     steer = 0
                     self.unstucking_frames[i] += 1
                 # accelerate and turn as hard as you can
-                elif self.unstucking_frames[i] < 50:
+                elif self.unstucking_frames[i] < 30:
                     acceleration = 1
                     steer = 1
                     self.unstucking_frames[i] += 1
