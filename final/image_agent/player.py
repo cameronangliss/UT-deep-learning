@@ -96,8 +96,8 @@ class Team:
             brake = False
             steer = puck_x
 
-            print("position:", player_state[i]["kart"]["location"])
-            print("direction:", dir_vec)
+            print(f"position of {i}:", player_state[i]["kart"]["location"])
+            print(f"direction of {i}:", dir_vec)
 
             # detecting if we need to get unstuck
             in_goalpost = abs(player_state[i]["kart"]["location"][2]) > 64
@@ -105,7 +105,7 @@ class Team:
             stuck_against_y_dir_wall = abs(player_state[i]["kart"]["location"][2]) > 63 and dir_vec[2] > dir_vec[0]
 
             # get out of goalpost if stuck in it
-            if in_goalpost and self.getting_out_of_goalpost[i]:
+            if in_goalpost or self.getting_out_of_goalpost[i]:
                 print(f"Player {i} escaping goalpost")
                 self.getting_out_of_goalpost[i] = True
                 # back up in straight line
