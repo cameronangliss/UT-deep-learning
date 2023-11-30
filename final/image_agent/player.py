@@ -20,6 +20,8 @@ class Team:
             print("Done!")
         self.team = None
         self.num_players = None
+
+        # counters to help with getting unstuck
         self.backup_frames = [0, 0]
         self.turn_frames = [0, 0]
 
