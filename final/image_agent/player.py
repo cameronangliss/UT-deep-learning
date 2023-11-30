@@ -114,7 +114,7 @@ class Team:
             # don't get stuck against the wall
             elif abs(player_state[i]["kart"]["location"][0]) > 35:
                 print(f"Player {i} getting off wall")
-                print(player_state[i]["kart"]["front"])
+                print("front", player_state[i]["kart"]["front"])
 
             action = dict(
                 acceleration=acceleration,
