@@ -77,6 +77,8 @@ class Team:
             puck_locations = self.model.forward(img[None])
             puck_x = float(puck_locations[0][0].item())
             steering = 0
+            drifting = False
+            acc = 1
             if (puck_x <0) :
                 steering = -1
             if (puck_x >0):
