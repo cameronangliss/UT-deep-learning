@@ -122,7 +122,7 @@ class Team:
             # get off the wall if you're stuck against it
             elif (
                 abs(player_state[i]["kart"]["location"][0]) > 38
-                or player_state[i]["kart"]["location"][2] > 63
+                or player_state[i]["kart"]["location"][2] > 63.5
                 or self.stuck_against_wall
             ):
                 print(f"Player {i} getting off wall")
