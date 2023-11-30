@@ -100,9 +100,9 @@ class Team:
             print("direction:", dir_vec)
 
             # detecting if we need to get unstuck
-            in_goalpost = player_state[i]["kart"]["location"][2] > 64
+            in_goalpost = abs(player_state[i]["kart"]["location"][2]) > 64
             stuck_against_x_dir_wall = abs(player_state[i]["kart"]["location"][0]) > 38 and dir_vec[0] > dir_vec[2]
-            stuck_against_y_dir_wall = player_state[i]["kart"]["location"][2] > 63 and dir_vec[2] > dir_vec[0]
+            stuck_against_y_dir_wall = abs(player_state[i]["kart"]["location"][2]) > 63 and dir_vec[2] > dir_vec[0]
 
             # get out of goalpost if stuck in it
             if in_goalpost and self.getting_out_of_goalpost[i]:
