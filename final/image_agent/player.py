@@ -96,13 +96,9 @@ class Team:
             brake = False
             steer = puck_x
 
-            # don't get stuck on the sides or in a goalpost
-            if (
-                abs(player_state[i]["kart"]["location"][2]) > 64
-                or abs(player_state[i]["kart"]["location"][0]) > 40
-                or self.backup_frames[i] > 0
-            ):
-                print(f"Player {i} getting unstuck")
+            # don't get stuck in a goalpost
+            if abs(player_state[i]["kart"]["location"][2]) > 64 or self.backup_frames[i] > 0:
+                print(f"Player {i} escaping goalpost")
                 if self.backup_frames[i] < 25:
                     acceleration = 0
                     brake = True
@@ -114,6 +110,11 @@ class Team:
                 else:
                     self.backup_frames[i] = 0
                     self.turn_frames[i] = 0
+
+            # don't get stuck against the wall
+            elif abs(player_state[i]["kart"]["location"][0]) > 35:
+                print(f"Player {i} getting off wall")
+                print(player_state[i]["kart"]["front"])
 
             action = dict(
                 acceleration=acceleration,
