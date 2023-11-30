@@ -102,7 +102,7 @@ class Team:
                 or abs(player_state[i]["kart"]["location"][0]) > 40
                 or self.backup_frames[i] > 0
             ):
-                print(f"Player {i} escaping goal")
+                print(f"Player {i} getting unstuck")
                 if self.backup_frames[i] < 25:
                     acceleration = 0
                     brake = True
