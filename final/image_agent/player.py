@@ -74,23 +74,39 @@ class Team:
                  rescue:       bool (optional. no clue where you will end up though.)
                  steer:        float -1..1 steering angle
         """
-        
+
         action_dicts = []
         for i in range(self.num_players):
+            print(puck_coords)
+            print(f"Player {i}", player_state[i]["kart"]["location"])
+
             # calculating puck's x-coordinate on screen
             img = torch.tensor(np.transpose(player_image[i], [2, 1, 0]), dtype=torch.float).to(self.device)
             puck_coords = self.model.forward(img[None])[0]
             puck_x = float(puck_coords[0].item())
 
-            # escape from a goalpost
-            if abs(player_state[i]["kart"]["location"][2]) > 64 or self.backup_frames[i] > 0:
-                # print(f"Player {i} escaping goal")
-                if self.backup_frames[i] < 50:
+            # normal behavior
+            if player_state["kart"]["velocity"] < 20:
+                acceleration = 1
+            else:
+                acceleration = 0
+            brake = False
+            drift = abs(puck_x) > 0.7
+            steer = puck_x
+
+            # don't get stuck on the sides or in a goalpost
+            if (
+                abs(player_state[i]["kart"]["location"][2]) > 64
+                or abs(player_state[i]["kart"]["location"][0]) > 40
+                or self.backup_frames[i] > 0
+            ):
+                print(f"Player {i} escaping goal")
+                if self.backup_frames[i] < 25:
                     acceleration = 0
                     brake = True
                     steer = 0
                     self.backup_frames[i] += 1
-                elif self.turn_frames[i] < 50:
+                elif self.turn_frames[i] < 40:
                     acceleration = 1
                     brake = False
                     steer = 1
@@ -102,13 +118,6 @@ class Team:
                     self.backup_frames[i] = 0
                     self.turn_frames[i] = 0
 
-            # normal behavior
-            else:
-                acceleration = 1
-                brake = False
-                steer = puck_x
-            # print(puck_coords)
-            # print(f"Player {i}", player_state[i]["kart"]["location"])
             action = dict(
                 acceleration=acceleration,
                 brake=brake,
