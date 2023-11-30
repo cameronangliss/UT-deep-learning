@@ -23,7 +23,7 @@ class SuperTuxDataset(Dataset):
             img = Image.open(f.replace('.csv', '.png'))
             img.load()
             self.data.append((img, label))
-        print("Dataset length =", len(self.data))
+        print(f"Dataset length = {len(self.data)}")
         self.transform = transform
 
     def __len__(self):
