@@ -75,8 +75,8 @@ class Team:
         escaping_goal = False
         for i in range(self.num_players):
             img = torch.tensor(np.transpose(player_image[i], [2, 1, 0]), dtype=torch.float).to(self.device)
-            puck_locations = self.model.forward(img[None])
-            puck_x = float(puck_locations[0][0].item())
+            puck_coords = self.model.forward(img[None])[0]
+            puck_x = float(puck_coords[0].item())
             if escaping_goal:
                 acceleration = 0
                 brake = True
@@ -90,7 +90,7 @@ class Team:
                 acceleration = 1
                 brake = False
                 steer = puck_x
-            print(puck_locations)
+            print(puck_coords)
             print(f"Player {i}", player_state[i]["kart"]["location"])
             action = dict(
                 acceleration=acceleration,
