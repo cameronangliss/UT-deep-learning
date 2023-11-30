@@ -76,7 +76,8 @@ class Team:
             img = torch.tensor(np.transpose(player_image[i], [2, 1, 0]), dtype=torch.float).to(self.device)
             puck_locations = self.model.forward(img[None])
             puck_x = float(puck_locations[0][0].item())
-            # making default action for now
+            print(puck_x)
+            print(f"Player {i}", player_state[i]["kart"]["location"])
             action = dict(
                 acceleration=1,
                 brake=False,
