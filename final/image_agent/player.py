@@ -97,7 +97,7 @@ class Team:
             if abs(player_state[i]["kart"]["location"][2]) > 64 or self.backup_frames[i] > 0:
                 print(f"Player {i} escaping goalpost")
                 print("position:", player_state[i]["kart"]["location"])
-                print("direction:", player_state[i]["kart"]["front"] - player_state[i]["kart"]["location"])
+                print("direction:", np.array(player_state[i]["kart"]["front"]) - np.array(player_state[i]["kart"]["location"]))
                 if self.backup_frames[i] < 25:
                     acceleration = 0
                     brake = True
@@ -114,7 +114,7 @@ class Team:
             elif abs(player_state[i]["kart"]["location"][0]) > 35 or player_state[i]["kart"]["location"][2] > 64:
                 print(f"Player {i} getting off wall")
                 print("position:", player_state[i]["kart"]["location"])
-                print("direction:", player_state[i]["kart"]["front"] - player_state[i]["kart"]["location"])
+                print("direction:", np.array(player_state[i]["kart"]["front"]) - np.array(player_state[i]["kart"]["location"]))
 
             action = dict(
                 acceleration=acceleration,
