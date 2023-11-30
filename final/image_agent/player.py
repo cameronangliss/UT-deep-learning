@@ -77,13 +77,11 @@ class Team:
 
         action_dicts = []
         for i in range(self.num_players):
-            print(puck_coords)
-            print(f"Player {i}", player_state[i]["kart"]["location"])
-
-            # calculating puck's x-coordinate on screen
+            # calculating puck's x and y coordinates on screen
             img = torch.tensor(np.transpose(player_image[i], [2, 1, 0]), dtype=torch.float).to(self.device)
             puck_coords = self.model.forward(img[None])[0]
             puck_x = float(puck_coords[0].item())
+            puck_y = float(puck_coords[1].item())
 
             # setting values for normal behavior (may be changed by later code for edge cases)
             if player_state["kart"]["velocity"] < 20:
@@ -91,7 +89,6 @@ class Team:
             else:
                 acceleration = 0
             brake = False
-            drift = abs(puck_x) > 0.7
             steer = puck_x
 
             # don't get stuck on the sides or in a goalpost
@@ -116,7 +113,7 @@ class Team:
             action = dict(
                 acceleration=acceleration,
                 brake=brake,
-                drift=drift,
+                drift=abs(steer) > 0.7,
                 fire=False,
                 nitro=False,
                 rescue=False,
