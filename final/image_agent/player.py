@@ -92,6 +92,9 @@ class Team:
                     steer = 1
                     self.frame_count[i] += 1
                 else:
+                    acceleration = 1
+                    brake = False
+                    steer = puck_x
                     self.escaping_goal[i] = False
                     self.frame_count[i] = 0
             elif abs(player_state[i]["kart"]["location"][2]) > 78:
