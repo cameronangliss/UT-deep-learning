@@ -84,7 +84,7 @@ class Team:
 
             # escape from a goalpost
             if abs(player_state[i]["kart"]["location"][2]) > 64 or self.backup_frames[i] > 0:
-                print(f"Player {i} escaping goal")
+                # print(f"Player {i} escaping goal")
                 if self.backup_frames[i] < 50:
                     acceleration = 0
                     brake = True
@@ -108,7 +108,7 @@ class Team:
                 brake = False
                 steer = puck_x
             # print(puck_coords)
-            print(f"Player {i}", player_state[i]["kart"]["location"])
+            # print(f"Player {i}", player_state[i]["kart"]["location"])
             action = dict(
                 acceleration=acceleration,
                 brake=brake,
