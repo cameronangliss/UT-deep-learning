@@ -6,6 +6,7 @@ import numpy as np
 from .utils import load_data
 from . import dense_transforms
 
+
 def train(args):
     from os import path
     train_logger, valid_logger = None, None
@@ -16,7 +17,9 @@ def train(args):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model = Detector().to(device)
     if os.path.exists("homework/det.th"):
+        print("Loading saved model...")
         model.load_state_dict(torch.load("homework/det.th"))
+        print("Done!")
     loss = torch.nn.MSELoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=1e-4, weight_decay=1e-4)
 
