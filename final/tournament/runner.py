@@ -179,6 +179,7 @@ class Match:
         RaceConfig = self._pystk.RaceConfig
 
         logging.info('Creating teams')
+        print("here")
 
         # Start a new match
         t1_cars = self._g(self._r(team1.new_match)(0, num_player)) or ['tux']
