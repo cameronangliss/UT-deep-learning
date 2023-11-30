@@ -111,7 +111,7 @@ class Team:
                     self.turn_frames[i] = 0
 
             # don't get stuck against the wall
-            elif abs(player_state[i]["kart"]["location"][0]) > 35 or player_state[i]["kart"]["location"][2] > 64:
+            elif abs(player_state[i]["kart"]["location"][0]) > 38 or player_state[i]["kart"]["location"][2] > 63:
                 print(f"Player {i} getting off wall")
                 print("position:", player_state[i]["kart"]["location"])
                 print("direction:", np.array(player_state[i]["kart"]["front"]) - np.array(player_state[i]["kart"]["location"]))
