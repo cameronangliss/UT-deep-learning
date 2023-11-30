@@ -102,14 +102,14 @@ class Team:
             # detecting if we need to get unstuck
             in_goalpost = abs(player_state[i]["kart"]["location"][2]) > 64
             stuck_against_x_dir_wall = (
-                abs(player_state[i]["kart"]["location"][0]) > 40
-                and dir_vec[0] > dir_vec[2]
-                and np.sign(player_state[i]["kart"]["location"][0]) == np.sign(dir_vec[0])
+                abs(player_state[i]["kart"]["location"][0]) > 40  # located next to x wall
+                and abs(dir_vec[0]) > abs(dir_vec[2])  # primarily pointing in x dir
+                and np.sign(player_state[i]["kart"]["location"][0]) == np.sign(dir_vec[0])  # pointed towards wall
             )
             stuck_against_y_dir_wall = (
-                abs(player_state[i]["kart"]["location"][2]) > 63
-                and dir_vec[2] > dir_vec[0]
-                and np.sign(player_state[i]["kart"]["location"][2]) == np.sign(dir_vec[2])
+                abs(player_state[i]["kart"]["location"][2]) > 63  # located next to y wall
+                and abs(dir_vec[2]) > abs(dir_vec[0])  # primarily pointing in y dir
+                and np.sign(player_state[i]["kart"]["location"][2]) == np.sign(dir_vec[2])  # pointed towards wall
             )
             print(f"Player {i}:", in_goalpost, stuck_against_x_dir_wall, stuck_against_y_dir_wall)
 
@@ -132,6 +132,7 @@ class Team:
                     self.getting_out_of_goalpost[i] = False
                     self.unstucking_frames[i] = 0
 
+            # get off of wall if stuck against it
             if stuck_against_x_dir_wall or stuck_against_y_dir_wall or self.getting_off_of_wall[i]:
                 print(f"Player {i} getting off wall")
                 self.getting_off_of_wall[i] = True
