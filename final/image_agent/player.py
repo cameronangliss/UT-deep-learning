@@ -89,9 +89,9 @@ class Team:
               acc = 0
             # making default action for now
             action = dict(
-                acceleration=1,
+                acceleration=acc,
                 brake=False,
-                drift=drifting,
+                drift=True,
                 fire=False,
                 nitro=False,
                 rescue=False,
