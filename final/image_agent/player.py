@@ -85,9 +85,6 @@ class Team:
             puck_x = float(puck_coords[0].item())
             puck_y = float(puck_coords[1].item())
 
-            print(puck_coords)
-            print(f"Player {i}", player_state[i]["kart"]["location"])
-
             # setting values for normal behavior (may be changed by later code for edge cases)
             if np.linalg.norm(player_state[i]["kart"]["velocity"]) < 15:
                 acceleration = 1
@@ -99,6 +96,8 @@ class Team:
             # don't get stuck in a goalpost
             if abs(player_state[i]["kart"]["location"][2]) > 64 or self.backup_frames[i] > 0:
                 print(f"Player {i} escaping goalpost")
+                print("position:", player_state[i]["kart"]["location"])
+                print("direction:", player_state[i]["kart"]["front"])
                 if self.backup_frames[i] < 25:
                     acceleration = 0
                     brake = True
@@ -112,9 +111,10 @@ class Team:
                     self.turn_frames[i] = 0
 
             # don't get stuck against the wall
-            elif abs(player_state[i]["kart"]["location"][0]) > 35:
+            elif abs(player_state[i]["kart"]["location"][0]) > 35 or player_state[i]["kart"]["location"][2] > 64:
                 print(f"Player {i} getting off wall")
-                print("front", player_state[i]["kart"]["front"])
+                print("position:", player_state[i]["kart"]["location"])
+                print("direction:", player_state[i]["kart"]["front"])
 
             action = dict(
                 acceleration=acceleration,
