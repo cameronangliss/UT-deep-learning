@@ -33,7 +33,13 @@ def map_image(team1_state, team2_state, soccer_state, resolution=512, extent=65,
     draw = ImageDraw.Draw(r)
     # Let's draw the goal line
     draw.line([(_to_coord(x), _to_coord(y)) for x, _, y in soccer_state['goal_line'][0]], width=5*anti_alias, fill=RED_COLOR)
+    for x, _, y in soccer_state['goal_line'][0]:
+        print(x)
+        print(y)
     draw.line([(_to_coord(x), _to_coord(y)) for x, _, y in soccer_state['goal_line'][1]], width=5*anti_alias, fill=BLUE_COLOR)
+    for x, _, y in soccer_state['goal_line'][1]:
+        print(x)
+        print(y)
 
     # and the ball
     x, _, y = soccer_state['ball']['location']
