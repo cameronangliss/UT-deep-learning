@@ -86,7 +86,7 @@ class Team:
             if (abs(puck_x) > 0.3):
               drifting = True
             #if (player_state['velocity'] > 5):
-            print(player_state.kart)
+            print(player_state[i])
             #  acc = 0
             # making default action for now
             action = dict(
