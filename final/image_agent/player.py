@@ -22,8 +22,9 @@ class Team:
         self.num_players = None
 
         # counters to help with getting unstuck
-        self.backup_frames = [0, 0]
-        self.turn_frames = [0, 0]
+        self.stuck_in_goalpost = [False, False]
+        self.stuck_against_wall = [False, False]
+        self.unstucking_frames = [0, 0]
 
     def new_match(self, team: int, num_players: int) -> list:
         """
@@ -79,11 +80,12 @@ class Team:
 
         action_dicts = []
         for i in range(self.num_players):
-            # calculating puck's x and y coordinates on screen
+            # calculating various values
             img = torch.tensor(np.transpose(player_image[i], [2, 1, 0]), dtype=torch.float).to(self.device)
             puck_coords = self.model.forward(img[None])[0]
             puck_x = float(puck_coords[0].item())
             puck_y = float(puck_coords[1].item())
+            dir_vec = np.array(player_state[i]["kart"]["front"]) - np.array(player_state[i]["kart"]["location"])
 
             # setting values for normal behavior (may be changed by later code for edge cases)
             if np.linalg.norm(player_state[i]["kart"]["velocity"]) < 15:
@@ -93,28 +95,49 @@ class Team:
             brake = False
             steer = puck_x
 
-            # don't get stuck in a goalpost
-            if abs(player_state[i]["kart"]["location"][2]) > 64 or self.backup_frames[i] > 0:
+            # get out of the goalpost if you're stuck in it
+            if (
+                abs(player_state[i]["kart"]["location"][2]) > 64
+                or self.stuck_in_goalpost
+            ):
                 print(f"Player {i} escaping goalpost")
                 print("position:", player_state[i]["kart"]["location"])
-                print("direction:", np.array(player_state[i]["kart"]["front"]) - np.array(player_state[i]["kart"]["location"]))
-                if self.backup_frames[i] < 25:
+                print("direction:", dir_vec)
+                self.stuck_in_goalpost[i] = True
+                # back up in straight line
+                if self.unstucking_frames[i] < 25:
                     acceleration = 0
                     brake = True
                     steer = 0
-                    self.backup_frames[i] += 1
-                elif self.turn_frames[i] < 40:
+                    self.unstucking_frames[i] += 1
+                # accelerate and turn as hard as you can
+                elif self.unstucking_frames[i] < 50:
+                    acceleration = 1
                     steer = 1
-                    self.turn_frames[i] += 1
+                    self.unstucking_frames[i] += 1
                 else:
-                    self.backup_frames[i] = 0
-                    self.turn_frames[i] = 0
+                    self.stuck_in_goalpost[i] = False
+                    self.unstucking_frames[i] = 0
 
-            # don't get stuck against the wall
-            elif abs(player_state[i]["kart"]["location"][0]) > 38 or player_state[i]["kart"]["location"][2] > 63:
+            # get off the wall if you're stuck against it
+            elif (
+                abs(player_state[i]["kart"]["location"][0]) > 38
+                or player_state[i]["kart"]["location"][2] > 63
+                or self.stuck_against_wall
+            ):
                 print(f"Player {i} getting off wall")
                 print("position:", player_state[i]["kart"]["location"])
-                print("direction:", np.array(player_state[i]["kart"]["front"]) - np.array(player_state[i]["kart"]["location"]))
+                print("direction:", dir_vec)
+                self.stuck_against_wall[i] = True
+                # accelerate and turn as hard as you can
+                if self.unstucking_frames[i] < 25:
+                    acceleration = 1
+                    steer = 1
+                    self.unstucking_frames[i] += 1
+                else:
+                    self.stuck_against_wall[i] = False
+                    self.unstucking_frames[i] = 0
+
 
             action = dict(
                 acceleration=acceleration,
