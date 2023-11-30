@@ -78,6 +78,7 @@ class Team:
             puck_x = float(puck_locations[0][0].item())
             steering = 0
             drifting = False
+            vel = np.linalg.norm(player_state[i].get('kart').get('velocity'))
             acc = 1
             if (puck_x <0) :
                 steering = -1
@@ -85,9 +86,8 @@ class Team:
                 steering = 1
             if (abs(puck_x) > 0.3):
               drifting = True
-            #if (player_state['velocity'] > 5):
-            print(player_state[i].get('kart').get('velocity'))
-            #  acc = 0
+            if (vel > 5):
+              acc = 0
             # making default action for now
             action = dict(
                 acceleration=acc,
