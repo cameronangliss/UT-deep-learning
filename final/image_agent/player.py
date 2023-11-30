@@ -15,8 +15,9 @@ class Team:
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.model = Detector().to(self.device)
         if os.path.exists("image_agent/det.th"):
-            print("Loading saved model")
+            print("Loading saved model...")
             self.model.load_state_dict(torch.load("image_agent/det.th"))
+            print("Done!")
         self.team = None
         self.num_players = None
 
