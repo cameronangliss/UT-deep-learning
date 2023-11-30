@@ -1,3 +1,8 @@
+import os
+import numpy as np
+import torch
+from .detector import Detector
+
 
 class Team:
     agent_type = 'image'
@@ -7,6 +12,10 @@ class Team:
           TODO: Load your agent here. Load network parameters, and other parts of our model
           We will call this function with default arguments only
         """
+        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        self.model = Detector().to(self.device)
+        if os.path.exists("homework/planner.th"):
+            self.model.load_state_dict(torch.load("homework/planner.th"))
         self.team = None
         self.num_players = None
 
@@ -61,5 +70,25 @@ class Team:
                  rescue:       bool (optional. no clue where you will end up though.)
                  steer:        float -1..1 steering angle
         """
-        # TODO: Change me. I'm just cruising straight
-        return [dict(acceleration=1, steer=0)] * self.num_players
+        
+        action_dicts = []
+        for i in range(self.num_players):
+            img = torch.tensor(np.transpose(player_image[i], [2, 1, 0]), dtype=torch.float).to(self.device)
+            puck_locations = self.model.forward(img[None])
+            puck_x = float(puck_locations[0][0].item())
+            # making default action for now
+            action = dict(
+                acceleration=1,
+                brake=False,
+                drift=False,
+                fire=False,
+                nitro=False,
+                rescue=False,
+                steer=puck_x
+            )
+            if (puck_x <0) :
+                action.steer = -1
+            if (puck_x >0):
+                action.steer = 1
+            action_dicts += [action]
+        return action_dicts

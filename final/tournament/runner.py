@@ -1,6 +1,8 @@
 import logging
 import numpy as np
+import os
 from collections import namedtuple
+
 
 TRACK_NAME = 'icy_soccer_field'
 MAX_FRAMES = 1000
@@ -112,7 +114,7 @@ class Match:
     """
         Do not create more than one match per process (use ray to create more)
     """
-    def __init__(self, use_graphics=False, logging_level=None):
+    def __init__(self, use_graphics=True, logging_level=None):
         # DO this here so things work out with ray
         import pystk
         self._pystk = pystk
@@ -123,8 +125,8 @@ class Match:
         self._use_graphics = use_graphics
         if use_graphics:
             graphics_config = self._pystk.GraphicsConfig.hd()
-            graphics_config.screen_width = 400
-            graphics_config.screen_height = 300
+            graphics_config.screen_width = 128
+            graphics_config.screen_height = 96
         else:
             graphics_config = self._pystk.GraphicsConfig.none()
 
@@ -167,8 +169,13 @@ class Match:
         logging.debug('timeout {} <? {} {}'.format(timeout, t1, t2))
         return t1 < timeout, t2 < timeout
 
+    @staticmethod
+    def _to_image(x, proj, view):
+        p = proj @ view @ np.array(list(x) + [1])
+        return np.clip(np.array([p[0] / p[-1], -p[1] / p[-1]]), -1, 1)
+    
     def run(self, team1, team2, num_player=1, max_frames=MAX_FRAMES, max_score=3, record_fn=None, timeout=1e10,
-            initial_ball_location=[0, 0], initial_ball_velocity=[0, 0], verbose=False):
+            initial_ball_location=[0, 0], initial_ball_velocity=[0, 0], collect_data=False, verbose=False):
         RaceConfig = self._pystk.RaceConfig
 
         logging.info('Creating teams')
@@ -206,7 +213,10 @@ class Match:
         state.set_ball_location((initial_ball_location[0], 1, initial_ball_location[1]),
                                 (initial_ball_velocity[0], 0, initial_ball_velocity[1]))
 
-        for it in range(max_frames):
+        from PIL import Image
+        num_data = 0
+        for it in range(MAX_FRAMES):
+            num_data += 1
             logging.debug('iteration {} / {}'.format(it, MAX_FRAMES))
             state.update()
 
@@ -215,9 +225,57 @@ class Match:
             team2_state = [to_native(p) for p in state.players[1::2]]
             soccer_state = to_native(state.soccer)
             team1_images = team2_images = None
+
+            kart0 = state.players[0].kart
+            kart1 = state.players[1].kart
+            kart2 = state.players[2].kart
+            kart3 = state.players[3].kart
+
+            projTeam1Player0 = np.array(state.players[0].camera.projection).T
+            viewTeam1Player0 = np.array(state.players[0].camera.view).T
+            
+            projTeam2Player1 = np.array(state.players[1].camera.projection).T
+            viewTeam2Player1= np.array(state.players[1].camera.view).T
+
+            projTeam1Player2 = np.array(state.players[2].camera.projection).T
+            viewTeam1Player2 = np.array(state.players[2].camera.view).T
+
+            projTeam2Player3 = np.array(state.players[3].camera.projection).T
+            viewTeam2Player3 = np.array(state.players[3].camera.view).T
+
+            puckWorldLocation = state.soccer.ball.location
+
+            #aim_point_world = self._point_on_track(kart.distance_down_track+TRACK_OFFSET, track)
+            
+            puckScreenLocationPlayer0 = self._to_image(puckWorldLocation, projTeam1Player0, viewTeam1Player0)
+            puckScreenLocationPlayer1 = self._to_image(puckWorldLocation, projTeam2Player1, viewTeam2Player1)
+            puckScreenLocationPlayer2 = self._to_image(puckWorldLocation, projTeam1Player2, viewTeam1Player2)
+            puckScreenLocationPlayer3 = self._to_image(puckWorldLocation, projTeam2Player3, viewTeam2Player3)
+
             if self._use_graphics:
+                player_0_image = np.array(race.render_data[0].image)
+                player_1_image = np.array(race.render_data[1].image)
+                player_2_image = np.array(race.render_data[2].image)
+                player_3_image = np.array(race.render_data[3].image)
                 team1_images = [np.array(race.render_data[i].image) for i in range(0, len(race.render_data), 2)]
                 team2_images = [np.array(race.render_data[i].image) for i in range(1, len(race.render_data), 2)]
+
+            # Save off images/labels
+            if collect_data:
+                if not os.path.exists("drive_data"):
+                    os.mkdir("drive_data")
+                Image.fromarray(player_0_image).save("drive_data/KartTraining_0_" + str(it) + '.png')
+                Image.fromarray(player_1_image).save("drive_data/KartTraining_1_" + str(it) + '.png')
+                Image.fromarray(player_2_image).save("drive_data/KartTraining_2_" + str(it) + '.png')
+                Image.fromarray(player_3_image).save("drive_data/KartTraining_3_" + str(it) + '.png')
+                with open("drive_data/KartTraining_0_" + str(it) + '.csv', 'w') as f:
+                    f.write('%0.1f,%0.1f' % tuple(puckScreenLocationPlayer0))
+                with open("drive_data/KartTraining_1_" + str(it) + '.csv', 'w') as f:
+                    f.write('%0.1f,%0.1f' % tuple(puckScreenLocationPlayer1))
+                with open("drive_data/KartTraining_2_" + str(it) + '.csv', 'w') as f:
+                    f.write('%0.1f,%0.1f' % tuple(puckScreenLocationPlayer2))
+                with open("drive_data/KartTraining_3_" + str(it) + '.csv', 'w') as f:
+                    f.write('%0.1f,%0.1f' % tuple(puckScreenLocationPlayer3))
 
             # Have each team produce actions (in parallel)
             if t1_can_act:
@@ -263,6 +321,9 @@ class Match:
         race.stop()
         del race
 
+        if collect_data:
+            print(f"Collected {num_data} data elements.")
+
         return state.soccer.score
 
     def wait(self, x):
@@ -278,6 +339,7 @@ if __name__ == '__main__':
     parser = ArgumentParser(description="Play some Ice Hockey. List any number of players, odd players are in team 1, even players team 2.")
     parser.add_argument('-r', '--record_video', help="Do you want to record a video?")
     parser.add_argument('-s', '--record_state', help="Do you want to pickle the state?")
+    parser.add_argument('-c', '--collect_data', action='store_true', help="Do you want to collect image data?")
     parser.add_argument('-f', '--num_frames', default=1200, type=int, help="How many steps should we play for?")
     parser.add_argument('-p', '--num_players', default=2, type=int, help="Number of players per team")
     parser.add_argument('-m', '--max_score', default=3, type=int, help="How many goal should we play to?")
@@ -304,17 +366,17 @@ if __name__ == '__main__':
             recorder = recorder & utils.StateRecorder(args.record_state)
 
         # Start the match
-        match = Match(use_graphics=team1.agent_type == 'image' or team2.agent_type == 'image')
+        match = Match(use_graphics=True)
         try:
             result = match.run(team1, team2, args.num_players, args.num_frames, max_score=args.max_score,
                                initial_ball_location=args.ball_location, initial_ball_velocity=args.ball_velocity,
-                               record_fn=recorder)
+                               record_fn=recorder, collect_data=args.collect_data)
         except MatchException as e:
             print('Match failed', e.score)
             print(' T1:', e.msg1)
             print(' T2:', e.msg2)
 
-        print('Match results', result)
+        #print('Match results', result)
 
     else:
         # Fire up ray
