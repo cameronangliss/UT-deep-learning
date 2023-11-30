@@ -87,10 +87,9 @@ class Team:
 
             print(puck_coords)
             print(f"Player {i}", player_state[i]["kart"]["location"])
-            print(player_state[i]["kart"]["velocity"], np.linalg.norm(player_state[i]["kart"]["velocity"]))
 
             # setting values for normal behavior (may be changed by later code for edge cases)
-            if player_state[i]["kart"]["velocity"] < 20:
+            if np.linalg.norm(player_state[i]["kart"]["velocity"]) < 20:
                 acceleration = 1
             else:
                 acceleration = 0
