@@ -72,20 +72,34 @@ class Team:
         """
         
         action_dicts = []
+        escaping_goal = False
         for i in range(self.num_players):
             img = torch.tensor(np.transpose(player_image[i], [2, 1, 0]), dtype=torch.float).to(self.device)
-            puck_locations = self.model.forward(img[None])
+            puck_locations = self.model.forward(img)
             puck_x = float(puck_locations[0][0].item())
-            print(puck_x)
+            if escaping_goal:
+                acceleration = 0
+                brake = True
+                steer = 0
+            elif player_state[i]["kart"]["location"][2] > 78:
+                escaping_goal = True
+                acceleration = 0
+                brake = True
+                steer = 0
+            else:
+                acceleration = 1
+                brake = False
+                steer = puck_x
+            print(puck_locations)
             print(f"Player {i}", player_state[i]["kart"]["location"])
             action = dict(
-                acceleration=1,
-                brake=False,
+                acceleration=acceleration,
+                brake=brake,
                 drift=False,
                 fire=False,
                 nitro=False,
                 rescue=False,
-                steer=puck_x
+                steer=steer
             )
             action_dicts += [action]
         return action_dicts
