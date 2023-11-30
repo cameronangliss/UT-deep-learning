@@ -22,8 +22,6 @@ class Team:
         self.num_players = None
 
         # counters to help with getting unstuck
-        self.stuck_in_goalpost = [False, False]
-        self.stuck_against_wall = [False, False]
         self.unstucking_frames = [0, 0]
 
     def new_match(self, team: int, num_players: int) -> list:
@@ -97,13 +95,13 @@ class Team:
 
             # get out of the goalpost if you're stuck in it
             if (
-                abs(player_state[i]["kart"]["location"][2]) > 64
-                or self.stuck_in_goalpost[i]
+                abs(player_state[i]["kart"]["location"][0]) > 38
+                or player_state[i]["kart"]["location"][2] > 63
+                or self.unstucking_frames[i] > 0
             ):
                 print(f"Player {i} escaping goalpost")
                 print("position:", player_state[i]["kart"]["location"])
                 print("direction:", dir_vec)
-                self.stuck_in_goalpost[i] = True
                 # back up in straight line
                 if self.unstucking_frames[i] < 25:
                     acceleration = 0
@@ -116,26 +114,6 @@ class Team:
                     steer = 1
                     self.unstucking_frames[i] += 1
                 else:
-                    self.stuck_in_goalpost[i] = False
-                    self.unstucking_frames[i] = 0
-
-            # get off the wall if you're stuck against it
-            elif (
-                abs(player_state[i]["kart"]["location"][0]) > 38
-                or player_state[i]["kart"]["location"][2] > 63
-                or self.stuck_against_wall[i]
-            ):
-                print(f"Player {i} getting off wall")
-                print("position:", player_state[i]["kart"]["location"])
-                print("direction:", dir_vec)
-                self.stuck_against_wall[i] = True
-                # accelerate and turn as hard as you can
-                if self.unstucking_frames[i] < 25:
-                    acceleration = 1
-                    steer = 1
-                    self.unstucking_frames[i] += 1
-                else:
-                    self.stuck_against_wall[i] = False
                     self.unstucking_frames[i] = 0
 
 
