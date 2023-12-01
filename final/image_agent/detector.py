@@ -9,6 +9,7 @@ def spatial_argmax(logit):
     :return: A tensor of size BS x 2 the soft-argmax in normalized coordinates (-1 .. 1)
     """
     weights = F.softmax(logit.view(logit.size(0), -1), dim=-1).view_as(logit)
+    print(torch.max(weights))
     # indicating if the puck is not seen
     if torch.max(weights) < 0.01:
         return None
