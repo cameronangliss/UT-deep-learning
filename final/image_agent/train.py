@@ -5,6 +5,7 @@ import torch.utils.tensorboard as tb
 import numpy as np
 from .utils import load_data
 from . import dense_transforms
+from pprint import pprint
 
 
 def train(args):
@@ -46,7 +47,7 @@ def train(args):
         for batch in train_data:
             images = batch[0].to(device)
             heatmaps = batch[1][:, 0, :, :].to(device)
-            print(heatmaps[0].tolist())
+            pprint(heatmaps[0].tolist())
             model_output = model.forward(images)
             train_error = loss.forward(model_output, heatmaps)
             train_logger.add_scalar("loss", train_error, global_step=global_step)
