@@ -176,10 +176,10 @@ class Team:
                 acceleration = 1
                 fire = True
                 if (5 <= self.act_count <= 7):
-                    steer = -0.1
+                    steer = -0.3
                     drift = True
                 elif (7 < self.act_count <= 10):
-                    steer = 0.1
+                    steer = 0.3
                     drift = True
 
             action = dict(
