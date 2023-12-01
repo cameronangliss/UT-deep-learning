@@ -116,13 +116,8 @@ class Team:
             )
             # print(f"Player {i}:", in_goalpost, stuck_against_x_dir_wall, stuck_against_y_dir_wall)
 
-            # GO AFTER THAT PUCK!!
-            if puck_x is not None:
-                acceleration = 1
-                steer = puck_x
-
             # get out of goalpost if stuck in it
-            elif in_goalpost or self.getting_out_of_goalpost[i]:
+            if in_goalpost or self.getting_out_of_goalpost[i]:
                 # print(f"Player {i} escaping goalpost")
                 self.getting_out_of_goalpost[i] = True
                 # back up in straight line
@@ -158,6 +153,11 @@ class Team:
                 else:
                     self.getting_off_of_wall[i] = False
                     self.unstucking_frames[i] = 0
+
+            # GO AFTER THAT PUCK!!
+            elif puck_x is not None:
+                acceleration = 1
+                steer = puck_x
 
             action = dict(
                 acceleration=acceleration,
