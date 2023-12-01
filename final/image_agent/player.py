@@ -89,8 +89,8 @@ class Team:
             dir_vec = np.array(player_state[i]["kart"]["front"]) - np.array(player_state[i]["kart"]["location"])
 
             # setting values for normal behavior (may be changed by later code for edge cases)
-            if np.linalg.norm(player_state[i]["kart"]["velocity"]) < 15:
-                acceleration = 1
+            if np.linalg.norm(player_state[i]["kart"]["velocity"]) < 10:
+                acceleration = 0.5
             else:
                 acceleration = 0
             brake = False
@@ -115,8 +115,7 @@ class Team:
 
             # GO AFTER THAT PUCK!!
             if puck_x is not None:
-                # no defaults change; puck is highest priority
-                pass
+                acceleration = 1
 
             # get out of goalpost if stuck in it
             elif in_goalpost or self.getting_out_of_goalpost[i]:
