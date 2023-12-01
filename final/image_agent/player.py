@@ -166,7 +166,7 @@ class Team:
                     self.unstucking_frames[i] = 0
              
             #immediate behavior        
-            if (self.act_count < 10):
+            if (self.act_count < 30):
                 nitro = True
                 acceleration = 1
 
