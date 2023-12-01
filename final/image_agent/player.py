@@ -178,7 +178,7 @@ class Team:
                 steer = 0
                 drift = False
                 
-                if (62 <= self.act_count <= 63):
+                if (64 <= self.act_count <= 65):
                     steer = 1
 
             action = dict(
