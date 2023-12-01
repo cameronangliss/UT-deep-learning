@@ -82,7 +82,9 @@ class Team:
         action_dicts = []
         for i in range(self.num_players):
             # calculating various values
-            img = torch.tensor(np.transpose(player_image[i], [2, 1, 0]), dtype=torch.float).to(self.device)
+            print("Hi")
+            img = torch.tensor(np.transpose(player_image[i], [2, 0, 1]), dtype=torch.float).to(self.device)
+            print("hello")
             puck_coords = self.model.detect(img)
             puck_x = float(puck_coords[0].item()) or None
             puck_y = float(puck_coords[1].item()) or None
