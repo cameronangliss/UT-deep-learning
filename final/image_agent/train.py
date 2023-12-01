@@ -5,7 +5,7 @@ import torch.utils.tensorboard as tb
 import numpy as np
 from .utils import load_data
 from . import dense_transforms
-import json
+import matplotlib.pyplot as plt
 
 
 def train(args):
@@ -47,7 +47,6 @@ def train(args):
         for batch in train_data:
             images = batch[0].to(device)
             heatmaps = batch[1][:, 0, :, :].to(device)
-            print(json.dumps(heatmaps[0].tolist(), indent=2))
             model_output = model.forward(images)
             train_error = loss.forward(model_output, heatmaps)
             train_logger.add_scalar("loss", train_error, global_step=global_step)
@@ -57,6 +56,7 @@ def train(args):
             global_step += 1
             i += 1
             avg_error += (1 / i) * (train_error.item() - avg_error)
+        plt.imshow(heatmaps[0], cmap="gray")
         print(f"Epoch {epoch + 1} training error:", avg_error)
 
     save_model(model)
