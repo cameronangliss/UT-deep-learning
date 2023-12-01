@@ -17,13 +17,10 @@ class SuperTuxDataset(Dataset):
         from os import path
         self.data = []
         for f in glob(path.join(dataset_path, '*.csv')):
-            label = np.loadtxt(f, dtype=np.float32, delimiter=',')
-            if -1.0 in label or 1.0 in label:
-                continue
             img = Image.open(f.replace('.csv', '.png'))
             img.load()
+            label = np.loadtxt(f, dtype=np.float32, delimiter=',')
             self.data.append((img, label))
-        print(f"Dataset length = {len(self.data)}")
         self.transform = transform
 
     def __len__(self):
