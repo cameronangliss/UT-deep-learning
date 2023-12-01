@@ -91,8 +91,11 @@ class Detector(torch.nn.Module):
             # print("side", x.size())
         x = self.final_conv(x)[:, 0, :, :]
         # print("final", x.size())
-        x = spatial_argmax(x)
         return x
+
+    def detect(self, x):
+        x = self.forward(x[None])[0]
+        return spatial_argmax(x)
 
 
 def save_model(model):
