@@ -100,6 +100,7 @@ class Team:
                 acceleration = 0
             brake = False
             steer = 0
+            nitro = False
 
             # print(f"position of {i}:", player_state[i]["kart"]["location"])
             # print(f"direction of {i}:", dir_vec)
@@ -163,6 +164,11 @@ class Team:
                 else:
                     self.getting_off_of_wall[i] = False
                     self.unstucking_frames[i] = 0
+             
+            #immediate behavior        
+            if (self.act_count < 10):
+                nitro = True
+                acceleration = 1
 
             action = dict(
                 acceleration=acceleration,
