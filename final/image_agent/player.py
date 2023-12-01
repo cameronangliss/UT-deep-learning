@@ -43,7 +43,7 @@ class Team:
            TODO: feel free to edit or delete any of the code below
         """
         self.team, self.num_players = team, num_players
-        return ['kiki'] * num_players
+        return ['wilber'] * num_players
 
     def act(self, player_state, player_image):
         """
