@@ -20,7 +20,8 @@ class SuperTuxDataset(Dataset):
             img = Image.open(f.replace('.csv', '.png'))
             img.load()
             label = np.loadtxt(f, dtype=np.float32, delimiter=',')
-            self.data.append((img, np.concatenate(label, [0, 0])[None]))
+            formatted_label = np.concatenate(label, [0, 0]).reshape(1, -1)
+            self.data.append((img, formatted_label))
         self.transform = transform
 
     def __len__(self):
