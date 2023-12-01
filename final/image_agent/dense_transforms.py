@@ -6,7 +6,6 @@ import random
 import torch
 from torchvision import transforms as T
 from torchvision.transforms import functional as F
-import torch
 
 
 class RandomHorizontalFlip(object):
@@ -44,12 +43,8 @@ class ColorJitter(T.ColorJitter):
 class ToTensor(object):
     def __call__(self, image, *args):
         return (F.to_tensor(image),) + args
-<<<<<<< HEAD
-    
-=======
 
 
->>>>>>> bccdda1e7edb1f1227a21b9961949298416683ea
 class ToHeatmap(object):
     def __init__(self, radius=2):
         self.radius = radius
@@ -60,23 +55,15 @@ class ToHeatmap(object):
 
 
 def detections_to_heatmap(dets, shape, radius=2, device=None):
-<<<<<<< HEAD
-=======
     if -1 in dets[0] or 1 in dets[0]:
         return torch.zeros(shape), torch.tensor([])
->>>>>>> bccdda1e7edb1f1227a21b9961949298416683ea
     with torch.no_grad():
         size = torch.zeros((2, shape[0], shape[1]), device=device)
         peak = torch.zeros((len(dets), shape[0], shape[1]), device=device)
         for i, det in enumerate(dets):
             if len(det):
                 det = torch.tensor(det.astype(float), dtype=torch.float32, device=device)
-<<<<<<< HEAD
-                cx = (det.sum(axis=1) - 1) / 2
-                cy = (det.sum(axis=0) - 1) / 2
-=======
                 cx, cy = (det[:, 0] + det[:, 2] - 1) / 2, (det[:, 1] + det[:, 3] - 1) / 2
->>>>>>> bccdda1e7edb1f1227a21b9961949298416683ea
                 x = torch.arange(shape[1], dtype=cx.dtype, device=cx.device)
                 y = torch.arange(shape[0], dtype=cy.dtype, device=cy.device)
                 gx = (-((x[:, None] - cx[None, :]) / radius)**2).exp()
@@ -87,8 +74,3 @@ def detections_to_heatmap(dets, shape, radius=2, device=None):
                 size[:, mask] = det_size[:, id[mask]]
                 peak[i] = gaussian
         return peak, size
-<<<<<<< HEAD
-
-
-=======
->>>>>>> bccdda1e7edb1f1227a21b9961949298416683ea
