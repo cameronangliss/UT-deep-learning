@@ -40,7 +40,6 @@ def train(args):
     global_step = 0
 
     for epoch in range(args.n_epochs):
-        print(f"Epoch {epoch} of {args.n_epochs}")
         avg_error = 0
         i = 0
         for batch in train_data:
@@ -59,7 +58,7 @@ def train(args):
             global_step += 1
             i += 1
             avg_error += (1 / i) * (train_error.item() - avg_error)
-        print("training error:", avg_error)
+        print(f"Epoch {epoch} training error:", avg_error)
 
     save_model(model)
 
