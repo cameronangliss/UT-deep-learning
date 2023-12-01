@@ -84,19 +84,22 @@ class Team:
         action_dicts = []
         for i in range(self.num_players):
             # calculating various values
-            img = torch.tensor(np.transpose(player_image[i], [2, 1, 0]), dtype=torch.float).to(self.device)
-            puck_coords = self.model.forward(img[None])[0]
-            puck_x = float(puck_coords[0].item())
-            puck_y = float(puck_coords[1].item())
+            img = torch.tensor(np.transpose(player_image[i], [2, 0, 1]), dtype=torch.float).to(self.device)
+            puck_coords = self.model.detect(img)
+            if puck_coords is None:
+                puck_x, puck_y = None, None
+            else:
+                puck_x = float(puck_coords[0].item())
+                puck_y = float(puck_coords[1].item())
             dir_vec = np.array(player_state[i]["kart"]["front"]) - np.array(player_state[i]["kart"]["location"])
 
             # setting values for normal behavior (may be changed by later code for edge cases)
-            if np.linalg.norm(player_state[i]["kart"]["velocity"]) < 15:
-                acceleration = 1
+            if np.linalg.norm(player_state[i]["kart"]["velocity"]) < 10:
+                acceleration = 0.5
             else:
                 acceleration = 0
             brake = False
-            steer = puck_x
+            steer = 0
 
             # print(f"position of {i}:", player_state[i]["kart"]["location"])
             # print(f"direction of {i}:", dir_vec)
@@ -118,18 +121,23 @@ class Team:
             #print(player_state[i].get('kart').get('front'))
             # print(f"Player {i}:", in_goalpost, stuck_against_x_dir_wall, stuck_against_y_dir_wall)
 
+            # GO AFTER THAT PUCK!!
+            if puck_x is not None:
+                acceleration = 1
+                steer = puck_x
+
             # get out of goalpost if stuck in it
-            if in_goalpost or self.getting_out_of_goalpost[i]:
+            elif in_goalpost or self.getting_out_of_goalpost[i]:
                 # print(f"Player {i} escaping goalpost")
                 self.getting_out_of_goalpost[i] = True
                 # back up in straight line
-                if self.unstucking_frames[i] < 20:
+                if self.unstucking_frames[i] < 30:
                     acceleration = 0
                     brake = True
                     steer = 0
                     self.unstucking_frames[i] += 1
                 # accelerate and turn as hard as you can
-                elif self.unstucking_frames[i] < 40:
+                elif self.unstucking_frames[i] < 60:
                     acceleration = 1
                     steer = 1
                     self.unstucking_frames[i] += 1
@@ -138,7 +146,7 @@ class Team:
                     self.unstucking_frames[i] = 0
 
             # get off of wall if stuck against it
-            if stuck_against_x_dir_wall or stuck_against_y_dir_wall or self.getting_off_of_wall[i]:
+            elif stuck_against_x_dir_wall or stuck_against_y_dir_wall or self.getting_off_of_wall[i]:
                 # print(f"Player {i} getting off wall")
                 self.getting_off_of_wall[i] = True
                 # back up in straight line

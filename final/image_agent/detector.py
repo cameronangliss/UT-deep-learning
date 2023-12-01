@@ -10,6 +10,9 @@ def spatial_argmax(logit):
     :return: A tensor of size BS x 2 the soft-argmax in normalized coordinates (-1 .. 1)
     """
     weights = F.softmax(logit.view(logit.size(0), -1), dim=-1).view_as(logit)
+    # indicating if the puck is not seen
+    if torch.max(weights) < 0.01:
+        return None
     return torch.stack(((weights.sum(1) * torch.linspace(-1, 1, logit.size(2)).to(logit.device)[None]).sum(1),
                         (weights.sum(2) * torch.linspace(-1, 1, logit.size(1)).to(logit.device)[None]).sum(1)), 1)
 
@@ -92,8 +95,15 @@ class Detector(torch.nn.Module):
             # print("side", x.size())
         x = self.final_conv(x)[:, 0, :, :]
         # print("final", x.size())
-        x = spatial_argmax(x)
         return x
+
+    def detect(self, x):
+        x = self.forward(x[None])
+        detections = spatial_argmax(x)
+        if detections is None:
+            return None
+        else:
+            return detections[0]
 
 
 def save_model(model):

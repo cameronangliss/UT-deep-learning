@@ -20,7 +20,7 @@ def train(args):
         print("Loading saved model...")
         model.load_state_dict(torch.load("homework/det.th"))
         print("Done!")
-    loss = torch.nn.MSELoss()
+    loss = torch.nn.BCEWithLogitsLoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=1e-4, weight_decay=1e-4)
 
     # load the data: train and valid
@@ -31,6 +31,7 @@ def train(args):
             ),
             dense_transforms.RandomHorizontalFlip(),
             dense_transforms.ToTensor(),
+            dense_transforms.ToHeatmap(),
             dense_transforms.ToHeatmap()
         ]
     )
@@ -40,17 +41,12 @@ def train(args):
     global_step = 0
 
     for epoch in range(args.n_epochs):
-        print(f"Epoch {epoch} of {args.n_epochs}")
         avg_error = 0
         i = 0
         for batch in train_data:
             images = batch[0].to(device)
-            heatmaps = batch[1].to(device)
-            #print(images.size())
-            #print(heatmaps.size())
+            heatmaps = batch[1][:, 0, :, :].to(device)
             model_output = model.forward(images)
-            #print(model_output.size())
-            #print(heatmaps.size())
             train_error = loss.forward(model_output, heatmaps)
             train_logger.add_scalar("loss", train_error, global_step=global_step)
             optimizer.zero_grad()
@@ -59,7 +55,7 @@ def train(args):
             global_step += 1
             i += 1
             avg_error += (1 / i) * (train_error.item() - avg_error)
-        print("training error:", avg_error)
+        print(f"Epoch {epoch + 1} training error:", avg_error)
 
     save_model(model)
 

@@ -215,9 +215,7 @@ class Match:
                                 (initial_ball_velocity[0], 0, initial_ball_velocity[1]))
 
         from PIL import Image
-        num_data = 0
-        for it in range(MAX_FRAMES):
-            num_data += 1
+        for it in range(max_frames):
             logging.debug('iteration {} / {}'.format(it, MAX_FRAMES))
             state.update()
 
@@ -321,9 +319,6 @@ class Match:
 
         race.stop()
         del race
-
-        if collect_data:
-            print(f"Collected {num_data} data elements.")
 
         return state.soccer.score
 
