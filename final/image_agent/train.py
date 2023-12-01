@@ -3,7 +3,7 @@ from .detector import Detector, save_model
 import torch
 import torch.utils.tensorboard as tb
 import numpy as np
-from .utils import load_data
+from .utils import load_data, load_detection_data
 from . import dense_transforms
 
 
@@ -31,12 +31,12 @@ def train(args):
             ),
             dense_transforms.RandomHorizontalFlip(),
             dense_transforms.ToTensor(),
+            dense_transforms.ToHeatmap()
         ]
     )
-    train_data = load_data("drive_data", transform=train_transform)
-    # valid_data = load_data("drive_data")
+    
+    train_data = load_detection_data("drive_data", transform=train_transform)
 
-    # Run SGD for several epochs
     global_step = 0
 
     for epoch in range(args.n_epochs):
