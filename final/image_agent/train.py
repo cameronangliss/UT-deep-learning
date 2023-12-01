@@ -45,7 +45,7 @@ def train(args):
         i = 0
         for batch in train_data:
             images = batch[0].to(device)
-            heatmaps = batch[1].to(device)
+            heatmaps = batch[1][:, 0, :, :].to(device)
             model_output = model.forward(images)
             train_error = loss.forward(model_output, heatmaps)
             train_logger.add_scalar("loss", train_error, global_step=global_step)
