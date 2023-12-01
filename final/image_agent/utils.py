@@ -16,11 +16,14 @@ class SuperTuxDataset(Dataset):
         from glob import glob
         from os import path
         self.data = []
-        print(len(glob(path.join(dataset_path, '*.csv'))))
         for f in glob(path.join(dataset_path, '*.csv')):
-            i = Image.open(f.replace('.csv', '.png'))
-            i.load()
-            self.data.append((i, np.loadtxt(f, dtype=np.float32, delimiter=',')))
+            label = np.loadtxt(f, dtype=np.float32, delimiter=',')
+            if -1.0 in label or 1.0 in label:
+                continue
+            img = Image.open(f.replace('.csv', '.png'))
+            img.load()
+            self.data.append((img, label))
+        print(f"Dataset length = {len(self.data)}")
         self.transform = transform
 
     def __len__(self):
