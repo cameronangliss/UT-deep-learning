@@ -55,6 +55,8 @@ class ToHeatmap(object):
 
 
 def detections_to_heatmap(dets, shape, radius=2, device=None):
+    if -1 in dets[0] or 1 in dets[0]:
+        return torch.zeros(shape)
     with torch.no_grad():
         size = torch.zeros((2, shape[0], shape[1]), device=device)
         peak = torch.zeros((len(dets), shape[0], shape[1]), device=device)
