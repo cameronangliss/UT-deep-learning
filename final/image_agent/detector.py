@@ -95,7 +95,9 @@ class Detector(torch.nn.Module):
 
     def detect(self, x):
         x = self.forward(x[None])
+        print(torch.max(x))
         return spatial_argmax(x)[0]
+
 
 
 def save_model(model):
