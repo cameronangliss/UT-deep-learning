@@ -43,7 +43,7 @@ class Team:
            TODO: feel free to edit or delete any of the code below
         """
         self.team, self.num_players = team, num_players
-        return ['sara_the_racer'] * num_players
+        return ['hexley'] * num_players
 
     def act(self, player_state, player_image):
         """
@@ -101,6 +101,7 @@ class Team:
             brake = False
             steer = 0
             nitro = False
+            fire = False
 
             # print(f"position of {i}:", player_state[i]["kart"]["location"])
             # print(f"direction of {i}:", dir_vec)
@@ -169,12 +170,14 @@ class Team:
             if (self.act_count < 30):
                 nitro = True
                 acceleration = 1
+                fire = True
+                
 
             action = dict(
                 acceleration=acceleration,
                 brake=brake,
                 drift=abs(steer) > 0.7,
-                fire=False,
+                fire=fire,
                 nitro=nitro,
                 rescue=False,
                 steer=steer
