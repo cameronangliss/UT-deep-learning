@@ -177,6 +177,9 @@ class Team:
                 fire = True
                 steer = 0
                 drift = False
+                
+                if (self.act_count == 10):
+                    steer = 1
 
             action = dict(
                 acceleration=acceleration,
