@@ -175,7 +175,7 @@ class Team:
                 brake=brake,
                 drift=abs(steer) > 0.7,
                 fire=False,
-                nitro=False,
+                nitro=nitro,
                 rescue=False,
                 steer=steer
             )
