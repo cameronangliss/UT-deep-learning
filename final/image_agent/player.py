@@ -173,11 +173,14 @@ class Team:
             #immediate behavior        
             if (self.act_count < 30):
                 nitro = True
-                steer = 0
                 acceleration = 1
                 fire = True
-                drift = True
-                
+                if (5 <= self.act_count <= 7):
+                    steer = -0.1
+                    drift = True
+                elif (7 < self.act_count <= 10):
+                    steer = 0.1
+                    drift = True
 
             action = dict(
                 acceleration=acceleration,
