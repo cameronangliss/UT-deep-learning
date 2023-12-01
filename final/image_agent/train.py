@@ -56,12 +56,11 @@ def train(args):
             global_step += 1
             i += 1
             avg_error += (1 / i) * (train_error.item() - avg_error)
-        plt.imsave("image.png", images[0, 0, :, :].cpu(), cmap="gray")
-        plt.imsave("label.png", heatmaps[0].cpu(), cmap="gray")
+        # plt.imsave("image.png", images[0, 0, :, :].cpu(), cmap="gray")
+        # plt.imsave("label.png", heatmaps[0].cpu(), cmap="gray")
         print(f"Epoch {epoch + 1} training error:", avg_error)
-        break
 
-    # save_model(model)
+    save_model(model)
 
 def log(logger, img, label, pred, global_step):
     """
