@@ -62,6 +62,7 @@ def detections_to_heatmap(dets, shape, radius=2, device=None):
         peak = torch.zeros((len(dets), shape[0], shape[1]), device=device)
         for i, det in enumerate(dets):
             if len(det):
+                print(det)
                 det = torch.tensor(det.astype(float), dtype=torch.float32, device=device)
                 cx, cy = (det[:, 0] + det[:, 2] - 1) / 2, (det[:, 1] + det[:, 3] - 1) / 2
                 x = torch.arange(shape[1], dtype=cx.dtype, device=cx.device)
@@ -73,4 +74,5 @@ def detections_to_heatmap(dets, shape, radius=2, device=None):
                 det_size = (det[:, 2:] - det[:, :2]).T / 2
                 size[:, mask] = det_size[:, id[mask]]
                 peak[i] = gaussian
+                print(peak[i])
         return peak, size
