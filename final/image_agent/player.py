@@ -173,6 +173,7 @@ class Team:
             #immediate behavior        
             if (self.act_count < 30):
                 nitro = True
+                steer = 0
                 acceleration = 1
                 fire = True
                 drift = True
