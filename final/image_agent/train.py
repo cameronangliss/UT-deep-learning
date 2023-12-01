@@ -35,7 +35,7 @@ def train(args):
         ]
     )
     
-    train_data = load_detection_data("drive_data", transform=train_transform)
+    train_data = load_data("drive_data", transform=train_transform)
 
     global_step = 0
 
