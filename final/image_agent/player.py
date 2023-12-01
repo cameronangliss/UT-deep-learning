@@ -159,6 +159,11 @@ class Team:
                 acceleration = 1
                 steer = puck_x
 
+            # Find the puck quickly
+            else:
+                acceleration = 0.5
+                steer = 1
+
             action = dict(
                 acceleration=acceleration,
                 brake=brake,
