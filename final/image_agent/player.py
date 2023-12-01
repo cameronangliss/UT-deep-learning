@@ -133,7 +133,7 @@ class Team:
                     self.unstucking_frames[i] = 0
 
             # get off of wall if stuck against it
-            if stuck_against_x_dir_wall or stuck_against_y_dir_wall or self.getting_off_of_wall[i]:
+            elif stuck_against_x_dir_wall or stuck_against_y_dir_wall or self.getting_off_of_wall[i]:
                 print(f"Player {i} getting off wall")
                 self.getting_off_of_wall[i] = True
                 # back up in straight line
