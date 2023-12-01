@@ -56,7 +56,7 @@ def train(args):
             global_step += 1
             i += 1
             avg_error += (1 / i) * (train_error.item() - avg_error)
-        plt.imshow(heatmaps[0], cmap="gray")
+        plt.imshow(heatmaps[0].cpu(), cmap="gray")
         print(f"Epoch {epoch + 1} training error:", avg_error)
 
     save_model(model)
