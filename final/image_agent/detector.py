@@ -11,7 +11,7 @@ def spatial_argmax(logit):
     weights = F.softmax(logit.view(logit.size(0), -1), dim=-1).view_as(logit)
     # print(torch.max(weights))
     # indicating if the puck is not seen
-    if torch.max(weights) < 0.08:
+    if torch.max(weights) < 0.05:
         return None
     return torch.stack(((weights.sum(1) * torch.linspace(-1, 1, logit.size(2)).to(logit.device)[None]).sum(1),
                         (weights.sum(2) * torch.linspace(-1, 1, logit.size(1)).to(logit.device)[None]).sum(1)), 1)
