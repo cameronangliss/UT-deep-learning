@@ -43,7 +43,7 @@ def load_detection_data(dataset_path, num_workers=0, batch_size=32, **kwargs):
     return DataLoader(dataset, num_workers=num_workers, batch_size=batch_size, shuffle=True, drop_last=True)
 
 
-if __name__ == '__main__':
+'''if __name__ == '__main__':
     dataset = DetectionSuperTuxDataset('dense_data/train')
     import torchvision.transforms.functional as F
     from pylab import show, subplots
@@ -86,7 +86,7 @@ if __name__ == '__main__':
     fig.tight_layout()
     # fig.savefig('heat.png', bbox_inches='tight', pad_inches=0, transparent=True)
 
-    show()
+    show()'''
 
 
 
