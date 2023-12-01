@@ -85,6 +85,7 @@ class Team:
             img = torch.tensor(np.transpose(player_image[i], [2, 0, 1]), dtype=torch.float).to(self.device)
             puck_coords = self.model.detect(img)
             puck_x = float(puck_coords[0].item()) or None
+            print(puck_x)
             puck_y = float(puck_coords[1].item()) or None
             dir_vec = np.array(player_state[i]["kart"]["front"]) - np.array(player_state[i]["kart"]["location"])
 
