@@ -20,7 +20,9 @@ class SuperTuxDataset(Dataset):
             img = Image.open(f.replace('.csv', '.png'))
             img.load()
             label = np.loadtxt(f, dtype=np.float32, delimiter=',')
-            self.data.append((img, label))
+            scaled_label = np.floor(np.array([(label[0] + 1) * 128 / 2, (label[1] + 1) * 96 / 2])).astype(int)
+            formatted_label = np.concatenate([scaled_label, scaled_label]).reshape(1, -1)
+            self.data.append((img, formatted_label))
         self.transform = transform
 
     def __len__(self):
@@ -32,7 +34,7 @@ class SuperTuxDataset(Dataset):
         return data
 
 
-def load_data(dataset_path=DATASET_PATH, transform=dense_transforms.ToTensor(), num_workers=0, batch_size=10):
+def load_data(dataset_path=DATASET_PATH, transform=dense_transforms.ToTensor(), num_workers=0, batch_size=32):
     dataset = SuperTuxDataset(dataset_path, transform=transform)
     return DataLoader(dataset, num_workers=num_workers, batch_size=batch_size, shuffle=True, drop_last=True)
 
