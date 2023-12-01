@@ -9,6 +9,7 @@ def spatial_argmax(logit):
     :return: A tensor of size BS x 2 the soft-argmax in normalized coordinates (-1 .. 1)
     """
     weights = F.softmax(logit.view(logit.size(0), -1), dim=-1).view_as(logit)
+    print(torch.max(weights))
     return torch.stack(((weights.sum(1) * torch.linspace(-1, 1, logit.size(2)).to(logit.device)[None]).sum(1),
                         (weights.sum(2) * torch.linspace(-1, 1, logit.size(1)).to(logit.device)[None]).sum(1)), 1)
 
@@ -95,7 +96,6 @@ class Detector(torch.nn.Module):
 
     def detect(self, x):
         x = self.forward(x[None])
-        print(torch.max(x))
         return spatial_argmax(x)[0]
 
 
