@@ -96,8 +96,8 @@ class Team:
             brake = False
             steer = 2 * puck_x
 
-            print(f"position of {i}:", player_state[i]["kart"]["location"])
-            print(f"direction of {i}:", dir_vec)
+            # print(f"position of {i}:", player_state[i]["kart"]["location"])
+            # print(f"direction of {i}:", dir_vec)
 
             # detecting if we need to get unstuck
             in_goalpost = abs(player_state[i]["kart"]["location"][2]) > 64
@@ -111,7 +111,7 @@ class Team:
                 and abs(dir_vec[2]) > abs(dir_vec[0])  # primarily pointing in y dir
                 and np.sign(player_state[i]["kart"]["location"][2]) == np.sign(dir_vec[2])  # pointed towards wall
             )
-            print(f"Player {i}:", in_goalpost, stuck_against_x_dir_wall, stuck_against_y_dir_wall)
+            # print(f"Player {i}:", in_goalpost, stuck_against_x_dir_wall, stuck_against_y_dir_wall)
 
             # GO AFTER THAT PUCK!!
             if puck_x is not None:
@@ -119,7 +119,7 @@ class Team:
 
             # get out of goalpost if stuck in it
             elif in_goalpost or self.getting_out_of_goalpost[i]:
-                print(f"Player {i} escaping goalpost")
+                # print(f"Player {i} escaping goalpost")
                 self.getting_out_of_goalpost[i] = True
                 # back up in straight line
                 if self.unstucking_frames[i] < 30:
@@ -138,7 +138,7 @@ class Team:
 
             # get off of wall if stuck against it
             elif stuck_against_x_dir_wall or stuck_against_y_dir_wall or self.getting_off_of_wall[i]:
-                print(f"Player {i} getting off wall")
+                # print(f"Player {i} getting off wall")
                 self.getting_off_of_wall[i] = True
                 # back up in straight line
                 if self.unstucking_frames[i] < 20:
