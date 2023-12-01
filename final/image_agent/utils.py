@@ -21,7 +21,7 @@ class SuperTuxDataset(Dataset):
             img.load()
             label = np.loadtxt(f, dtype=np.float32, delimiter=',')
             print(label)
-            formatted_label = np.concatenate(label, [0, 0]).reshape(1, -1)
+            formatted_label = np.array([np.concatenate(label, [0, 0])])
             self.data.append((img, formatted_label))
         self.transform = transform
 
