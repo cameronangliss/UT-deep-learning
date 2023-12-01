@@ -75,6 +75,6 @@ def detections_to_heatmap(dets, shape, radius=2, device=None):
                 det_size = (det[:, 2:] - det[:, :2]).T / 2
                 size[:, mask] = det_size[:, id[mask]]
                 peak[i] = gaussian
-        print(peak[orig_dets[0][0]][orig_dets[0][1]])
-        print(size)
+        print(peak.size())
+        print(size.size())
         return peak, size
