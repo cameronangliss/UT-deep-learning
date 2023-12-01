@@ -20,7 +20,7 @@ def train(args):
         print("Loading saved model...")
         model.load_state_dict(torch.load("homework/det.th"))
         print("Done!")
-    loss = torch.nn.MSELoss()
+    loss = torch.nn.BCEWithLogitsLoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=1e-4, weight_decay=1e-4)
 
     # load the data: train and valid
@@ -31,6 +31,7 @@ def train(args):
             ),
             dense_transforms.RandomHorizontalFlip(),
             dense_transforms.ToTensor(),
+            dense_transforms.ToHeatmap(),
         ]
     )
     train_data = load_data("drive_data", transform=train_transform)
