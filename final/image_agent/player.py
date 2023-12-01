@@ -84,8 +84,8 @@ class Team:
             # calculating various values
             img = torch.tensor(np.transpose(player_image[i], [2, 1, 0]), dtype=torch.float).to(self.device)
             puck_coords = self.model.forward(img[None])[0]
-            puck_x = float(puck_coords[0].item())
-            puck_y = float(puck_coords[1].item())
+            puck_x = float(puck_coords[0].item()) or None
+            puck_y = float(puck_coords[1].item()) or None
             dir_vec = np.array(player_state[i]["kart"]["front"]) - np.array(player_state[i]["kart"]["location"])
 
             # setting values for normal behavior (may be changed by later code for edge cases)
@@ -94,7 +94,7 @@ class Team:
             else:
                 acceleration = 0
             brake = False
-            steer = puck_x
+            steer = 2 * puck_x
 
             print(f"position of {i}:", player_state[i]["kart"]["location"])
             print(f"direction of {i}:", dir_vec)
@@ -113,8 +113,13 @@ class Team:
             )
             print(f"Player {i}:", in_goalpost, stuck_against_x_dir_wall, stuck_against_y_dir_wall)
 
+            # GO AFTER THAT PUCK!!
+            if puck_x is not None:
+                # no defaults change; puck is highest priority
+                pass
+
             # get out of goalpost if stuck in it
-            if in_goalpost or self.getting_out_of_goalpost[i]:
+            elif in_goalpost or self.getting_out_of_goalpost[i]:
                 print(f"Player {i} escaping goalpost")
                 self.getting_out_of_goalpost[i] = True
                 # back up in straight line
