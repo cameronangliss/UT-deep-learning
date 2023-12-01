@@ -82,7 +82,7 @@ class Team:
         action_dicts = []
         for i in range(self.num_players):
             # calculating various values
-            img = torch.tensor(np.transpose(player_image[i], [2, 1, 0]), dtype=torch.float).to(self.device)
+            img = torch.tensor(np.transpose(player_image[i], [2, 0, 1]), dtype=torch.float).to(self.device)
             puck_coords = self.model.detect(img)
             puck_x = float(puck_coords[0].item()) or None
             puck_y = float(puck_coords[1].item()) or None
@@ -94,7 +94,7 @@ class Team:
             else:
                 acceleration = 0
             brake = False
-            steer = 2 * puck_x
+            steer = puck_x
 
             # print(f"position of {i}:", player_state[i]["kart"]["location"])
             # print(f"direction of {i}:", dir_vec)
