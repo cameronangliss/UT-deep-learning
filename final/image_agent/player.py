@@ -171,7 +171,7 @@ class Team:
             drift=abs(steer) > 0.7
              
             #immediate behavior        
-            if (self.act_count < 30):
+            if (self.act_count < 300):
                 nitro = True
                 acceleration = 1
                 fire = True
