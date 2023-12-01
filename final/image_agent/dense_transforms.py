@@ -55,6 +55,7 @@ class ToHeatmap(object):
 
 
 def detections_to_heatmap(dets, shape, radius=2, device=None):
+    print(dets[0])
     if -1 in dets[0] or 1 in dets[0]:
         return torch.zeros(shape)
     with torch.no_grad():
@@ -73,4 +74,5 @@ def detections_to_heatmap(dets, shape, radius=2, device=None):
                 det_size = (det[:, 2:] - det[:, :2]).T / 2
                 size[:, mask] = det_size[:, id[mask]]
                 peak[i] = gaussian
+        print(peak, size)
         return peak, size
