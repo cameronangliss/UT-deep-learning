@@ -118,13 +118,13 @@ class Team:
                 # print(f"Player {i} escaping goalpost")
                 self.getting_out_of_goalpost[i] = True
                 # back up in straight line
-                if self.unstucking_frames[i] < 20:
+                if self.unstucking_frames[i] < 30:
                     acceleration = 0
                     brake = True
                     steer = 0
                     self.unstucking_frames[i] += 1
                 # accelerate and turn as hard as you can
-                elif self.unstucking_frames[i] < 40:
+                elif self.unstucking_frames[i] < 60:
                     acceleration = 1
                     steer = 1
                     self.unstucking_frames[i] += 1
