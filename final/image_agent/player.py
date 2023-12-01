@@ -24,7 +24,8 @@ class Team:
         # bools to track unstucking behavior
         self.getting_out_of_goalpost = [False, False]
         self.getting_off_of_wall = [False, False]
-        # counter to help with getting unstuck
+        # frame counters
+        self.frame = 0
         self.unstucking_frames = [0, 0]
 
     def new_match(self, team: int, num_players: int) -> list:
@@ -80,6 +81,7 @@ class Team:
         """
 
         action_dicts = []
+        self.frame += 1
         for i in range(self.num_players):
             # print(f"PLAYER {i}")
 
@@ -100,6 +102,7 @@ class Team:
                 acceleration = 0
             brake = False
             steer = 0
+            nitro = self.frame <= 20
 
             # print(f"position of {i}:", player_state[i]["kart"]["location"])
             # print(f"direction of {i}:", dir_vec)
@@ -171,7 +174,7 @@ class Team:
                 brake=brake,
                 drift=abs(steer) > 0.7,
                 fire=False,
-                nitro=False,
+                nitro=nitro,
                 rescue=False,
                 steer=steer
             )
