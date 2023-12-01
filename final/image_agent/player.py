@@ -180,4 +180,5 @@ class Team:
                 steer=steer
             )
             action_dicts += [action]
+            self.act_count += 1
         return action_dicts
