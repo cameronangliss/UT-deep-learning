@@ -16,12 +16,12 @@ class Team:
         self.detector = Detector().to(self.device)
         if os.path.exists("image_agent/det.th"):
             print("Loading detector model...")
-            self.model.load_state_dict(torch.load("image_agent/det.th", map_location="cpu"))
+            self.detector.load_state_dict(torch.load("image_agent/det.th", map_location="cpu"))
             print("Done!")
         self.classifier = CNNClassifier().to(self.device)
         if os.path.exists("image_agent/cnn.th"):
             print("Loading classifier model...")
-            self.model.load_state_dict(torch.load("image_agent/cnn.th", map_location="cpu"))
+            self.classifier.load_state_dict(torch.load("image_agent/cnn.th", map_location="cpu"))
             print("Done!")
         self.team = None
         self.num_players = None
