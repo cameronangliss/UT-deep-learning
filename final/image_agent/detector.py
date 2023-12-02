@@ -152,7 +152,7 @@ class CNNClassifier(torch.nn.Module):
         x = self.dropout(x)
         x = self.classifier(x)
         
-        return x 
+        return x[:,0] 
         
         #return self.classifier(self.network(x).mean(dim=[2, 3]))
 
