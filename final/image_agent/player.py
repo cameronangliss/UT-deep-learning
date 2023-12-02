@@ -127,7 +127,7 @@ class Team:
 
             # print(self.frame)
             # rush the puck in the beginning of the game
-            if self.frame <= 120:
+            if self.frame <= 200:
                 self.acceleration = 1
                 self.steer = puck_x
 
