@@ -167,6 +167,9 @@ class Team:
                     self.getting_off_of_wall[i] = False
                     self.unstucking_frames[i] = 0
                     
+                    
+            #wall_goal_angle
+                    
             
             drift=abs(steer) > 0.7
              
@@ -183,6 +186,10 @@ class Team:
                     
                 if (self.act_count < 70):
                     acceleration = 0
+                    
+                if (70 <= self.act_count <= 72):
+                    steer = 1
+                
 
             action = dict(
                 acceleration=acceleration,
