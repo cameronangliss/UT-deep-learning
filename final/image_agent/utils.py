@@ -33,7 +33,7 @@ class SuperTuxDataset(Dataset):
     def __getitem__(self, idx):
         data = self.data[idx]
         trans_data = self.transform(data[0])
-        return [trans_data, data[1:]]
+        return [trans_data, data[1], data[2]]
 
 
 def load_data(dataset_path=DATASET_PATH, transform=dense_transforms.ToTensor(), num_workers=0, batch_size=32):
