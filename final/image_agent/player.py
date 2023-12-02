@@ -178,7 +178,9 @@ class Team:
 
             # Find the puck quickly
             else:
-                steer = 1
+                # we are facing away from the center of the arena
+                if np.dot(dir_vec, player_state[i]["kart"]["location"]) > 0:
+                    steer = 1
 
             action = dict(
                 acceleration=acceleration,
