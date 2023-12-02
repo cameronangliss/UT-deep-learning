@@ -16,6 +16,10 @@ def train(args):
 
     # create a model, loss, optimizer
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    # Added fort Kyle's mac -> switch to mps if available
+    if torch.backends.mps.is_available():
+        print("swapped to mps")
+        device = torch.device("mps")
     model = Detector().to(device)
     if os.path.exists("image_agent/det.th"):
         print("Loading saved model...")
