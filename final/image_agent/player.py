@@ -168,7 +168,7 @@ class Team:
                     self.unstucking_frames[i] = 0
                     
                     
-            goal_angle = 
+            #goal_angle = 
                     
             
             drift=abs(steer) > 0.7
