@@ -157,13 +157,16 @@ class CNNClassifier(torch.nn.Module):
         #return self.classifier(self.network(x).mean(dim=[2, 3]))
 
 
-
+model_factory = {
+    'cnn': CNNClassifier
+}
 
 def save_model(model):
     from torch import save
     from os import path
-    if isinstance(model, Detector):
-        return save(model.state_dict(), path.join(path.dirname(path.abspath(__file__)), 'cnndet.th'))
+    for n, m in model_factory.items():
+        if isinstance(model, m):
+            return save(model.state_dict(), path.join(path.dirname(path.abspath(__file__)), '%s.th' % n))
     raise ValueError("model type '%s' not supported!" % str(type(model)))
 
 
