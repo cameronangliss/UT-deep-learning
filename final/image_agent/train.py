@@ -23,7 +23,7 @@ def train(args):
     model = Detector().to(device)
     if os.path.exists("image_agent/det.th"):
         print("Loading saved model...")
-        model.load_state_dict(torch.load("image_agent/det.th"))
+        model.load_state_dict(torch.load("image_agent/det.th", map_location="cpu"))
         print("Done!")
     loss = torch.nn.BCEWithLogitsLoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=1e-4, weight_decay=1e-4)
