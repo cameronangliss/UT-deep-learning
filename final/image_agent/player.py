@@ -90,12 +90,10 @@ class Team:
         action_dicts = []
         for i in range(self.num_players):
             # calculating various values
-            
-            print("here1")
-            
+                       
             
             x, _, y = np.array(soccer_state['ball']['location']) - np.array(player_state[i]["kart"]["location"])
-            print("here1")
+
             loc = np.array(player_state[i]["kart"]["location"])[[0,2]]
             #img = torch.tensor(np.transpose(player_image[i], [2, 0, 1]), dtype=torch.float).to(self.device)
             #puck_coords = self.model.detect(img)
@@ -106,19 +104,17 @@ class Team:
             #     puck_y = float(puck_coords[1].item())
             dir_vec = np.array(player_state[i]["kart"]["front"]) - np.array(player_state[i]["kart"]["location"])
             dir = dir_vec[[0,2]]
-            print("here1")
+
             cur_loc = loc
             game_restart = False
             if len(self.last_loc) > 0:
                 if np.linalg.norm(cur_loc- self.last_loc) > 0.3:
                     game_restart = True
             #pcuk movement
-            print(x)
-            print(y)
             ball_dir = [x,y]
             print("here1")
             ball_vec = ball_dir - loc
-            turn = m.atan2(ball_vec) - m.atan2(dir)
+            turn = m.atan2(ball_vec[0], ball_vec[1]) - m.atan2(dir[0], dir[1])
             print("here1")
             if turn < -1*m.pi or 0 < turn <= m.pi:
                 steer = 1
