@@ -51,7 +51,7 @@ def cnntrain(args):
             images = batch[0].to(device)
             #print(batch[2])
             labels = batch[2].to(device)
-            model_output = model.forward(images)
+            model_output = model.forward(images)[:,0]
             train_error = loss.forward(model_output, labels)
             train_logger.add_scalar("loss", train_error, global_step=global_step)
             optimizer.zero_grad()
