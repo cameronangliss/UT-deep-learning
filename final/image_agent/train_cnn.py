@@ -33,8 +33,8 @@ def cnntrain(args):
             transforms.ColorJitter(
                 brightness=0.5, contrast=0.5, saturation=0.5, hue=0.25
             ),
-            transforms.RandomHorizontalFlip()
-            #dense_transforms.ToTensor(),
+            transforms.RandomHorizontalFlip(),
+            transforms.ToTensor(),
             #dense_transforms.ToHeatmap(),
         ]
     )
