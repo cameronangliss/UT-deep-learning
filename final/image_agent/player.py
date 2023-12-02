@@ -26,7 +26,10 @@ class Team:
         self.getting_off_of_wall = [False, False]
         # counter to help with getting unstuck
         self.unstucking_frames = [0, 0]
+        self.prev_puck_x = 0
+        self.prev_puck_y = 0
         self.act_count = 0
+        self.det_vel_cutoff = 0.5
 
     def new_match(self, team: int, num_players: int) -> list:
         """
@@ -91,7 +94,18 @@ class Team:
                 puck_x = float(puck_coords[0].item())
                 puck_y = float(puck_coords[1].item())
             dir_vec = np.array(player_state[i]["kart"]["front"]) - np.array(player_state[i]["kart"]["location"])
-
+            #pcuk movement
+            puck_dir = [0,0]
+            puck_vel = 0
+            if self.prev_puck_x is not None:
+                puck_dir = [puck_x - self.prev_puck_x, puck_y - self.prev_puck_y]
+                puck_vel = np.linalg.norm(puck_dir)
+            #puck moving too quickly for an actual detection
+                if (puck_vel > self.det_vel_cutoff):
+                    puck_x, puck_y = None, None 
+            #2 coord direction
+            direction = dir_vec[[0,2]]
+            
             # setting values for normal behavior (may be changed by later code for edge cases)
             if np.linalg.norm(player_state[i]["kart"]["velocity"]) < 10:
                 acceleration = 0.5
@@ -121,6 +135,10 @@ class Team:
             if puck_x is not None:
                 acceleration = 1
                 steer = puck_x
+            #if previous dir known go after that
+            elif self.prev_puck_x is not None:
+                acceleration = 1
+                steer = self.prev_puck_x
 
             # get out of goalpost if stuck in it
             elif in_goalpost or self.getting_out_of_goalpost[i]:
@@ -172,4 +190,6 @@ class Team:
             )
             action_dicts += [action]
             self.act_count += 1
+            self.prev_puck_x = puck_x
+            self.prev_puck_y = puck_y
         return action_dicts
