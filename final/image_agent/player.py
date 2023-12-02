@@ -91,6 +91,7 @@ class Team:
         for i in range(self.num_players):
             # calculating various values
             
+            print("here1")
             
             
             x, _, y = soccer_state['ball']['location'] - player_state[i]["kart"]["location"]
