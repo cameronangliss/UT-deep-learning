@@ -143,7 +143,7 @@ class Team:
                     self.unstucking_frames[i] += 1
                 # accelerate and turn as hard as you can
                 elif self.unstucking_frames[i] < 60:
-                    acceleration = 1
+                    acceleration = 0.5
                     steer = 1
                     self.unstucking_frames[i] += 1
                 else:
@@ -162,7 +162,7 @@ class Team:
                     self.unstucking_frames[i] += 1
                 # accelerate and turn as hard as you can
                 elif self.unstucking_frames[i] < 40:
-                    acceleration = 1
+                    acceleration = 0.5
                     steer = 1
                     self.unstucking_frames[i] += 1
                 else:
