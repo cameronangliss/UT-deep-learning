@@ -178,11 +178,15 @@ class Team:
                     steer = 1
                     drift = True
                     
-                if (50 <= self.act_count <= 50):
+                if (55 <= self.act_count <= 55):
                     steer = 1
                     #drift = True
                     
-                if (60 <= self.act_count <= 61):
+                if (60 <= self.act_count <= 60):
+                    steer = 1
+                    #drift = True
+                    
+                if (70<= self.act_count <= 70):
                     steer = 1
                     #drift = True
                     
