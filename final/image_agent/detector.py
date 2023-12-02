@@ -141,11 +141,15 @@ class CNNClassifier(torch.nn.Module):
         Hint: Apply input normalization inside the network, to make sure it is applied in the grader
         """
         
+        print(x.size())
         x = self.network(x)
+        print(x.size())
         x = x.mean(dim=[2, 3])
+        print(x.size())
         x = self.dropout(x)
+        print(x.size())
         x = self.classifier(x)
-        
+        print(x.size())
         return x[:,0] 
         
         #return self.classifier(self.network(x).mean(dim=[2, 3]))
