@@ -21,6 +21,8 @@ class Team:
         self.team = None
         self.num_players = None
 
+        # state memory
+        self.last_loc = [[0, 0], [0, 0]]
         # bools to track unstucking behavior
         self.getting_out_of_goalpost = [False, False]
         self.getting_off_of_wall = [False, False]
@@ -94,6 +96,9 @@ class Team:
                 puck_x = float(puck_coords[0].item())
                 puck_y = float(puck_coords[1].item())
             dir_vec = np.array(player_state[i]["kart"]["front"]) - np.array(player_state[i]["kart"]["location"])
+            loc_change = ((player_state[i]["kart"]["location"][0] - self.last_loc[0])**2 + (player_state[i]["kart"]["location"][2] - self.last_loc[1])**2)**0.5
+            if loc_change > 10:
+                self.frame = 1
 
             # setting values for normal behavior (may be changed by later code for edge cases)
             if np.linalg.norm(player_state[i]["kart"]["velocity"]) < 10:
@@ -120,6 +125,7 @@ class Team:
             )
             # print(f"Player {i}:", in_goalpost, stuck_against_x_dir_wall, stuck_against_y_dir_wall)
 
+            print(self.frame)
             # rush the puck in the beginning of the game
             if self.frame <= 80:
                 self.acceleration = 1
@@ -183,4 +189,7 @@ class Team:
                 steer=steer
             )
             action_dicts += [action]
+
+            self.last_loc[i][0] = player_state[i]["kart"]["location"][0]
+            self.last_loc[i][1] = player_state[i]["kart"]["location"][2]
         return action_dicts

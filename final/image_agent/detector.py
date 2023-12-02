@@ -15,7 +15,7 @@ def spatial_argmax(logit):
     # print("mean:", mean)
     # print("largest mean:", largest_vals_mean)
     # indicating if the puck is not seen
-    print(torch.max(weights))
+    # print(torch.max(weights))
     if torch.max(weights) < 0.02:
         return None
     return torch.stack(((weights.sum(1) * torch.linspace(-1, 1, logit.size(2)).to(logit.device)[None]).sum(1),
