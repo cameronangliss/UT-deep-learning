@@ -87,12 +87,9 @@ class Team:
 
             # calculating various values
             img = torch.tensor(np.transpose(player_image[i], [2, 0, 1]), dtype=torch.float).to(self.device)
-            puck_coords = self.model.detect(img)
-            if puck_coords is None:
-                puck_x, puck_y = None, None
-            else:
-                puck_x = float(puck_coords[0].item())
-                puck_y = float(puck_coords[1].item())
+            puck_coords, seeing_puck = self.model.detect(img)
+            puck_x = float(puck_coords[0].item())
+            puck_y = float(puck_coords[1].item())
             dir_vec = np.array(player_state[i]["kart"]["front"]) - np.array(player_state[i]["kart"]["location"])
 
             # setting values for normal behavior (may be changed by later code for edge cases)
@@ -160,13 +157,13 @@ class Team:
                     self.unstucking_frames[i] = 0
 
             # GO AFTER THAT PUCK!!
-            elif puck_x is not None:
+            elif seeing_puck:
                 acceleration = 1
                 steer = puck_x
 
             # Find the puck quickly
             else:
-                acceleration = 0.5
+                acceleration = 0.1
                 steer = 1
 
             action = dict(
