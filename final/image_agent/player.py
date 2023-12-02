@@ -121,7 +121,7 @@ class Team:
             # print(f"Player {i}:", in_goalpost, stuck_against_x_dir_wall, stuck_against_y_dir_wall)
 
             # rush the puck in the beginning of the game
-            if self.frame <= 20:
+            if self.frame <= 50:
                 self.acceleration = 1
                 self.steer = puck_x
 
