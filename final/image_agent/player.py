@@ -25,13 +25,9 @@ class Team:
         # bools to track unstucking behavior
         self.getting_out_of_goalpost = [False, False]
         self.getting_off_of_wall = [False, False]
-        # counter to help with getting unstuck
+        # frame counters
+        self.frame = 0
         self.unstucking_frames = [0, 0]
-        self.prev_puck_x = [0,0]
-        self.prev_puck_y = [0,0]
-        self.act_count = 0
-        self.det_vel_cutoff = 0.5
-        self.last_loc = []
 
     def new_match(self, team: int, num_players: int) -> list:
         """
