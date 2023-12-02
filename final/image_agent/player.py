@@ -128,8 +128,8 @@ class Team:
             print(self.frame)
             # rush the puck in the beginning of the game
             if self.frame <= 120:
-                self.acceleration = 1
-                self.steer = puck_x
+                acceleration = 1
+                steer = puck_x
 
             # get out of goalpost if stuck in it
             elif in_goalpost or self.getting_out_of_goalpost[i]:
