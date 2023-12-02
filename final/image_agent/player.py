@@ -85,7 +85,7 @@ class Team:
         action_dicts = []
         self.frame += 1
         for i in range(self.num_players):
-            print(f"PLAYER {i}")
+            # print(f"PLAYER {i}")
 
             # calculating various values
             img = torch.tensor(np.transpose(player_image[i], [2, 0, 1]), dtype=torch.float).to(self.device)
@@ -125,7 +125,7 @@ class Team:
             )
             # print(f"Player {i}:", in_goalpost, stuck_against_x_dir_wall, stuck_against_y_dir_wall)
 
-            print(self.frame)
+            # print(self.frame)
             # rush the puck in the beginning of the game
             if self.frame <= 80:
                 self.acceleration = 1
