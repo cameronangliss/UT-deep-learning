@@ -1,7 +1,7 @@
 import os
 import numpy as np
 import torch
-from .detector import Detector
+from .detector import Detector, CNNClassifier
 
 
 class Team:
@@ -13,10 +13,15 @@ class Team:
           We will call this function with default arguments only
         """
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        self.model = Detector().to(self.device)
+        self.detector = Detector().to(self.device)
         if os.path.exists("image_agent/det.th"):
-            print("Loading saved model...")
+            print("Loading detector model...")
             self.model.load_state_dict(torch.load("image_agent/det.th", map_location="cpu"))
+            print("Done!")
+        self.classifier = CNNClassifier().to(self.device)
+        if os.path.exists("image_agent/cnn.th"):
+            print("Loading classifier model...")
+            self.model.load_state_dict(torch.load("image_agent/cnn.th", map_location="cpu"))
             print("Done!")
         self.team = None
         self.num_players = None
@@ -89,12 +94,10 @@ class Team:
 
             # calculating various values
             img = torch.tensor(np.transpose(player_image[i], [2, 0, 1]), dtype=torch.float).to(self.device)
-            puck_coords = self.model.detect(img)
-            if puck_coords is None:
-                puck_x, puck_y = None, None
-            else:
-                puck_x = float(puck_coords[0].item())
-                puck_y = float(puck_coords[1].item())
+            puck_coords = self.detector.detect(img)
+            puck_x = float(puck_coords[0].item())
+            puck_y = float(puck_coords[1].item())
+            seeing_puck = self.classifier.forward(img[None])[0]
             dir_vec = np.array(player_state[i]["kart"]["front"]) - np.array(player_state[i]["kart"]["location"])
             loc_change = ((player_state[i]["kart"]["location"][0] - self.last_loc[i][0])**2 + (player_state[i]["kart"]["location"][2] - self.last_loc[i][1])**2)**0.5
             if loc_change > 10:
@@ -172,7 +175,7 @@ class Team:
                     self.unstucking_frames[i] = 0
 
             # GO AFTER THAT PUCK!!
-            elif puck_x is not None:
+            elif seeing_puck:
                 acceleration = 1
                 steer = puck_x
 
