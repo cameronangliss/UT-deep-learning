@@ -109,8 +109,9 @@ class Team:
             print("here1")
             cur_loc = loc
             game_restart = False
-            if np.linalg.norm(cur_loc- self.last_loc) > 0.3:
-                game_restart = True
+            if self.last_loc is not None:
+                if np.linalg.norm(cur_loc- self.last_loc) > 0.3:
+                    game_restart = True
             #pcuk movement
             print(x)
             print(y)
