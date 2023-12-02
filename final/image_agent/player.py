@@ -176,7 +176,13 @@ class Team:
 
             # Find the puck quickly
             else:
-                acceleration = 0.5
+                if np.linalg.norm(player_state[i]["kart"]["velocity"]) < 10:
+                    acceleration = 0.5
+                elif np.linalg.norm(player_state[i]["kart"]["velocity"]) > 15:
+                    acceleration = 0
+                    brake = True
+                else:
+                    acceleration = 0
                 steer = 1
 
             action = dict(
