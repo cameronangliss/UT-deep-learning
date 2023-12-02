@@ -24,7 +24,7 @@ def cnntrain(args):
         print("Loading saved model...")
         model.load_state_dict(torch.load("image_agent/cnndet.th"))
         print("Done!")
-    loss = torch.nn.BCEWithLogitsLoss()
+    loss = torch.nn.BCELoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=1e-4, weight_decay=1e-4)
 
     # load the data: train and valid
