@@ -101,58 +101,40 @@ class Detector(torch.nn.Module):
         
         
 class CNNClassifier(torch.nn.Module):
-    def __init__(self):
+    class Block(torch.nn.Module):
+        def __init__(self, n_input, n_output, stride=1):
+            super().__init__()
+            self.layers = torch.nn.Sequential(
+                torch.nn.Conv2d(n_input, n_output, kernel_size=3, padding=1, stride=stride),
+                torch.nn.BatchNorm2d(n_output),
+                torch.nn.ReLU(),
+            )
+            self.downsample = torch.nn.Sequential(
+                torch.nn.Conv2d(n_input, n_output, kernel_size=1, stride=stride),
+                torch.nn.BatchNorm2d(n_output)
+            )
+
+        def forward(self, x):
+            return self.layers(x) + self.downsample(x)
+
+    def __init__(self, layers=[16, 32, 64], n_input_channels=3):
         super().__init__()
-        """
-        Your code here
-        Hint: Base this on yours or HW2 master solution if you'd like.
-        Hint: Overall model can be similar to HW2, but you likely need some architecture changes (e.g. ResNets)
-        """
-      
-        
-        layers=[16, 32, 64, 128]
-        n_input_channels=3
-        n_output_channels=1
-        stride=2
-        kernel_size=5
-        L = []
-        c = n_input_channels
+        c = layers[0]
+        L = [
+            torch.nn.Conv2d(n_input_channels, c, kernel_size=7, padding=3),
+            torch.nn.ReLU(),
+            torch.nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
+        ]
         for l in layers:
-            L.append(torch.nn.Conv2d(c, l, kernel_size, stride, padding=kernel_size//2))
-            L.append(torch.nn.BatchNorm2d(l))
-            L.append(torch.nn.ReLU())
-            c = l
-            L.append(torch.nn.Conv2d(c, l, kernel_size, stride, padding=kernel_size//2))
-            L.append(torch.nn.BatchNorm2d(l))
-            L.append(torch.nn.Identity())
-            L.append(torch.nn.ReLU())
-            
+            L.append(self.Block(c, l, stride=2))
+            c=l
         self.network = torch.nn.Sequential(*L)
+        self.classifier = torch.nn.Linear(c, 1)
 
-        self.dropout = torch.nn.Dropout(0.5)
-
-        self.classifier = torch.nn.Linear(128, n_output_channels)
-        
     def forward(self, x):
-        """
-        Your code here
-        @x: torch.Tensor((B,3,64,64))
-        @return: torch.Tensor((B,6))
-        Hint: Apply input normalization inside the network, to make sure it is applied in the grader
-        """
-        
-        print(x.size())
         x = self.network(x)
-        print(x.size())
         x = x.mean(dim=[2, 3])
-        print(x.size())
-        x = self.dropout(x)
-        print(x.size())
-        x = self.classifier(x)
-        print(x.size())
-        return x[:,0] 
-        
-        #return self.classifier(self.network(x).mean(dim=[2, 3]))
+        return self.classifier(x)
 
 
 model_factory = {
