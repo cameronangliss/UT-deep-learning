@@ -49,7 +49,7 @@ def cnntrain(args):
         i = 0
         for batch in train_data:
             images = batch[0].to(device)
-            print(batch[2])
+            #print(batch[2])
             labels = batch[2].to(device)
             model_output = model.forward(images)
             train_error = loss.forward(model_output, labels)
