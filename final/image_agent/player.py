@@ -107,20 +107,7 @@ class Team:
 
             cur_loc = loc
             game_restart = False
-            if len(self.last_loc) > 0:
-                if np.linalg.norm(cur_loc- self.last_loc) > 0.3:
-                    game_restart = True
-            #pcuk movement
-            ball_dir = [x,y]
-            print("here1")
-            ball_vec = ball_dir - loc
-            print("before atan")
-            turn = m.atan2(ball_vec[0], ball_vec[1]) - m.atan2(dir[0], dir[1])
-            print("here1")
-            if turn < -1*m.pi or 0 < turn <= m.pi:
-                steer = 1
-            else :
-                steer = -1
+            
 
             print("here1")            
             # puck_dir = [0,0]
@@ -166,14 +153,19 @@ class Team:
             #pcuk movement
             ball_dir = [x,y]
             ball_vec = ball_dir - loc
+            if len(self.last_loc) > 0:
+                if np.linalg.norm(cur_loc- self.last_loc) > 0.3:
+                    game_restart = True
+            #pcuk movement
+            ball_dir = [x,y]
+            ball_vec = ball_dir - loc
+            print("before atan")
+            turn = m.atan2(ball_vec[0], ball_vec[1]) - m.atan2(dir[0], dir[1])
             print("here1")
-            turn = m.atan2(ball_vec) - m.atan2(dir)
             if turn < -1*m.pi or 0 < turn <= m.pi:
                 steer = 1
-                acceleration =1 
             else :
                 steer = -1
-                acceleration = 1
 
             # print(f"position of {i}:", player_state[i]["kart"]["location"])
             # print(f"direction of {i}:", dir_vec)
