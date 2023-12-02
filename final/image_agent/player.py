@@ -96,7 +96,9 @@ class Team:
             dir_vec = np.array(player_state[i]["kart"]["front"]) - np.array(player_state[i]["kart"]["location"])
 
             # setting values for normal behavior (may be changed by later code for edge cases)
-            if np.linalg.norm(player_state[i]["kart"]["velocity"]) < 10:
+            if self.frame < 20:
+                acceleration = 1
+            elif np.linalg.norm(player_state[i]["kart"]["velocity"]) < 10:
                 acceleration = 0.5
             else:
                 acceleration = 0
