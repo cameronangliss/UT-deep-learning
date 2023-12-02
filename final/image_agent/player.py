@@ -83,7 +83,7 @@ class Team:
         action_dicts = []
         self.frame += 1
         for i in range(self.num_players):
-            # print(f"PLAYER {i}")
+            print(f"PLAYER {i}")
 
             # calculating various values
             img = torch.tensor(np.transpose(player_image[i], [2, 0, 1]), dtype=torch.float).to(self.device)
