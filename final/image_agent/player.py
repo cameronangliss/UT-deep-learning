@@ -94,10 +94,12 @@ class Team:
 
             # calculating various values
             img = torch.tensor(np.transpose(player_image[i], [2, 0, 1]), dtype=torch.float).to(self.device)
+            print(img.size())
             puck_coords = self.detector.detect(img)
             puck_x = float(puck_coords[0].item())
             puck_y = float(puck_coords[1].item())
             seeing_puck = self.classifier.forward(img[None])[0]
+            print(seeing_puck)
             dir_vec = np.array(player_state[i]["kart"]["front"]) - np.array(player_state[i]["kart"]["location"])
             loc_change = ((player_state[i]["kart"]["location"][0] - self.last_loc[i][0])**2 + (player_state[i]["kart"]["location"][2] - self.last_loc[i][1])**2)**0.5
             if loc_change > 10:
