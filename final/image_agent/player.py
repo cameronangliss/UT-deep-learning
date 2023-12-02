@@ -126,7 +126,7 @@ class Team:
                 self.steer = puck_x
 
             # get out of goalpost if stuck in it
-            if in_goalpost or self.getting_out_of_goalpost[i]:
+            elif in_goalpost or self.getting_out_of_goalpost[i]:
                 # print(f"Player {i} escaping goalpost")
                 self.getting_out_of_goalpost[i] = True
                 # back up in straight line
