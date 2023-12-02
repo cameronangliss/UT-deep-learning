@@ -103,13 +103,67 @@ class Detector(torch.nn.Module):
             return None
         else:
             return detections[0]
+        
+        
+        
+class CNNClassifier(torch.nn.Module):
+    def __init__(self):
+        super().__init__()
+        """
+        Your code here
+        Hint: Base this on yours or HW2 master solution if you'd like.
+        Hint: Overall model can be similar to HW2, but you likely need some architecture changes (e.g. ResNets)
+        """
+      
+        
+        layers=[16, 32, 64, 128]
+        n_input_channels=3
+        n_output_channels=6
+        stride=2
+        kernel_size=5
+        L = []
+        c = n_input_channels
+        for l in layers:
+            L.append(torch.nn.Conv2d(c, l, kernel_size, stride, padding=kernel_size//2))
+            L.append(torch.nn.BatchNorm2d(l))
+            L.append(torch.nn.ReLU())
+            c = l
+            L.append(torch.nn.Conv2d(c, l, kernel_size, stride, padding=kernel_size//2))
+            L.append(torch.nn.BatchNorm2d(l))
+            L.append(torch.nn.Identity())
+            L.append(torch.nn.ReLU())
+            
+        self.network = torch.nn.Sequential(*L)
+
+        self.dropout = torch.nn.Dropout(0.5)
+
+        self.classifier = torch.nn.Linear(128, n_output_channels)
+        
+    def forward(self, x):
+        """
+        Your code here
+        @x: torch.Tensor((B,3,64,64))
+        @return: torch.Tensor((B,6))
+        Hint: Apply input normalization inside the network, to make sure it is applied in the grader
+        """
+        
+        x = self.network(x)
+        x = x.mean(dim=[2, 3])
+        x = self.dropout(x)
+        x = self.classifier(x)
+        
+        return x 
+        
+        #return self.classifier(self.network(x).mean(dim=[2, 3]))
+
+
 
 
 def save_model(model):
     from torch import save
     from os import path
     if isinstance(model, Detector):
-        return save(model.state_dict(), path.join(path.dirname(path.abspath(__file__)), 'det.th'))
+        return save(model.state_dict(), path.join(path.dirname(path.abspath(__file__)), 'cnndet.th'))
     raise ValueError("model type '%s' not supported!" % str(type(model)))
 
 

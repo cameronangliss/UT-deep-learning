@@ -7,7 +7,7 @@ from .utils import load_data
 from . import dense_transforms
 
 
-def train(args):
+def cnntrain(args):
     from os import path
     train_logger, valid_logger = None, None
     if args.log_dir is not None:
@@ -19,10 +19,10 @@ def train(args):
     if torch.backends.mps.is_available():
         print("swapped to mps")
         device = torch.device("mps")
-    model = Detector().to(device)
-    if os.path.exists("homework/det.th"):
+    model = CNNClassifier().to(device)
+    if os.path.exists("homework/cnndet.th"):
         print("Loading saved model...")
-        model.load_state_dict(torch.load("homework/det.th"))
+        model.load_state_dict(torch.load("homework/cnndet.th"))
         print("Done!")
     loss = torch.nn.BCEWithLogitsLoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=1e-4, weight_decay=1e-4)
@@ -49,9 +49,9 @@ def train(args):
         i = 0
         for batch in train_data:
             images = batch[0].to(device)
-            heatmaps = batch[1][:, 0, :, :].to(device)
+            labels = batch[3].to(device)
             model_output = model.forward(images)
-            train_error = loss.forward(model_output, heatmaps)
+            train_error = loss.forward(model_output, labels)
             train_logger.add_scalar("loss", train_error, global_step=global_step)
             optimizer.zero_grad()
             train_error.backward()
@@ -91,4 +91,4 @@ if __name__ == '__main__':
     parser.add_argument('-n', '--n_epochs', default=10, type=int)
 
     args = parser.parse_args()
-    train(args)
+    cnntrain(args)
