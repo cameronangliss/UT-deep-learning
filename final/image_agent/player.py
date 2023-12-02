@@ -114,6 +114,7 @@ class Team:
             ball_dir = [x,y]
             print("here1")
             ball_vec = ball_dir - loc
+            print("before atan")
             turn = m.atan2(ball_vec[0], ball_vec[1]) - m.atan2(dir[0], dir[1])
             print("here1")
             if turn < -1*m.pi or 0 < turn <= m.pi:
