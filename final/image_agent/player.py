@@ -181,7 +181,7 @@ class Team:
                 if (63 <= self.act_count <= 64):
                     steer = -1
                     
-                if (self.act_count < 3):
+                if (self.act_count < 30):
                     acceleration = 0
 
             action = dict(
