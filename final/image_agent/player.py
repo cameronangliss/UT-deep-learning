@@ -16,7 +16,7 @@ class Team:
         self.model = Detector().to(self.device)
         if os.path.exists("image_agent/det.th"):
             print("Loading saved model...")
-            self.model.load_state_dict(torch.load("image_agent/det.th"))
+            self.model.load_state_dict(torch.load("image_agent/det.th", map_location="cpu"))
             print("Done!")
         self.team = None
         self.num_players = None
