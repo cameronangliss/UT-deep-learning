@@ -184,7 +184,7 @@ class Team:
             # Find the puck quickly
             else:
                 # we are facing away from the center of the arena
-                if np.dot(dir_vec, player_state[i]["kart"]["location"]) / (np.linalg.norm(dir_vec) * np.linalg.norm(player_state[i]["kart"]["location"])) > 0.05:
+                if np.dot(dir_vec, player_state[i]["kart"]["location"]) / (np.linalg.norm(dir_vec) * np.linalg.norm(player_state[i]["kart"]["location"])) > [0.05, -2][i]:
                     steer = 1
 
             action = dict(
