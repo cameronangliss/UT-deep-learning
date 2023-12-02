@@ -20,9 +20,9 @@ def cnntrain(args):
         print("swapped to mps")
         device = torch.device("mps")
     model = CNNClassifier().to(device)
-    if os.path.exists("homework/cnndet.th"):
+    if os.path.exists("image_agent/cnndet.th"):
         print("Loading saved model...")
-        model.load_state_dict(torch.load("homework/cnndet.th"))
+        model.load_state_dict(torch.load("image_agent/cnndet.th"))
         print("Done!")
     loss = torch.nn.BCEWithLogitsLoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=1e-4, weight_decay=1e-4)
