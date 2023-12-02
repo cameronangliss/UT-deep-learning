@@ -34,8 +34,8 @@ def cnntrain(args):
                 brightness=0.5, contrast=0.5, saturation=0.5, hue=0.25
             ),
             dense_transforms.RandomHorizontalFlip(),
-            dense_transforms.ToTensor(),
-            dense_transforms.ToHeatmap(),
+            #dense_transforms.ToTensor(),
+            #dense_transforms.ToHeatmap(),
         ]
     )
     train_data = load_data("drive_data", transform=train_transform)
