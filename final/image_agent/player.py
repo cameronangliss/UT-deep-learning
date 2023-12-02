@@ -168,7 +168,7 @@ class Team:
                     self.unstucking_frames[i] = 0
                     
                     
-            #wall_goal_angle
+            goal_angle = 
                     
             
             drift=abs(steer) > 0.7
@@ -187,7 +187,7 @@ class Team:
                 if (self.act_count < 70):
                     acceleration = 0
                     
-                if (70 <= self.act_count <= 75):
+                if (70 <= self.act_count <= 85):
                     steer = 1
                 
 
