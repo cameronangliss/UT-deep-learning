@@ -93,7 +93,7 @@ class Team:
                 puck_y = float(puck_coords[1].item())
             dir_vec = np.array(player_state[i]["kart"]["front"]) - np.array(player_state[i]["kart"]["location"])
 
-            #goal_dir = [0,]
+            #goal_dir = [0,-65]
             # setting values for normal behavior (may be changed by later code for edge cases)
             if np.linalg.norm(player_state[i]["kart"]["velocity"]) < 10:
                 acceleration = 0.5
@@ -188,7 +188,7 @@ class Team:
                 if (self.act_count < 65):
                     acceleration = 0
                     
-                if (65 <= self.act_count <= 81):
+                if (65 <= self.act_count <= 80):
                     steer = 1
                     drift = True
                 
