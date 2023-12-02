@@ -147,7 +147,6 @@ class Team:
             drift = False
             nitro = False
             fire = False
-            print("here1")
             
             dir = dir_vec[[0,2]]
             #pcuk movement
@@ -159,9 +158,7 @@ class Team:
             #pcuk movement
             ball_dir = [x,y]
             ball_vec = ball_dir - loc
-            print("before atan")
             turn = m.atan2(ball_vec[0], ball_vec[1]) - m.atan2(dir[0], dir[1])
-            print("here1")
             if turn < -1*m.pi or 0 < turn <= m.pi:
                 steer = 1
             else :
