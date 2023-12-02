@@ -106,9 +106,9 @@ class Team:
                 self.frame = 1
 
             # setting values for normal behavior (may be changed by later code for edge cases)
-            if np.linalg.norm(player_state[i]["kart"]["velocity"]) < 7:
+            if np.linalg.norm(player_state[i]["kart"]["velocity"]) < 10:
                     acceleration = 0.5
-            elif np.linalg.norm(player_state[i]["kart"]["velocity"]) > 12:
+            elif np.linalg.norm(player_state[i]["kart"]["velocity"]) > 15:
                 acceleration = 0
                 brake = True
             else:
