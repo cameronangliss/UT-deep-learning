@@ -2,6 +2,7 @@ import os
 import numpy as np
 import torch
 from .detector import Detector
+import math as m
 
 
 class Team:
@@ -88,36 +89,52 @@ class Team:
         action_dicts = []
         for i in range(self.num_players):
             # calculating various values
-            img = torch.tensor(np.transpose(player_image[i], [2, 0, 1]), dtype=torch.float).to(self.device)
-            puck_coords = self.model.detect(img)
-            if puck_coords is None:
-                puck_x, puck_y = None, None
-            else:
-                puck_x = float(puck_coords[0].item())
-                puck_y = float(puck_coords[1].item())
+            
+            x, _, y = soccer_state['ball']['location'] - player_state[i]["kart"]["location"]
+            loc = np.array(player_state[i]["kart"]["location"])[[0,2]]
+            #img = torch.tensor(np.transpose(player_image[i], [2, 0, 1]), dtype=torch.float).to(self.device)
+            #puck_coords = self.model.detect(img)
+            # if puck_coords is None:
+            #     puck_x, puck_y = None, None
+            # else:
+            #     puck_x = float(puck_coords[0].item())
+            #     puck_y = float(puck_coords[1].item())
             dir_vec = np.array(player_state[i]["kart"]["front"]) - np.array(player_state[i]["kart"]["location"])
+            dir = dir_vec[[0,2]]
             #pcuk movement
-            puck_dir = [0,0]
-            puck_vel = 0
-            if self.prev_puck_x is not None:
-                puck_dir = [puck_x - self.prev_puck_x[i], puck_y - self.prev_puck_y[i]]
-                puck_vel = np.linalg.norm(puck_dir)
-            #puck moving too quickly for an actual detection
-                if (puck_vel > self.det_vel_cutoff):
-                    puck_x, puck_y = None, None 
+            ball_dir = [x,y]
+            ball_vec = ball_dir - loc
+            turn = m.atan2(ball_vec) - m.atan2(dir)
+            if turn < -1*m.pi or 0 < turn <= m.pi:
+                steer = 1
+            else :
+                steer = -1
             
-            loc = np.array(player_state[i]["kart"]["location"])[0,2]
-            front= np.array(player_state[i]["kart"]["front"])[0,2]
-            #2 coord direction
-            direction = dir_vec[[0,2]]
+            # puck_dir = [0,0]
+            # puck_vel = 0
+            # if self.prev_puck_x is not None:
+            #     puck_dir = [puck_x - self.prev_puck_x[i], puck_y - self.prev_puck_y[i]]
+            #     puck_vel = np.linalg.norm(puck_dir)
+            # #puck moving too quickly for an actual detection
+            #     if (puck_vel > self.det_vel_cutoff):
+            #         puck_x, puck_y = None, None 
+                    
+            # ball_angle = np.arccos(np.dot(dir, opp_goal_dir)/(np.linalg.norm(opp_goal_dir)*np.linalg.norm(dir)))
             
-            our_goal_dir = ([0,65] - loc)
-            our_goal_dist = our_goal_dir/np.linalg.norm(our_goal_dir)
-            opp_goal_dir = ([0,-65] - loc)/np.linalg.norm([0,-65] - loc)
-            opp_goal_dist = opp_goal_dir/np.linalg.norm(opp_goal_dir)
+            # loc = np.array(player_state[i]["kart"]["location"])[0,2]
+            # front= np.array(player_state[i]["kart"]["front"])[0,2]
+            # #2 coord direction
+            # direction = dir_vec[[0,2]]
+            
+            # our_goal_dir = ([0,65] - loc)
+            # our_goal_dist = our_goal_dir/np.linalg.norm(our_goal_dir)
+            # opp_goal_dir = ([0,-65] - loc)/np.linalg.norm([0,-65] - loc)
+            # opp_goal_dist = opp_goal_dir/np.linalg.norm(opp_goal_dir)
             
             #angle between two vectors
-            opp_goal_angle = np.arccos(np.dot(dir, opp_goal_dir)/(np.linalg.norm(opp_goal_dir)*np.linalg.norm(dir)))
+            # opp_goal_angle = np.arccos(np.dot(dir, opp_goal_dir)/(np.linalg.norm(opp_goal_dir)*np.linalg.norm(dir)))
+            
+            
             
             
             # setting values for normal behavior (may be changed by later code for edge cases)
@@ -130,6 +147,18 @@ class Team:
             drift = False
             nitro = False
             fire = False
+            
+            dir = dir_vec[[0,2]]
+            #pcuk movement
+            ball_dir = [x,y]
+            ball_vec = ball_dir - loc
+            turn = m.atan2(ball_vec) - m.atan2(dir)
+            if turn < -1*m.pi or 0 < turn <= m.pi:
+                steer = 1
+                acceleration =1 
+            else :
+                steer = -1
+                acceleration = 1
 
             # print(f"position of {i}:", player_state[i]["kart"]["location"])
             # print(f"direction of {i}:", dir_vec)
@@ -149,16 +178,18 @@ class Team:
             # print(f"Player {i}:", in_goalpost, stuck_against_x_dir_wall, stuck_against_y_dir_wall)
 
             # GO AFTER THAT PUCK!!
-            if puck_x is not None:
-                acceleration = 1
-                steer = puck_x
-            #if previous dir known go after that
-            elif self.prev_puck_x is not None:
-                acceleration = 1
-                steer = self.prev_puck_x[i]
+            # if puck_x is not None:
+            #     acceleration = 1
+            #     steer = puck_x
+            # #if previous dir known go after that
+            # elif self.prev_puck_x is not None:
+            #     acceleration = 1
+            #     steer = self.prev_puck_x[i]
+            
+            
 
             # get out of goalpost if stuck in it
-            elif in_goalpost or self.getting_out_of_goalpost[i]:
+            if in_goalpost or self.getting_out_of_goalpost[i]:
                 # print(f"Player {i} escaping goalpost")
                 self.getting_out_of_goalpost[i] = True
                 # back up in straight line
@@ -208,6 +239,6 @@ class Team:
             )
             action_dicts += [action]
             self.act_count += 1
-            self.prev_puck_x[i] = puck_x
-            self.prev_puck_y[i] = puck_y
+            # self.prev_puck_x[i] = puck_x
+            # self.prev_puck_y[i] = puck_y
         return action_dicts
