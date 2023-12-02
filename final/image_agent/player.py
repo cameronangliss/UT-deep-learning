@@ -94,7 +94,7 @@ class Team:
             print("here1")
             
             
-            x, _, y = soccer_state['ball']['location'] - player_state[i]["kart"]["location"]
+            x, _, y = np.array(soccer_state['ball']['location']) - np.array(player_state[i]["kart"]["location"])
             print("here1")
             loc = np.array(player_state[i]["kart"]["location"])[[0,2]]
             #img = torch.tensor(np.transpose(player_image[i], [2, 0, 1]), dtype=torch.float).to(self.device)
