@@ -96,15 +96,12 @@ class Team:
             dir_vec = np.array(player_state[i]["kart"]["front"]) - np.array(player_state[i]["kart"]["location"])
 
             # setting values for normal behavior (may be changed by later code for edge cases)
-            if self.frame < 20:
-                acceleration = 1
-            elif np.linalg.norm(player_state[i]["kart"]["velocity"]) < 10:
+            if np.linalg.norm(player_state[i]["kart"]["velocity"]) < 10:
                 acceleration = 0.5
             else:
                 acceleration = 0
             brake = False
             steer = 0
-            nitro = self.frame <= 20
 
             # print(f"position of {i}:", player_state[i]["kart"]["location"])
             # print(f"direction of {i}:", dir_vec)
@@ -122,6 +119,11 @@ class Team:
                 and np.sign(player_state[i]["kart"]["location"][2]) == np.sign(dir_vec[2])  # pointed towards wall
             )
             # print(f"Player {i}:", in_goalpost, stuck_against_x_dir_wall, stuck_against_y_dir_wall)
+
+            # rush the puck in the beginning of the game
+            if self.frame <= 20:
+                self.acceleration = 1
+                self.steer = puck_x
 
             # get out of goalpost if stuck in it
             if in_goalpost or self.getting_out_of_goalpost[i]:
@@ -176,7 +178,7 @@ class Team:
                 brake=brake,
                 drift=abs(steer) > 0.7,
                 fire=False,
-                nitro=nitro,
+                nitro=False,
                 rescue=False,
                 steer=steer
             )
