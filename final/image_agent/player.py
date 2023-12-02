@@ -158,7 +158,9 @@ class Team:
                 else:
                     self.getting_off_of_wall[i] = False
                     self.unstucking_frames[i] = 0
-                    
+            
+            drift = False
+            fire = False        
             #immediate behavior        
             if (self.act_count < 200):
                 nitro = True
@@ -182,9 +184,9 @@ class Team:
             action = dict(
                 acceleration=acceleration,
                 brake=brake,
-                drift=abs(steer) > 0.7,
-                fire=False,
-                nitro=False,
+                drift=drift,
+                fire=fire,
+                nitro=nitro,
                 rescue=False,
                 steer=steer
             )
