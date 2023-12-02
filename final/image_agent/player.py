@@ -2,7 +2,6 @@ import os
 import numpy as np
 import torch
 from .detector import Detector
-import math as m
 
 
 class Team:
@@ -46,8 +45,6 @@ class Team:
         """
         self.team, self.num_players = team, num_players
         return ['tux'] * num_players
-    
-    #soccer state for controller testing
 
     def act(self, player_state, player_image):
         """
@@ -113,7 +110,6 @@ class Team:
                 acceleration = 0
             brake = False
             steer = 0
-            nitro = self.frame <= 20
 
             # print(f"position of {i}:", player_state[i]["kart"]["location"])
             # print(f"direction of {i}:", dir_vec)
@@ -138,7 +134,7 @@ class Team:
                 steer = 0
 
             # get out of goalpost if stuck in it
-            if in_goalpost or self.getting_out_of_goalpost[i]:
+            elif in_goalpost or self.getting_out_of_goalpost[i]:
                 # print(f"Player {i} escaping goalpost")
                 self.getting_out_of_goalpost[i] = True
                 # back up in straight line
@@ -191,7 +187,7 @@ class Team:
                 brake=brake,
                 drift=abs(steer) > 0.7,
                 fire=False,
-                nitro=nitro,
+                nitro=False,
                 rescue=False,
                 steer=steer
             )
