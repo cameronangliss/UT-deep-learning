@@ -107,9 +107,7 @@ class Team:
 
             cur_loc = loc
             game_restart = False
-            
-
-            print("here1")            
+                    
             # puck_dir = [0,0]
             # puck_vel = 0
             # if self.prev_puck_x is not None:
