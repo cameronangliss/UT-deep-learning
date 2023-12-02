@@ -58,7 +58,7 @@ class Detector(torch.nn.Module):
         rev_layers = list(reversed(layers))
         for i in range(len(layers) - 1):
             self.up_blocks.append(self.Block(rev_layers[i] + rev_layers[i + 1], rev_layers[i + 1]))
-        self.final_conv = torch.nn.Conv2d(layers[0], 1, kernel_size=1)
+        self.final_conv = torch.nn.Conv2d(layers[0], 2, kernel_size=1)
         self.network_chain = torch.nn.Sequential(*self.down_blocks, *self.up_convs, *self.up_blocks)
 
     def forward(self, x):
