@@ -1,10 +1,10 @@
 import os
 from .detector import Detector, save_model, CNNClassifier
 import torch
+from torchvision import transforms
 import torch.utils.tensorboard as tb
 import numpy as np
 from .utils import load_data
-from . import dense_transforms
 
 
 def cnntrain(args):
@@ -28,12 +28,12 @@ def cnntrain(args):
     optimizer = torch.optim.Adam(model.parameters(), lr=1e-4, weight_decay=1e-4)
 
     # load the data: train and valid
-    train_transform = dense_transforms.Compose(
+    train_transform = transforms.Compose(
         [
-            dense_transforms.ColorJitter(
+            transforms.ColorJitter(
                 brightness=0.5, contrast=0.5, saturation=0.5, hue=0.25
             ),
-            dense_transforms.RandomHorizontalFlip(),
+            transforms.RandomHorizontalFlip()
             #dense_transforms.ToTensor(),
             #dense_transforms.ToHeatmap(),
         ]
@@ -49,7 +49,7 @@ def cnntrain(args):
         i = 0
         for batch in train_data:
             images = batch[0].to(device)
-            labels = batch[3].to(device)
+            labels = batch[2].to(device)
             model_output = model.forward(images)
             train_error = loss.forward(model_output, labels)
             train_logger.add_scalar("loss", train_error, global_step=global_step)
