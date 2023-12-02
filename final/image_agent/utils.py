@@ -23,6 +23,7 @@ class SuperTuxDataset(Dataset):
             scaled_label = np.floor(np.array([(label[0] + 1) * 128 / 2, (label[1] + 1) * 96 / 2])).astype(int)
             formatted_label = np.concatenate([scaled_label, scaled_label]).reshape(1, -1)
             self.data.append((img, formatted_label))
+        print(f"Collected {len(self.data)} data points")
         self.transform = transform
 
     def __len__(self):
