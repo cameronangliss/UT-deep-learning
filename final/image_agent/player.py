@@ -31,6 +31,7 @@ class Team:
         self.prev_puck_y = [0,0]
         self.act_count = 0
         self.det_vel_cutoff = 0.5
+        self.last_loc = []
 
     def new_match(self, team: int, num_players: int) -> list:
         """
@@ -90,7 +91,10 @@ class Team:
         for i in range(self.num_players):
             # calculating various values
             
+            
+            
             x, _, y = soccer_state['ball']['location'] - player_state[i]["kart"]["location"]
+            print("here1")
             loc = np.array(player_state[i]["kart"]["location"])[[0,2]]
             #img = torch.tensor(np.transpose(player_image[i], [2, 0, 1]), dtype=torch.float).to(self.device)
             #puck_coords = self.model.detect(img)
@@ -101,15 +105,23 @@ class Team:
             #     puck_y = float(puck_coords[1].item())
             dir_vec = np.array(player_state[i]["kart"]["front"]) - np.array(player_state[i]["kart"]["location"])
             dir = dir_vec[[0,2]]
+            print("here1")
+            cur_loc = loc
+            game_restart = False
+            if np.linalg.norm(cur_loc- self.last_loc) > 0.3:
+                game_restart = True
             #pcuk movement
             ball_dir = [x,y]
+            print("here1")
             ball_vec = ball_dir - loc
             turn = m.atan2(ball_vec) - m.atan2(dir)
+            print("here1")
             if turn < -1*m.pi or 0 < turn <= m.pi:
                 steer = 1
             else :
                 steer = -1
-            
+
+            print("here1")            
             # puck_dir = [0,0]
             # puck_vel = 0
             # if self.prev_puck_x is not None:
@@ -147,11 +159,13 @@ class Team:
             drift = False
             nitro = False
             fire = False
+            print("here1")
             
             dir = dir_vec[[0,2]]
             #pcuk movement
             ball_dir = [x,y]
             ball_vec = ball_dir - loc
+            print("here1")
             turn = m.atan2(ball_vec) - m.atan2(dir)
             if turn < -1*m.pi or 0 < turn <= m.pi:
                 steer = 1
@@ -238,6 +252,7 @@ class Team:
                 steer=steer
             )
             action_dicts += [action]
+            self.last_loc = cur_loc
             self.act_count += 1
             # self.prev_puck_x[i] = puck_x
             # self.prev_puck_y[i] = puck_y
