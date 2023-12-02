@@ -96,9 +96,9 @@ class Team:
                 puck_x = float(puck_coords[0].item())
                 puck_y = float(puck_coords[1].item())
             dir_vec = np.array(player_state[i]["kart"]["front"]) - np.array(player_state[i]["kart"]["location"])
-            loc_change = ((player_state[i]["kart"]["location"][0] - self.last_loc[i][0])**2 + (player_state[i]["kart"]["location"][2] - self.last_loc[i][1])**2)**0.5
-            if loc_change > 10:
-                self.frame = 1
+            # loc_change = ((player_state[i]["kart"]["location"][0] - self.last_loc[i][0])**2 + (player_state[i]["kart"]["location"][2] - self.last_loc[i][1])**2)**0.5
+            # if loc_change > 10:
+            #     self.frame = 1
 
             # setting values for normal behavior (may be changed by later code for edge cases)
             if np.linalg.norm(player_state[i]["kart"]["velocity"]) < 10:
