@@ -105,11 +105,19 @@ class Team:
                     puck_x, puck_y = None, None 
             
             loc = np.array(player_state[i]["kart"]["location"])[0,2]
+            front= np.array(player_state[i]["kart"]["front"])[0,2]
             #2 coord direction
             direction = dir_vec[[0,2]]
             
-            our_goal_dir = ([0,65] - loc)/np.linalg.norm([0,65] - loc)
+            our_goal_dir = ([0,65] - loc)
+            our_goal_dist = our_goal_dir/np.linalg.norm(our_goal_dir)
             opp_goal_dir = ([0,-65] - loc)/np.linalg.norm([0,-65] - loc)
+            opp_goal_dist = opp_goal_dir/np.linalg.norm(opp_goal_dir)
+            
+            #angle between two vectors
+            opp_goal_angle = np.arccos(np.dot(dir, opp_goal_dir)/(np.linalg.norm(opp_goal_dir)*np.linalg.norm(dir)))
+            
+            
             # setting values for normal behavior (may be changed by later code for edge cases)
             if np.linalg.norm(player_state[i]["kart"]["velocity"]) < 10:
                 acceleration = 0.5
