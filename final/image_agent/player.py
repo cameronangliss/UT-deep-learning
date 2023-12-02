@@ -26,8 +26,8 @@ class Team:
         self.getting_off_of_wall = [False, False]
         # counter to help with getting unstuck
         self.unstucking_frames = [0, 0]
-        self.prev_puck_x = 0
-        self.prev_puck_y = 0
+        self.prev_puck_x = [0,0]
+        self.prev_puck_y = [0,0]
         self.act_count = 0
         self.det_vel_cutoff = 0.5
 
@@ -98,14 +98,18 @@ class Team:
             puck_dir = [0,0]
             puck_vel = 0
             if self.prev_puck_x is not None:
-                puck_dir = [puck_x - self.prev_puck_x, puck_y - self.prev_puck_y]
+                puck_dir = [puck_x - self.prev_puck_x[i], puck_y - self.prev_puck_y[i]]
                 puck_vel = np.linalg.norm(puck_dir)
             #puck moving too quickly for an actual detection
                 if (puck_vel > self.det_vel_cutoff):
                     puck_x, puck_y = None, None 
+            
+            loc = np.array(player_state[i]["kart"]["location"])[0,2]
             #2 coord direction
             direction = dir_vec[[0,2]]
             
+            our_goal_dir = ([0,65] - loc)/np.linalg.norm([0,65] - loc)
+            opp_goal_dir = ([0,-65] - loc)/np.linalg.norm([0,-65] - loc)
             # setting values for normal behavior (may be changed by later code for edge cases)
             if np.linalg.norm(player_state[i]["kart"]["velocity"]) < 10:
                 acceleration = 0.5
@@ -141,7 +145,7 @@ class Team:
             #if previous dir known go after that
             elif self.prev_puck_x is not None:
                 acceleration = 1
-                steer = self.prev_puck_x
+                steer = self.prev_puck_x[i]
 
             # get out of goalpost if stuck in it
             elif in_goalpost or self.getting_out_of_goalpost[i]:
@@ -194,6 +198,6 @@ class Team:
             )
             action_dicts += [action]
             self.act_count += 1
-            self.prev_puck_x = puck_x
-            self.prev_puck_y = puck_y
+            self.prev_puck_x[i] = puck_x
+            self.prev_puck_y[i] = puck_y
         return action_dicts
