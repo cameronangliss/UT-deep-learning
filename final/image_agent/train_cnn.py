@@ -1,14 +1,13 @@
 import os
 from .detector import Detector, save_model, CNNClassifier
 import torch
+from torchvision import transforms
 import torch.utils.tensorboard as tb
 import numpy as np
 from .utils import load_data
-from . import dense_transforms
-import matplotlib.pyplot as plt
 
 
-def train(args):
+def cnntrain(args):
     from os import path
     train_logger, valid_logger = None, None
     if args.log_dir is not None:
@@ -20,23 +19,23 @@ def train(args):
     if torch.backends.mps.is_available():
         print("swapped to mps")
         device = torch.device("mps")
-    model = Detector().to(device)
-    if os.path.exists("image_agent/det.th"):
+    model = CNNClassifier().to(device)
+    if os.path.exists("image_agent/cnndet.th"):
         print("Loading saved model...")
-        model.load_state_dict(torch.load("image_agent/det.th", map_location="cpu"))
+        model.load_state_dict(torch.load("image_agent/cnndet.th"))
         print("Done!")
     loss = torch.nn.BCEWithLogitsLoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=1e-4, weight_decay=1e-4)
 
     # load the data: train and valid
-    train_transform = dense_transforms.Compose(
+    train_transform = transforms.Compose(
         [
-            dense_transforms.ColorJitter(
+            transforms.ColorJitter(
                 brightness=0.5, contrast=0.5, saturation=0.5, hue=0.25
             ),
-            dense_transforms.RandomHorizontalFlip(),
-            dense_transforms.ToTensor(),
-            dense_transforms.ToHeatmap(),
+            transforms.RandomHorizontalFlip(),
+            transforms.ToTensor(),
+            #dense_transforms.ToHeatmap(),
         ]
     )
     train_data = load_data("drive_data", transform=train_transform)
@@ -50,9 +49,10 @@ def train(args):
         i = 0
         for batch in train_data:
             images = batch[0].to(device)
-            heatmaps = batch[1][:, 0, :, :].to(device)
+            #print(batch[2])
+            labels = batch[2].to(device)
             model_output = model.forward(images)
-            train_error = loss.forward(model_output, heatmaps)
+            train_error = loss.forward(model_output, labels)
             train_logger.add_scalar("loss", train_error, global_step=global_step)
             optimizer.zero_grad()
             train_error.backward()
@@ -60,8 +60,6 @@ def train(args):
             global_step += 1
             i += 1
             avg_error += (1 / i) * (train_error.item() - avg_error)
-        # plt.imsave("image.png", images[0, 0, :, :].cpu(), cmap="gray")
-        # plt.imsave("label.png", heatmaps[0].cpu(), cmap="gray")
         print(f"Epoch {epoch + 1} training error:", avg_error)
 
     save_model(model)
@@ -94,4 +92,4 @@ if __name__ == '__main__':
     parser.add_argument('-n', '--n_epochs', default=10, type=int)
 
     args = parser.parse_args()
-    train(args)
+    cnntrain(args)
