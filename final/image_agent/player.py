@@ -112,6 +112,8 @@ class Team:
             if np.linalg.norm(cur_loc- self.last_loc) > 0.3:
                 game_restart = True
             #pcuk movement
+            print(x)
+            print(y)
             ball_dir = [x,y]
             print("here1")
             ball_vec = ball_dir - loc
