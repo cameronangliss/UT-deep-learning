@@ -102,7 +102,10 @@ class Team:
 
             # setting values for normal behavior (may be changed by later code for edge cases)
             if np.linalg.norm(player_state[i]["kart"]["velocity"]) < 10:
-                acceleration = 0.5
+                    acceleration = 0.5
+            elif np.linalg.norm(player_state[i]["kart"]["velocity"]) > 15:
+                acceleration = 0
+                brake = True
             else:
                 acceleration = 0
             brake = False
@@ -141,9 +144,8 @@ class Team:
                     brake = True
                     steer = 0
                     self.unstucking_frames[i] += 1
-                # accelerate and turn as hard as you can
+                # turn as hard as you can
                 elif self.unstucking_frames[i] < 60:
-                    acceleration = 0.5
                     steer = 1
                     self.unstucking_frames[i] += 1
                 else:
@@ -160,9 +162,8 @@ class Team:
                     brake = True
                     steer = 0
                     self.unstucking_frames[i] += 1
-                # accelerate and turn as hard as you can
+                # turn as hard as you can
                 elif self.unstucking_frames[i] < 40:
-                    acceleration = 0.5
                     steer = 1
                     self.unstucking_frames[i] += 1
                 else:
@@ -176,13 +177,6 @@ class Team:
 
             # Find the puck quickly
             else:
-                if np.linalg.norm(player_state[i]["kart"]["velocity"]) < 10:
-                    acceleration = 0.5
-                elif np.linalg.norm(player_state[i]["kart"]["velocity"]) > 15:
-                    acceleration = 0
-                    brake = True
-                else:
-                    acceleration = 0
                 steer = 1
 
             action = dict(
