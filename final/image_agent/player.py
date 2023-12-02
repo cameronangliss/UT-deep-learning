@@ -97,8 +97,10 @@ class Team:
             puck_coords = self.detector.detect(img)
             puck_x = float(puck_coords[0].item())
             puck_y = float(puck_coords[1].item())
-            seeing_puck = bool(round(float(self.classifier.forward(img[None])[0].item())))
-            # print(seeing_puck)
+            class_output = float(self.classifier.forward(img[None])[0].item())
+            print(class_output)
+            seeing_puck = bool(round(class_output))
+            print(seeing_puck)
             dir_vec = np.array(player_state[i]["kart"]["front"]) - np.array(player_state[i]["kart"]["location"])
             loc_change = ((player_state[i]["kart"]["location"][0] - self.last_loc[i][0])**2 + (player_state[i]["kart"]["location"][2] - self.last_loc[i][1])**2)**0.5
             if loc_change > 10:
