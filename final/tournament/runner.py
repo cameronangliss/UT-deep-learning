@@ -267,13 +267,17 @@ class Match:
                 Image.fromarray(player_2_image).save("drive_data/KartTraining_2_" + str(it) + '.png')
                 Image.fromarray(player_3_image).save("drive_data/KartTraining_3_" + str(it) + '.png')
                 with open("drive_data/KartTraining_0_" + str(it) + '.csv', 'w') as f:
-                    f.write('%0.1f,%0.1f' % tuple(puckScreenLocationPlayer0))
+                    #f.write('%0.1f,%0.1f,%s' % tuple(puckScreenLocationPlayer0))
+                    f.write(f'{puckScreenLocationPlayer0[0]:0.1f},{puckScreenLocationPlayer0[1]:0.1f},{abs(puckScreenLocationPlayer0[0])!=1}')
                 with open("drive_data/KartTraining_1_" + str(it) + '.csv', 'w') as f:
-                    f.write('%0.1f,%0.1f' % tuple(puckScreenLocationPlayer1))
+                    #f.write('%0.1f,%0.1f' % tuple(puckScreenLocationPlayer1))
+                    f.write(f'{puckScreenLocationPlayer1[0]:0.1f},{puckScreenLocationPlayer1[1]:0.1f},{abs(puckScreenLocationPlayer1[0])!=1}')
                 with open("drive_data/KartTraining_2_" + str(it) + '.csv', 'w') as f:
-                    f.write('%0.1f,%0.1f' % tuple(puckScreenLocationPlayer2))
+                    #f.write('%0.1f,%0.1f' % tuple(puckScreenLocationPlayer2))
+                    f.write(f'{puckScreenLocationPlayer2[0]:0.1f},{puckScreenLocationPlayer2[1]:0.1f},{abs(puckScreenLocationPlayer2[0])!=1}')
                 with open("drive_data/KartTraining_3_" + str(it) + '.csv', 'w') as f:
-                    f.write('%0.1f,%0.1f' % tuple(puckScreenLocationPlayer3))
+                    #f.write('%0.1f,%0.1f' % tuple(puckScreenLocationPlayer3))
+                    f.write(f'{puckScreenLocationPlayer3[0]:0.1f},{puckScreenLocationPlayer3[1]:0.1f},{abs(puckScreenLocationPlayer3[0])!=1}')
 
             # Have each team produce actions (in parallel)
             if t1_can_act:
