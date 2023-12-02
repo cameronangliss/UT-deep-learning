@@ -57,7 +57,7 @@ def train(args):
             hm_outputs = model_output[:,:1]
             bool_outputs = model_output[:,1:]
             hm_loss = coord_loss.forward(hm_outputs, heatmaps)
-            bool_loss = bools_loss.forward(bool_outputs, heatmaps)
+            bool_loss = bools_loss.forward(bool_outputs, bools)
             #train_logger.add_scalar("loss", train_error, global_step=global_step)
             optimizer.zero_grad()
             train_error  = 0.5*hm_loss + 0.5*bool_loss
