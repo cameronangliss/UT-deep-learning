@@ -161,7 +161,8 @@ class Team:
                     self.unstucking_frames[i] = 0
             
             drift = False
-            fire = False        
+            fire = False
+            nitro = False      
             #immediate behavior        
             if (self.act_count < 200):
                 nitro = True
