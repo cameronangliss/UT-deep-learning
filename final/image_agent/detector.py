@@ -134,7 +134,7 @@ class CNNClassifier(torch.nn.Module):
     def forward(self, x):
         x = self.network(x)
         x = x.mean(dim=[2, 3])
-        return self.classifier(x)[:0]
+        return self.classifier(x)
 
 
 model_factory = {
