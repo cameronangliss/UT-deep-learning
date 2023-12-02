@@ -110,7 +110,7 @@ class CNNClassifier(torch.nn.Module):
         """
       
         
-        layers=[16, 32, 64]
+        layers=[16, 32, 64, 128]
         n_input_channels=3
         n_output_channels=1
         stride=2
