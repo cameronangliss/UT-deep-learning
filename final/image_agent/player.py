@@ -24,7 +24,8 @@ class Team:
         # bools to track unstucking behavior
         self.getting_out_of_goalpost = [False, False]
         self.getting_off_of_wall = [False, False]
-        # counter to help with getting unstuck
+        # frame counters
+        self.frame = 0
         self.unstucking_frames = [0, 0]
 
     def new_match(self, team: int, num_players: int) -> list:
@@ -80,15 +81,15 @@ class Team:
         """
 
         action_dicts = []
+        self.frame += 1
         for i in range(self.num_players):
+            # print(f"PLAYER {i}")
+
             # calculating various values
             img = torch.tensor(np.transpose(player_image[i], [2, 0, 1]), dtype=torch.float).to(self.device)
-            puck_coords = self.model.detect(img)
-            if puck_coords is None:
-                puck_x, puck_y = None, None
-            else:
-                puck_x = float(puck_coords[0].item())
-                puck_y = float(puck_coords[1].item())
+            puck_coords, seeing_puck = self.model.detect(img)
+            puck_x = float(puck_coords[0].item())
+            puck_y = float(puck_coords[1].item())
             dir_vec = np.array(player_state[i]["kart"]["front"]) - np.array(player_state[i]["kart"]["location"])
 
             # setting values for normal behavior (may be changed by later code for edge cases)
@@ -98,6 +99,7 @@ class Team:
                 acceleration = 0
             brake = False
             steer = 0
+            nitro = self.frame <= 20
 
             # print(f"position of {i}:", player_state[i]["kart"]["location"])
             # print(f"direction of {i}:", dir_vec)
@@ -116,13 +118,8 @@ class Team:
             )
             # print(f"Player {i}:", in_goalpost, stuck_against_x_dir_wall, stuck_against_y_dir_wall)
 
-            # GO AFTER THAT PUCK!!
-            if puck_x is not None:
-                acceleration = 1
-                steer = puck_x
-
             # get out of goalpost if stuck in it
-            elif in_goalpost or self.getting_out_of_goalpost[i]:
+            if in_goalpost or self.getting_out_of_goalpost[i]:
                 # print(f"Player {i} escaping goalpost")
                 self.getting_out_of_goalpost[i] = True
                 # back up in straight line
@@ -159,12 +156,22 @@ class Team:
                     self.getting_off_of_wall[i] = False
                     self.unstucking_frames[i] = 0
 
+            # GO AFTER THAT PUCK!!
+            elif seeing_puck:
+                acceleration = 1
+                steer = puck_x
+
+            # Find the puck quickly
+            else:
+                acceleration = 0.1
+                steer = 1
+
             action = dict(
                 acceleration=acceleration,
                 brake=brake,
                 drift=abs(steer) > 0.7,
                 fire=False,
-                nitro=False,
+                nitro=nitro,
                 rescue=False,
                 steer=steer
             )

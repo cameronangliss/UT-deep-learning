@@ -5,6 +5,7 @@ import torch.utils.tensorboard as tb
 import numpy as np
 from .utils import load_data
 from . import dense_transforms
+import matplotlib.pyplot as plt
 
 
 def train(args):
@@ -20,9 +21,9 @@ def train(args):
         print("swapped to mps")
         device = torch.device("mps")
     model = Detector().to(device)
-    if os.path.exists("homework/det.th"):
+    if os.path.exists("image_agent/det.th"):
         print("Loading saved model...")
-        model.load_state_dict(torch.load("homework/det.th"))
+        model.load_state_dict(torch.load("image_agent/det.th"))
         print("Done!")
     loss = torch.nn.BCEWithLogitsLoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=1e-4, weight_decay=1e-4)
@@ -59,6 +60,8 @@ def train(args):
             global_step += 1
             i += 1
             avg_error += (1 / i) * (train_error.item() - avg_error)
+        # plt.imsave("image.png", images[0, 0, :, :].cpu(), cmap="gray")
+        # plt.imsave("label.png", heatmaps[0].cpu(), cmap="gray")
         print(f"Epoch {epoch + 1} training error:", avg_error)
 
     save_model(model)
