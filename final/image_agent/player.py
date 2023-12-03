@@ -1,7 +1,7 @@
 import os
 import numpy as np
 import torch
-from .detector import Detector, CNNClassifier
+from .detector import Detector
 
 
 class Team:
@@ -13,27 +13,20 @@ class Team:
           We will call this function with default arguments only
         """
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        self.detector = Detector().to(self.device)
+        self.model = Detector().to(self.device)
         if os.path.exists("image_agent/det.th"):
-            print("Loading detector model...")
-            self.detector.load_state_dict(torch.load("image_agent/det.th", map_location="cpu"))
-            print("Done!")
-        self.classifier = CNNClassifier().to(self.device)
-        if os.path.exists("image_agent/cnn.th"):
-            print("Loading classifier model...")
-            self.classifier.load_state_dict(torch.load("image_agent/cnn.th", map_location="cpu"))
+            print("Loading saved model...")
+            self.model.load_state_dict(torch.load("image_agent/det.th"))
             print("Done!")
         self.team = None
         self.num_players = None
 
-        # state memory
-        self.last_loc = [[0, 0], [0, 0]]
         # bools to track unstucking behavior
         self.getting_out_of_goalpost = [False, False]
         self.getting_off_of_wall = [False, False]
-        # frame counters
-        self.frame = 0
+        # counter to help with getting unstuck
         self.unstucking_frames = [0, 0]
+        self.act_count = 0
 
     def new_match(self, team: int, num_players: int) -> list:
         """
@@ -88,28 +81,20 @@ class Team:
         """
 
         action_dicts = []
-        self.frame += 1
         for i in range(self.num_players):
-            # print(f"PLAYER {i}")
-
             # calculating various values
             img = torch.tensor(np.transpose(player_image[i], [2, 0, 1]), dtype=torch.float).to(self.device)
-            puck_coords = self.detector.detect(img)
-            puck_x = float(puck_coords[0].item())
-            puck_y = float(puck_coords[1].item())
-            seeing_puck = bool(round(float(self.classifier.forward(img[None])[0].item())))
-            print(seeing_puck)
+            puck_coords = self.model.detect(img)
+            if puck_coords is None:
+                puck_x, puck_y = None, None
+            else:
+                puck_x = float(puck_coords[0].item())
+                puck_y = float(puck_coords[1].item())
             dir_vec = np.array(player_state[i]["kart"]["front"]) - np.array(player_state[i]["kart"]["location"])
-            loc_change = ((player_state[i]["kart"]["location"][0] - self.last_loc[i][0])**2 + (player_state[i]["kart"]["location"][2] - self.last_loc[i][1])**2)**0.5
-            if loc_change > 10:
-                self.frame = 1
 
             # setting values for normal behavior (may be changed by later code for edge cases)
-            if np.linalg.norm(player_state[i]["kart"]["velocity"]) < 7:
-                    acceleration = 0.5
-            elif np.linalg.norm(player_state[i]["kart"]["velocity"]) > 12:
-                acceleration = 0
-                brake = True
+            if np.linalg.norm(player_state[i]["kart"]["velocity"]) < 10:
+                acceleration = 0.5
             else:
                 acceleration = 0
             brake = False
@@ -132,22 +117,22 @@ class Team:
             )
             # print(f"Player {i}:", in_goalpost, stuck_against_x_dir_wall, stuck_against_y_dir_wall)
 
-            # rush the puck in the beginning of the game
-            if self.frame <= 60:
+            # GO AFTER THAT PUCK!!
+            if puck_x is not None:
                 acceleration = 1
-                steer = 0
+                steer = puck_x
 
             # get out of goalpost if stuck in it
             elif in_goalpost or self.getting_out_of_goalpost[i]:
                 # print(f"Player {i} escaping goalpost")
                 self.getting_out_of_goalpost[i] = True
                 # back up in straight line
-                if self.unstucking_frames[i] < 40:
+                if self.unstucking_frames[i] < 30:
                     acceleration = 0
                     brake = True
                     steer = 0
                     self.unstucking_frames[i] += 1
-                # turn as hard as you can
+                # accelerate and turn as hard as you can
                 elif self.unstucking_frames[i] < 60:
                     acceleration = 1
                     steer = 1
@@ -166,7 +151,7 @@ class Team:
                     brake = True
                     steer = 0
                     self.unstucking_frames[i] += 1
-                # turn as hard as you can
+                # accelerate and turn as hard as you can
                 elif self.unstucking_frames[i] < 40:
                     acceleration = 1
                     steer = 1
@@ -174,29 +159,45 @@ class Team:
                 else:
                     self.getting_off_of_wall[i] = False
                     self.unstucking_frames[i] = 0
-
-            # GO AFTER THAT PUCK!!
-            elif seeing_puck:
+            
+            drift = False
+            fire = False
+            nitro = False      
+            #immediate behavior        
+            if (self.act_count < 200):
+                nitro = True
                 acceleration = 1
-                steer = puck_x
-
-            # Find the puck quickly
-            else:
-                # we are facing away from the center of the arena
-                if np.dot(dir_vec, player_state[i]["kart"]["location"]) > 0:
+                fire = True
+                steer = 0
+                drift = False
+                    
+                if (self.act_count < 60):
+                    acceleration = 0
+                    
+                if (60 <= self.act_count <= 80):
                     steer = 1
+                    drift = True
+                    
+                if (10 <= self.act_count <= 100):
+                    steer = 1
+                    drift = True
+                    
+                    
+                    
+                if (120 < self.act_count <= 205):
+                    steer = -1
+                    #drift = True
+                
 
             action = dict(
                 acceleration=acceleration,
                 brake=brake,
-                drift=abs(steer) > 0.7,
-                fire=False,
-                nitro=False,
+                drift=drift,
+                fire=fire,
+                nitro=nitro,
                 rescue=False,
                 steer=steer
             )
             action_dicts += [action]
-
-            self.last_loc[i][0] = player_state[i]["kart"]["location"][0]
-            self.last_loc[i][1] = player_state[i]["kart"]["location"][2]
+            self.act_count += 1
         return action_dicts
