@@ -1,5 +1,5 @@
 import os
-from .detector import Detector, save_model 
+from .detector import Detector, save_model, CNNClassifier
 import torch
 import torch.utils.tensorboard as tb
 import numpy as np
@@ -23,7 +23,7 @@ def train(args):
     model = Detector().to(device)
     if os.path.exists("image_agent/det.th"):
         print("Loading saved model...")
-        model.load_state_dict(torch.load("image_agent/det.th"))
+        model.load_state_dict(torch.load("image_agent/det.th", map_location="cpu"))
         print("Done!")
     coord_loss = torch.nn.BCEWithLogitsLoss()
     bools_loss = torch.nn.BCEWithLogitsLoss()

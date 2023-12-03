@@ -20,11 +20,11 @@ class SuperTuxDataset(Dataset):
             img = Image.open(f.replace('.csv', '.png'))
             img.load()
             csv_data = np.loadtxt(f, dtype=np.float32, delimiter=',')
-            point_label = csv_data[:2]
-            bool_label = csv_data[2]
-            scaled_label = np.floor(np.array([(point_label[0] + 1) * 128 / 2, (point_label[1] + 1) * 96 / 2])).astype(int)
+            pos_data = csv_data[:2]
+            bool_data = csv_data[2]
+            scaled_label = np.floor(np.array([(pos_data[0] + 1) * 128 / 2, (pos_data[1] + 1) * 96 / 2])).astype(int)
             formatted_label = np.concatenate([scaled_label, scaled_label]).reshape(1, -1)
-            self.data.append((img, formatted_label, bool_label))
+            self.data.append((img, formatted_label, bool_data))
         self.transform = transform
 
     def __len__(self):
@@ -32,8 +32,8 @@ class SuperTuxDataset(Dataset):
 
     def __getitem__(self, idx):
         data = self.data[idx]
-        trans_data = self.transform(data[0], data[1])
-        return trans_data + [data[2]]
+        trans_data = self.transform(data[0])
+        return [trans_data, data[1], data[2]]
 
 
 def load_data(dataset_path=DATASET_PATH, transform=dense_transforms.ToTensor(), num_workers=0, batch_size=32):

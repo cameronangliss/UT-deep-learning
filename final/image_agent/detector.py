@@ -58,7 +58,7 @@ class Detector(torch.nn.Module):
         rev_layers = list(reversed(layers))
         for i in range(len(layers) - 1):
             self.up_blocks.append(self.Block(rev_layers[i] + rev_layers[i + 1], rev_layers[i + 1]))
-        self.final_conv = torch.nn.Conv2d(layers[0], 2, kernel_size=1)
+        self.final_conv = torch.nn.Conv2d(layers[0], 1, kernel_size=1)
         self.network_chain = torch.nn.Sequential(*self.down_blocks, *self.up_convs, *self.up_blocks)
 
     def forward(self, x):
@@ -95,14 +95,57 @@ class Detector(torch.nn.Module):
 
     def detect(self, x):
         x = self.forward(x[None])
-        return spatial_argmax(x)[0]
+        detections = spatial_argmax(x)
+        return detections[0]
+        
+        
+        
+class CNNClassifier(torch.nn.Module):
+    class Block(torch.nn.Module):
+        def __init__(self, n_input, n_output, stride=1):
+            super().__init__()
+            self.layers = torch.nn.Sequential(
+                torch.nn.Conv2d(n_input, n_output, kernel_size=3, padding=1, stride=stride),
+                torch.nn.BatchNorm2d(n_output),
+                torch.nn.ReLU(),
+            )
+            self.downsample = torch.nn.Sequential(
+                torch.nn.Conv2d(n_input, n_output, kernel_size=1, stride=stride),
+                torch.nn.BatchNorm2d(n_output)
+            )
 
+        def forward(self, x):
+            return self.layers(x) + self.downsample(x)
+
+    def __init__(self, layers=[16, 32, 64], n_input_channels=3):
+        super().__init__()
+        c = layers[0]
+        L = [
+            torch.nn.Conv2d(n_input_channels, c, kernel_size=7, padding=3),
+            torch.nn.ReLU(),
+            torch.nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
+        ]
+        for l in layers:
+            L.append(self.Block(c, l, stride=2))
+            c=l
+        self.network = torch.nn.Sequential(*L)
+        self.classifier = torch.nn.Linear(c, 1)
+
+    def forward(self, x):
+        x = self.network(x)
+        x = x.mean(dim=[2, 3])
+        return self.classifier(x)
+
+model_factory = {
+    'cnn': CNNClassifier
+}
 
 def save_model(model):
     from torch import save
     from os import path
-    if isinstance(model, Detector):
-        return save(model.state_dict(), path.join(path.dirname(path.abspath(__file__)), 'det.th'))
+    for n, m in model_factory.items():
+        if isinstance(model, m):
+            return save(model.state_dict(), path.join(path.dirname(path.abspath(__file__)), '%s.th' % n))
     raise ValueError("model type '%s' not supported!" % str(type(model)))
 
 
