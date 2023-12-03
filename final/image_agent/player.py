@@ -97,17 +97,18 @@ class Team:
             puck_coords = self.detector.detect(img)
             puck_x = float(puck_coords[0].item())
             puck_y = float(puck_coords[1].item())
-            seeing_puck = bool(round(float(self.classifier.forward(img[None])[0].item())))
-            # print(seeing_puck)
+            classify_output = float(self.classifier.forward(img[None])[0].item())
+            seeing_puck = classify_output > 0.5
+            # print(round(classify_output, 2) , "->", seeing_puck)
             dir_vec = np.array(player_state[i]["kart"]["front"]) - np.array(player_state[i]["kart"]["location"])
             loc_change = ((player_state[i]["kart"]["location"][0] - self.last_loc[i][0])**2 + (player_state[i]["kart"]["location"][2] - self.last_loc[i][1])**2)**0.5
             if loc_change > 10:
                 self.frame = 1
 
             # setting values for normal behavior (may be changed by later code for edge cases)
-            if np.linalg.norm(player_state[i]["kart"]["velocity"]) < 7:
+            if np.linalg.norm(player_state[i]["kart"]["velocity"]) < 15:
                     acceleration = 0.5
-            elif np.linalg.norm(player_state[i]["kart"]["velocity"]) > 12:
+            elif np.linalg.norm(player_state[i]["kart"]["velocity"]) > 20:
                 acceleration = 0
                 brake = True
             else:
@@ -133,7 +134,7 @@ class Team:
             # print(f"Player {i}:", in_goalpost, stuck_against_x_dir_wall, stuck_against_y_dir_wall)
 
             # rush the puck in the beginning of the game
-            if self.frame <= 60:
+            if self.frame <= 50:
                 acceleration = 1
                 steer = 0
 
@@ -183,7 +184,7 @@ class Team:
             # Find the puck quickly
             else:
                 # we are facing away from the center of the arena
-                if np.dot(dir_vec, player_state[i]["kart"]["location"]) > 0:
+                if np.dot(dir_vec, player_state[i]["kart"]["location"]) / (np.linalg.norm(dir_vec) * np.linalg.norm(player_state[i]["kart"]["location"])) > [0.05, -2][i]:
                     steer = 1
 
             action = dict(
