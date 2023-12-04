@@ -171,22 +171,9 @@ class Team:
                 steer = 0
                 drift = False
                     
-                if (self.act_count < 60):
+                if (55<= self.act_count <= 56):
                     acceleration = 0
-                    
-                if (60 <= self.act_count <= 80):
-                    steer = 1
-                    drift = True
-                    
-                if (10 <= self.act_count <= 100):
-                    steer = 1
-                    drift = True
-                    
-                    
-                    
-                if (120 < self.act_count <= 205):
-                    steer = -1
-                    #drift = True
+                    brake = True
                 
 
             action = dict(
